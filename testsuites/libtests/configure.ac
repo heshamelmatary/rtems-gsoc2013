@@ -84,6 +84,8 @@ malloc02/Makefile
 malloc03/Makefile
 malloc04/Makefile
 malloc05/Makefile
+mmtest1/Makefile
+mmtest2/Makefile
 monitor/Makefile
 monitor02/Makefile
 mouse01/Makefile

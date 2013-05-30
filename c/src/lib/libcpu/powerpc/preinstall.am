@@ -156,6 +156,14 @@ $(PROJECT_INCLUDE)/libcpu/pte121.h: mpc6xx/mmu/pte121.h $(PROJECT_INCLUDE)/libcp
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/pte121.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/pte121.h
 
+$(PROJECT_INCLUDE)/libcpu/mmu_support.h: mpc6xx/mmu/mmu_support.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/mmu_support.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/mmu_support.h
+
+$(PROJECT_INCLUDE)/libcpu/mm.h: ../shared/include/mm.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/mm.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/mm.h
+
 $(PROJECT_INCLUDE)/libcpu/c_clock.h: mpc6xx/clock/c_clock.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/c_clock.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/c_clock.h

@@ -1,11 +1,14 @@
 /*
  *  ARM920 MMU functions
- *
+ *  Copyright (c) 2013 Gedare Bloom.
+ *  Copyright (c) 2013 Hesham AL-Matary.
  *  Copyright (c) 2004 by Cogent Computer Systems
  *  Written by Jay Monkman <jtm@lopingdog.com>
  */
 #include <libcpu/mmu.h>
 #include <libcpu/arm-cp15.h>
+
+#include <libcpu/mm.h>
 
 typedef uint32_t mmu_lvl1_t;
 
@@ -14,17 +17,29 @@ extern uint32_t _ttbl_base;
 static void mmu_set_map_inval(mmu_lvl1_t *base);
 
 #define MMU_CTRL_MMU_EN             (1 << 0)
+#define MMU_CTRL_MMU_DES            (0 << 0)
 #define MMU_CTRL_ALIGN_FAULT_EN     (1 << 1)
 #define MMU_CTRL_D_CACHE_EN         (1 << 2)
+#define MMU_CTRL_D_CACHE_DES        (0 << 2)
 #define MMU_CTRL_DEFAULT            (0xf << 3)
 #define MMU_CTRL_LITTLE_ENDIAN      (0 << 7)
 #define MMU_CTRL_BIG_ENDIAN         (1 << 7)
 #define MMU_CTRL_SYS_PROT           (1 << 8)
 #define MMU_CTRL_ROM_PROT           (1 << 9)
 #define MMU_CTRL_I_CACHE_EN         (1 << 12)
+#define MMU_CTRL_I_CACHE_DES        (0 << 12)
 #define MMU_CTRL_LOW_VECT           (0 << 13)
 #define MMU_CTRL_HIGH_VECT          (1 << 13)
 
+#define ARM_MMU_AP_NOPR             0x03
+#define ARM_MMU_AP_USER_READ_ONLY   0x02
+#define ARM_MMU_AP_USER_NO_ACCESS   0x01
+#define ARM_MMU_AP_NO_ACCESS        0x00
+
+#define ARM_MMU_cb 0x0 //cache and buffer disabled
+#define ARM_MMU_cB 0x1 // cache disable and buffer enabled
+#define ARM_MMU_WT 0x2 // Write through
+#define ARM_MMU_WB 0x3 // Write Back
 
 #define MMU_SET_LVL1_SECT(addr, ap, dom, ce, be) \
           (((addr) & 0xfff00000) |     \
@@ -37,6 +52,69 @@ static void mmu_set_map_inval(mmu_lvl1_t *base);
 #define MMU_SET_LVL1_INVAL (0x0)
 
 #define MMU_SECT_AP_ALL (0x3 << 10)
+
+static void translate_attributes(uint32_t high_level_attr, uint32_t *ARM_CPU_ATTR)
+{
+   //TODO: Checking for invalid flags combinations.
+   /* Clear flags attributes */
+   *ARM_CPU_ATTR = 0;
+  //
+  /* Read access */
+  if ( high_level_attr & 0x1 ) 
+  *ARM_CPU_ATTR |= ARM_MMU_AP_USER_READ_ONLY;
+
+  /* Write access */
+  if ( high_level_attr & 0x2 )
+  *ARM_CPU_ATTR |= ARM_MMU_AP_NOPR;
+
+  /* Execute access */
+  if ( high_level_attr & 0x4 )
+  *ARM_CPU_ATTR |= ARM_MMU_AP_NOPR;
+}
+
+/* Re-enable MMU (after updating PTs)
+ * include two steps:
+ * 1- flushing caches and TLB (to ignore old caches page tables).
+ * 2- turn on MMU and caching unit after editing page tables.
+ */
+static void enable_mmu( void )
+{
+  /* flush the cache and TLB */
+  arm_cp15_cache_invalidate();
+  arm_cp15_tlb_invalidate();
+
+  /*  I & D caches turned on */
+  arm_cp15_set_control(
+      MMU_CTRL_DEFAULT |
+      MMU_CTRL_D_CACHE_EN |
+      MMU_CTRL_I_CACHE_EN |
+      MMU_CTRL_ALIGN_FAULT_EN |
+      MMU_CTRL_LITTLE_ENDIAN |
+      MMU_CTRL_MMU_EN
+  );
+}
+
+/* Disable MMU (required before updating PTs)
+ * include two steps:
+ * 1- flushing caches and TLB (to ignore old caches page tables).
+ * 2- turn of MMU and caching unit before editing page tables.
+ */
+static void disable_mmu( void )
+{
+  /* flush the cache and TLB */
+  arm_cp15_cache_invalidate();
+  arm_cp15_tlb_invalidate();
+
+  /*  I & D caches turned off */
+  arm_cp15_set_control(
+      MMU_CTRL_DEFAULT |
+      MMU_CTRL_D_CACHE_DES |
+      MMU_CTRL_I_CACHE_DES |
+      MMU_CTRL_ALIGN_FAULT_EN |
+      MMU_CTRL_LITTLE_ENDIAN |
+      MMU_CTRL_MMU_DES
+  );
+}
 
 void mmu_init(mmu_sect_map_t *map)
 {
@@ -114,6 +192,242 @@ void mmu_init(mmu_sect_map_t *map)
                          MMU_CTRL_MMU_EN);
 
     return;
+}
+
+/* Changing Page table attributes to new attributes */
+void arm_Region_Change_Attr(
+    arm920_mm_mme *mme,
+    uint32_t AP,
+    uint32_t CB
+)
+{
+  uintptr_t      *lvl1_pt;
+  int             sectionsNumber; /* 1MB sections */
+  int             PTEIndex;
+  uintptr_t       paddr;
+  uintptr_t       paddr_base;
+
+  int i;
+  int c;
+  int b;
+
+  sectionsNumber = mme->pagesNumber;
+
+  lvl1_pt = &_ttbl_base;
+  PTEIndex = ((mme->vAddress & 0xfff00000U) >> 20U);
+  paddr = (mme->vAddress & 0xfff00000U);
+
+  disable_mmu();
+
+  switch (CB) {
+    case ARM_MMU_cb:
+      c = 0;
+      b = 0;
+      break;
+    case ARM_MMU_cB:
+      c = 0;
+      b = 1;
+      break;
+    case ARM_MMU_WT:
+      c = 1;
+      b = 0;
+      break;
+    case ARM_MMU_WB:
+      c = 1;
+      b = 1;
+      break;
+  }
+
+  /* Return AP/CB for this region to defaults */
+  for ( i = 0; i < sectionsNumber; i++) {
+    paddr_base = (i<<20U) + paddr;
+    lvl1_pt[PTEIndex++] = MMU_SET_LVL1_SECT(
+        paddr_base,
+        AP,
+        0,
+        c,
+        b
+    );
+  }
+
+  mme->ap = AP; /* Default when installing entry */
+  mme->cb = CB; /* Default */
+
+  enable_mmu();
+
+  return RTEMS_SUCCESSFUL;
+}
+
+/* Initialize first page table level with no protected entries */
+void _CPU_Memory_management_Initialize( void )
+{
+  uintptr_t *lvl1_base;
+  uintptr_t paddr;
+  int i;
+
+  /* flush the cache and TLB */
+  arm_cp15_cache_invalidate();
+  arm_cp15_tlb_invalidate();
+
+  /* set manage mode access for all domains */
+  arm_cp15_set_domain_access_control(0xffffffff);
+
+  lvl1_base = &_ttbl_base;
+
+  /* set up the trans table */
+  /*mmu_set_map_inval(lvl1_base);*/
+  arm_cp15_set_translation_table_base(lvl1_base);
+  //puts(" Before loopint \n" );
+  /* fill level 1 pagetable with no protection slots, Cache through attributes
+   * and 1:1 address mapping
+   */
+  for (i = 0; i < (0x4000 / 4); i++) {
+    paddr = i; /* i = 1MB page size */
+    lvl1_base[i] = MMU_SET_LVL1_SECT(
+        (paddr << 20U),
+        ARM_MMU_AP_NOPR,
+        0,
+        1,
+        0
+    );
+  }
+
+  enable_mmu();
+
+  return RTEMS_SUCCESSFUL;
+}
+
+/* Installing @mme allocates new arm920_mm_mme for it
+ * and set its value for then allocate a new lvl2 page table
+ * and activate it. */
+void _CPU_Memory_management_Install_entry(
+  Memory_management_Entry *mme,
+  uint32_t attr
+)
+{
+  arm920_mm_mme *arm_mme;
+  uint32_t arm_mmu_attr;
+  uintptr_t      *lvl1_pt;
+  int             sectionsNumber; /* 1MB sections */
+  size_t          size; /* per Byte */
+  int             PTEIndex;
+  uintptr_t        paddr;
+  uintptr_t        paddr_base;
+  
+  int             i;
+
+  lvl1_pt = &_ttbl_base;
+  PTEIndex = ((mme->base & 0xfff00000U) >> 20U);
+  paddr = mme->base & 0xfff00000U;
+  size = mme->size;
+
+  /* FIXME: OK to malloc here? */
+  arm_mme = (arm920_mm_mme *)malloc(sizeof(arm920_mm_mme));
+
+  if ( arm_mme == NULL )
+    return RTEMS_NO_MEMORY;
+
+  sectionsNumber = (size / MMU_SECT_SIZE);
+
+  disable_mmu();
+  
+  translate_attributes(attr, &arm_mmu_attr);
+  /* Set AP for this region to NO ACCESS */
+
+  for ( i = 0; i < sectionsNumber; i++ ) {
+    paddr_base = (i<<20U) + paddr;
+
+    lvl1_pt[PTEIndex++] = MMU_SET_LVL1_SECT(
+        paddr_base,
+        arm_mmu_attr,
+        0,
+        1,
+        0
+    );
+  }
+
+  arm_mme->vAddress = mme->base;
+  /* for level 1 page table ptAddress is the same as ptlvl1Address */
+  arm_mme->ptAddress = lvl1_pt;
+  arm_mme->ptlvl1Address = lvl1_pt;
+  arm_mme->pagesNumber = sectionsNumber;
+  //arm_mme->type = LVL1_PT; /* Default value now */
+  arm_mme->ap   = ARM_MMU_AP_NO_ACCESS; /* Default when installing entry */
+  arm_mme->cb   = ARM_MMU_WT; /* Default */
+  arm_mme->domain = 0;
+
+  /* install a pointer to high-level API to bsp_mm_mme */
+  mme->bsp_mme = arm_mme;
+
+  enable_mmu();
+
+  return RTEMS_SUCCESSFUL;
+}
+
+/* Uninstalling @mme from level1 page table and return
+ * access/cache attributes to its defaults. Note that bsp mme
+ * will still exist even after uninstalling mme.
+ */
+void _CPU_Memory_management_Uninstall_Entry(
+  Memory_management_Entry *mme
+)
+{
+  arm920_mm_mme *arm_mme;
+  uintptr_t      *lvl1_pt;
+  int             sectionsNumber; /* 1MB sections */
+  size_t          size; /* per Byte */
+  int             PTEIndex;
+  uintptr_t       paddr;
+  uintptr_t       paddr_base;
+  int             i;
+
+  arm_mme = (arm920_mm_mme *) mme->bsp_mme;
+
+  if ( arm_mme == NULL )
+    return RTEMS_UNSATISFIED;
+
+  sectionsNumber = arm_mme->pagesNumber;
+
+  lvl1_pt = &_ttbl_base;
+  PTEIndex = ((mme->base & 0xfff00000U) >> 20U);
+  paddr = mme->base & 0xfff00000U;
+
+  disable_mmu();
+
+  /* Return ap/CB for this region to defaults */
+  for ( i = 0; i < sectionsNumber; i++) {
+    paddr_base = (i<<20U) + paddr;
+
+    lvl1_pt[PTEIndex++] = MMU_SET_LVL1_SECT(
+        paddr_base,
+        ARM_MMU_AP_NO_ACCESS,
+        0,
+        1,
+        0
+    );
+  }
+
+  arm_mme->ap   = ARM_MMU_AP_NO_ACCESS; /* Default */
+  arm_mme->cb   = ARM_MMU_WT; /* Default */
+
+  free(arm_mme); /* FIXME */
+  enable_mmu();
+
+  return RTEMS_SUCCESSFUL;
+}
+
+void _CPU_Memory_management_Set_entry_attr(
+  Memory_management_Entry *mme,
+  uint32_t attr
+){
+  uint32_t arm_mmu_attr;
+  translate_attributes(attr, &arm_mmu_attr);
+  arm920_mm_mme *arm_mme = (arm920_mm_mme *)(mme->bsp_mme);
+  return arm_Region_Change_Attr(
+      arm_mme,
+      arm_mmu_attr,
+      ARM_MMU_WT
+  );
 }
 
 /* set all the level 1 entrys to be invalid descriptors */

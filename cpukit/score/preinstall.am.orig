@@ -103,10 +103,6 @@ $(PROJECT_INCLUDE)/rtems/score/isrlevel.h: include/rtems/score/isrlevel.h $(PROJ
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/isrlevel.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/isrlevel.h
 
-$(PROJECT_INCLUDE)/rtems/score/mm.h: include/rtems/score/mm.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
-	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/mm.h
-PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/mm.h
-
 $(PROJECT_INCLUDE)/rtems/score/object.h: include/rtems/score/object.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/object.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/object.h
@@ -298,10 +294,6 @@ PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/heap.inl
 $(PROJECT_INCLUDE)/rtems/score/isr.inl: inline/rtems/score/isr.inl $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/isr.inl
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/isr.inl
-
-$(PROJECT_INCLUDE)/rtems/score/mm.inl: inline/rtems/score/mm.inl $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
-	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/mm.inl
-PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/mm.inl
 
 $(PROJECT_INCLUDE)/rtems/score/object.inl: inline/rtems/score/object.inl $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/object.inl
