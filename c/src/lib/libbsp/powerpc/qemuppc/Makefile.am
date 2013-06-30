@@ -42,7 +42,9 @@ console_SOURCES = ../../shared/console-polled.c console/console-io.c
 # irq
 include_bsp_HEADERS = irq/irq.h \
     ../../shared/include/irq-generic.h \
-    ../../shared/include/irq-info.h
+    ../../shared/include/irq-info.h \
+    ../../../libcpu/powerpc/new-exceptions/bspsupport/irq_supp.h
+
 irq_SOURCES =
 irq_SOURCES += ../../shared/src/irq-default-handler.c
 irq_SOURCES += ../../shared/src/irq-generic.c

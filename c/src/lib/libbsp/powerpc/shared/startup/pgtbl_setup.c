@@ -67,7 +67,7 @@ BSP_pgtbl_setup(unsigned int *) __attribute__ (( weak, alias("__BSP_default_pgtb
 /* get those from the linker script.
  * NOTE THAT THE CORRECTNESS OF THE LINKER SCRIPT IS CRUCIAL
  */
-extern unsigned long __DATA_START__[], _etext[];
+extern unsigned long __DATA_START__[], _etext[], _textSize[];
 
 Triv121PgTbl
 __BSP_default_pgtbl_setup(unsigned int *pmemsize)
@@ -92,31 +92,51 @@ unsigned		ldPtSize,tmp;
    */
   if ( (pt = triv121PgTblInit(*pmemsize - (1<<ldPtSize), ldPtSize)) ) {
 	/* map text and RO data read-only */
+  /* .text section starts at address 0x0c000000 for psim */ 
 	tmp = triv121PgTblMap(
-						pt,
-						TRIV121_121_VSID,
-						0,
-						(PAGE_ALIGN((unsigned long)_etext) - 0) >> PG_SHIFT,
-						0, /* WIMG */
-						TRIV121_PP_RO_PAGE);
+	pt,
+	TRIV121_121_VSID,
+	0x0c000000,
+        // work-around
+//(PAGE_ALIGN((unsigned long)_etext) - 0x0c000000) >> PG_SHIFT,
+        4096,
+	0, /* WIMG */
+	TRIV121_PP_RO_PAGE);
+
 	if (TRIV121_MAP_SUCCESS != tmp) {
-		printk("Unable to map page index %i; reverting to BAT0\n",
-				tmp);
-		pt = 0;
+	printk("Unable to map page index %i; reverting to BAT0\n",
+	tmp);
+	pt = 0;
 	} else {
-		/* map the rest (without the page table itself) RW */
-		tmp = triv121PgTblMap(
-						pt,
-						TRIV121_121_VSID,
-						(unsigned long)__DATA_START__,
-						(*pmemsize - (1<<ldPtSize) -  (unsigned long)__DATA_START__ )>> PG_SHIFT,
-						0, /* WIMG */
-						TRIV121_PP_RW_PAGE);
-		if (TRIV121_MAP_SUCCESS != tmp) {
-			printk("Unable to map page index %i; reverting to BAT0\n",
-					tmp);
-			pt = 0;
-		}
+	/* map the RAM (without the page table itself) RW */
+	tmp = triv121PgTblMap(
+	pt,
+	TRIV121_121_VSID,
+	(unsigned long) 0,
+        50, // 16 MB of RAM set to RW
+	//(*pmemsize - (1<<ldPtSize) -  (unsigned long)__DATA_START__ )>> PG_SHIFT,
+	0, /* WIMG */
+	TRIV121_PP_RW_PAGE);
+
+	if (TRIV121_MAP_SUCCESS != tmp) {
+	printk("Unable to map page index %i; reverting to BAT0\n",
+	tmp);
+	pt = 0;
+	}
+
+	tmp = triv121PgTblMap(
+	pt,
+	TRIV121_121_VSID,
+	(unsigned long) 50*1024*4,
+        (16*1024*1024 - 50*4*1024) / (1024 * 4) , // The remaining 16 MB of RAM set to RW
+	//(*pmemsize - (1<<ldPtSize) -  (unsigned long)__DATA_START__ )>> PG_SHIFT,
+	0, /* WIMG */
+	TRIV121_PP_RW_PAGE);
+	  if (TRIV121_MAP_SUCCESS != tmp) {
+	  printk("Unable to map page index %i; reverting to BAT0\n",
+	  tmp);
+	  pt = 0;
+	  }
 	}
   } else {
 	printk("WARNING: unable to allocate page table, keeping DBAT0\n");

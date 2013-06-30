@@ -227,7 +227,7 @@ mpc6xx_mmu_rel_SOURCES = mpc6xx/mmu/bat.c mpc6xx/mmu/bat.h \
     mpc6xx/mmu/pte121.c mpc6xx/mmu/pte121.h \
     mpc6xx/mmu/mmuAsm.S mpc6xx/mmu/mmu_support.h mpc6xx/mmu/mmu_support.c \
 		mpc6xx/mmu/mm.c \
-    ../shared/include/mm.h
+    ../shared/include/mm.h new-exceptions/bspsupport/irq_supp.h
 mpc6xx_mmu_rel_CPPFLAGS = $(AM_CPPFLAGS)
 mpc6xx_mmu_rel_LDFLAGS = $(RTEMS_RELLDFLAGS)
 

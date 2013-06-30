@@ -13,6 +13,8 @@
 #include <libcpu/spr.h>
 #include <libcpu/mmu_support.h>
 #include <libcpu/mm.h>
+#include <libcpu/bat.h>
+
 SPR_RW(SDR1);
 
 void _CPU_Memory_management_Initialize(void)
@@ -31,7 +33,7 @@ void _CPU_Memory_management_Initialize(void)
 
   /* Switch MMU and other Interrupts off */
   msr = _read_MSR();
-  _write_MSR(msr & ~ (MSR_EE | MSR_DR | MSR_IR));
+  //_write_MSR(msr & ~ (MSR_EE | MSR_DR | MSR_IR));
 
   asm volatile ("sync":::"memory");
    /*rtems_cache_flush_entire_data for mpc6XX is not actually implemented*/
@@ -53,7 +55,19 @@ void _CPU_Memory_management_Initialize(void)
     : : :"0");
 
   /* restore, i.e., switch MMU and IRQs back on */
-  _write_MSR( msr );
+  //_write_MSR( msr );
+  setdbat(0, 0x0<<24, 0x0<<24, 2<<24, _PAGE_RW);
+  setibat(0, 0x0<<24, 0x0<<24, 2<<24,        0);
+  /* PCI    */
+  setdbat(1, 0x8<<24, 0x8<<24, 1<<24,  IO_PAGE);
+  setdbat(2, 0xc<<24, 0xc<<24, 1<<24,  IO_PAGE);
+  /*
+  CLRBAT (DBAT0);
+  CLRBAT (DBAT1);
+  CLRBAT (DBAT2);
+  CLRBAT (DBAT3);
+  CLRBAT (IBAT0);
+  */
 }
 
 static void ppc_pte_change_attributes(
@@ -74,7 +88,7 @@ static void ppc_pte_change_attributes(
 
     /* Switch MMU and other Interrupts off */
     msr = _read_MSR();
-    _write_MSR(msr & ~ (MSR_EE | MSR_DR | MSR_IR));
+    //_write_MSR(msr & ~ (MSR_EE | MSR_DR | MSR_IR));
 
     for ( ; ea < block_end; ea += RTEMS_MPE_PAGE_SIZE ) {
       pt_entry->ptew0 &= ~PTEW0_VALID;
@@ -92,7 +106,7 @@ static void ppc_pte_change_attributes(
       pt_entry--;
     }
     /* restore, i.e., switch MMU and IRQs back on */
-    _write_MSR( msr );
+   // _write_MSR( msr );
   }
 }
 

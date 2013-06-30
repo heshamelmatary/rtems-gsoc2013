@@ -81,3 +81,7 @@ $(PROJECT_INCLUDE)/bsp/irq-info.h: ../../shared/include/irq-info.h $(PROJECT_INC
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/bsp/irq-info.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/bsp/irq-info.h
 
+$(PROJECT_INCLUDE)/bsp/irq_supp.h: ../../../libcpu/powerpc/new-exceptions/bspsupport/irq_supp.h $(PROJECT_INCLUDE)/bsp/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/bsp/irq_supp.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/bsp/irq_supp.h
+

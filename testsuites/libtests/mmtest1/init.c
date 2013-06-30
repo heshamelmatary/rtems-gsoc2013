@@ -42,7 +42,7 @@ rtems_task Init(
   puts( "\n\n*** Start of mmtest1 ***\n" );
 
   puts( "initialize the memory management manager\n");
-  _Memory_management_Initialize ( );
+  //_Memory_management_Initialize ( );
 
   printf("Test 1: Installing Entry-1 \
 and set it as Read only\n");

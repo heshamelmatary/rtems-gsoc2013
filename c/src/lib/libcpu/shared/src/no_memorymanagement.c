@@ -11,7 +11,7 @@
 
 void _CPU_Memory_management_Initialize( void ) { }
 
-void _CPU_Memory_management_Install_MPE( Memory_management_Entry *mpe ) { }
+void _CPU_Memory_management_Install_entry( Memory_management_Entry *mpe ) { }
 
 void _CPU_Memory_management_Set_read_only( Memory_management_Entry *mpe ) { }
 

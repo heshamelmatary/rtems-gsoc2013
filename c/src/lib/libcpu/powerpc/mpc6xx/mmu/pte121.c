@@ -475,9 +475,9 @@ triv121PgTblMap (Triv121PgTbl pt,
   unsigned long pi;
   APte pte;
   long vsid;
-#ifdef DEBUG
+//#ifdef DEBUG
   long saved_vsid = ovsid;
-#endif
+//#endif
 
   if (TRIV121_121_VSID == ovsid) {
     /* use 1:1 mapping */
@@ -486,11 +486,11 @@ triv121PgTblMap (Triv121PgTbl pt,
     ovsid = seg2vsid (start);
   }
 
-#ifdef DEBUG
+//#ifdef DEBUG
   PRINTF ("Mapping %i (0x%x) pages at 0x%08x for VSID 0x%08x\n",
           (unsigned) numPages, (unsigned) numPages,
           (unsigned) start, (unsigned) ovsid);
-#endif
+//#endif
 
   /* map in two passes. During the first pass, we try
    * to claim entries as needed. The 'slotFor()' routine
@@ -555,7 +555,7 @@ triv121PgTblMap (Triv121PgTbl pt,
     }
     unmarkAll (pt);
   }
-#ifdef DEBUG
+//#ifdef DEBUG
   {
     unsigned long failedat;
     CONSCHECK (-1);
@@ -568,7 +568,7 @@ triv121PgTblMap (Triv121PgTbl pt,
       return PI121 (failedat);
     }
   }
-#endif
+//#endif
   return TRIV121_MAP_SUCCESS;   /* -1 !! */
 }
 

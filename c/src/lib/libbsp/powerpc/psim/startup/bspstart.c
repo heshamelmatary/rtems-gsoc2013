@@ -19,13 +19,19 @@
 #include <psim.h>
 #include <bsp/bootcard.h>
 #include <bsp/linker-symbols.h>
+#include <bsp/openpic.h>
 #include <rtems/bspIo.h>
 #include <rtems/powerpc/powerpc.h>
-
+#include <bsp.h>
+//#include <bsp/pci.h>
+#include <rtems/bspIo.h>
 #include <libcpu/cpuIdent.h>
 #include <libcpu/bat.h>
+#include <libcpu/pte121.h>
 #include <libcpu/spr.h>
 #include <libcpu/mmu_support.h>
+
+ 
 SPR_RW(SPRG1)
 
 /*  On psim, each click of the decrementer register corresponds
@@ -57,6 +63,11 @@ uint32_t BSP_mem_size = (uint32_t)RamSize;
  */
 unsigned int BSP_time_base_divisor;
 
+extern Triv121PgTbl BSP_pgtbl_setup(unsigned int *);
+extern void BSP_pgtbl_activate(Triv121PgTbl);
+
+extern void ShowBATS(void);
+
 extern unsigned long __rtems_end[];
 
 void BSP_panic(char *s)
@@ -78,6 +89,8 @@ void _BSP_Fatal_error(unsigned int v)
  */
 void bsp_start( void )
 {
+
+  Triv121PgTbl  pt=0;
   /*
    * Note we can not get CPU identification dynamically.
    * PVR has to be set to PPC_PSIM (0xfffe) from the device
@@ -108,19 +121,65 @@ void bsp_start( void )
   );
 
   /*
-   * Initalize RTEMS IRQ system
+  // * Initalize RTEMS IRQ system
    */
-  BSP_rtems_irq_mng_init(0);
-  mmu_init();
-  /*
-   * Setup BATs and enable MMU
-   */
-  /* Memory */
+
   setdbat(0, 0x0<<24, 0x0<<24, 2<<24, _PAGE_RW);
   setibat(0, 0x0<<24, 0x0<<24, 2<<24,        0);
   /* PCI    */
   setdbat(1, 0x8<<24, 0x8<<24, 1<<24,  IO_PAGE);
   setdbat(2, 0xc<<24, 0xc<<24, 1<<24,  IO_PAGE);
+
+  //setdbat(1, _IO_BASE, _IO_BASE, 0x10000000, IO_PAGE);
+
+ // setdbat(1, 0xc<<24, 0xc<<24, 0x10000000, IO_PAGE);
+  //setdbat(2, PCI_MEM_BASE+PCI_MEM_WIN0, PCI_MEM_BASE+PCI_MEM_WIN0, 0x10000000, IO_PAGE);
+  //setdbat(2, 0xc<<24, 0xc<<24, 0x10000000, IO_PAGE);
+  //setdbat(3, 0xb0000000, 0xb0000000, 0x10000000, IO_PAGE);
+
+  pt = BSP_pgtbl_setup(&BSP_mem_size);
+
+  if (!pt || TRIV121_MAP_SUCCESS != triv121PgTblMap(
+       pt, TRIV121_121_VSID,
+#ifndef qemu
+      0xfeff0000,
+#else
+      0xbffff000,
+#endif
+      1,
+      TRIV121_ATTR_IO_PAGE, TRIV121_PP_RW_PAGE)) {
+      printk("WARNING: unable to setup page tables VME "
+      "bridge must share PCI space\n");
+      }
+
+  BSP_rtems_irq_mng_init(0);
+
+    /* Activate the page table mappings only after
+     *    * initializing interrupts because the irq_mng_init()
+     *       * routine needs to modify the text
+     *          */
+    if (pt) {
+       printf("Page table setup finished; will activate it NOW...\n");
+       BSP_pgtbl_activate(pt);
+       /* finally, switch off DBAT3 */
+       setdbat(3, 0, 0, 0, 0);
+       }
+
+      ShowBATS();
+
+      printk("Exit from bspstart\n");
+  //mmu_init();
+  /*
+   * Setup BATs and enable MMU
+   */
+  /* Memory */
+   /* Clear BAT registers*/
+
+  //setdbat(0, 0x0<<24, 0x0<<24, 2<<24, _PAGE_RW);
+  //setibat(0, 0x0<<24, 0x0<<24, 2<<24,        0);
+  /* PCI    */
+  //setdbat(1, 0x8<<24, 0x8<<24, 1<<24,  IO_PAGE);
+  //setdbat(2, 0xc<<24, 0xc<<24, 1<<24,  IO_PAGE);
 
 /* Invalidate all TLB Entries */
    asm volatile("sync; isync; tlbia; sync; isync");

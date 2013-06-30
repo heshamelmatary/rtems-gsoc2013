@@ -39,7 +39,13 @@ SECTIONS {
 	 * BSP: PSIM Register Block
 	 */
 	.psim_regs (NOLOAD) : {
+    __START_TEXT__ = . ;
 		psim_reg*(.text)
+    PROVIDE (_etext = ABSOLUTE(.));
+    PROVIDE (etext = .);
+    PROVIDE ( _textSize = . - __START_TEXT__); 
+    . = ALIGN(0x1000);
+    PROVIDE(__DATA_START__ = ABSOLUTE(.) );
 		psim_reg*(.data)
 		psim_reg*(.bss)
 		psim_reg*(COMMON)

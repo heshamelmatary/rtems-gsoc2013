@@ -37,6 +37,7 @@ libbsp_a_SOURCES += ../../shared/bspclean.c ../../shared/bsplibc.c \
     ../../shared/bsppredriverhook.c startup/bspstart.c \
     ../../shared/bspgetworkarea.c ../../shared/bootcard.c \
     ../../powerpc/shared/startup/sbrk.c ../../shared/gnatinstallhandler.c \
+		../../powerpc/shared/startup/pgtbl_setup.c ../../powerpc/shared/startup/pgtbl_activate.c \
     startup/psim_registers.c
 
 # pclock
@@ -48,10 +49,13 @@ libbsp_a_SOURCES += console/console-io.c console/consupp.S
 
 # irq
 include_bsp_HEADERS += irq/irq.h ../shared/openpic/openpic.h \
-    ../../shared/include/irq-generic.h
+    ../../shared/include/irq-generic.h ../../
 libbsp_a_SOURCES += irq/irq_init.c ../shared/irq/openpic_i8259_irq.c \
     ../shared/openpic/openpic.c ../../shared/src/irq-server.c  \
-    ../../shared/src/irq-generic.c ../../shared/src/irq-default-handler.c
+    ../../shared/src/irq-generic.c ../../shared/src/irq-default-handler.c \
+		../../powerpc/shared/pci/pci.h ../../powerpc/shared/showbats.c
+
+
 
 EXTRA_DIST = vectors/README
 # vectors

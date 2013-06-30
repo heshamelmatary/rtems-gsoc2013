@@ -26,6 +26,24 @@
 
 #define IO_PAGE	(_PAGE_NO_CACHE | _PAGE_GUARDED | _PAGE_RW)
 
+/* Macro for clearing BAT Arrays in ASM */
+
+#define CLRBAT_ASM(batu,r)      \
+  "  sync                 \n"  \
+  "  isync                \n"  \
+  "  li      "#r",    0   \n"  \
+  "  mtspr  "#batu", "#r"\n"  \
+  "  sync                 \n"  \
+  "  isync                \n"
+
+#define  CLRBAT(bat)        \
+  asm volatile(        \
+    CLRBAT_ASM(%0, 0)    \
+    :        \
+    :"i"(bat##U)      \
+    :"0")
+
+
 #ifndef ASM
 /* Take no risks -- the essential parts of this routine run with
  * interrupts disabled!

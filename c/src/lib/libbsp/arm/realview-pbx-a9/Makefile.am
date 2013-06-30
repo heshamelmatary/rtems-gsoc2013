@@ -45,6 +45,7 @@ include_bsp_HEADERS += ../shared/include/arm-pl011-regs.h
 include_bsp_HEADERS += include/irq.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 ###############################################################################
 #                  Data                                                       #
@@ -117,6 +118,9 @@ libbsp_a_SOURCES += ../shared/arm-a9mpcore-clock-config.c
 libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
 libbsp_a_SOURCES += ../../../libcpu/arm/shared/include/cache_.h
 libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
+
+# MMU
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c
