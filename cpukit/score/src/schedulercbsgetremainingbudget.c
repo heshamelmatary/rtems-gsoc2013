@@ -22,6 +22,7 @@
 #include <rtems/config.h>
 #include <rtems/score/scheduler.h>
 #include <rtems/score/schedulercbs.h>
+#include <rtems/score/threaddispatch.h>
 
 int _Scheduler_CBS_Get_remaining_budget (
   Scheduler_CBS_Server_id  server_id,
@@ -46,8 +47,8 @@ int _Scheduler_CBS_Get_remaining_budget (
                );
   /* The routine _Thread_Get may disable dispatch and not enable again. */
   if ( the_thread ) {
-    _Thread_Enable_dispatch();
     *remaining_budget = the_thread->cpu_time_budget;
+    _Objects_Put( &the_thread->Object );
   }
   else {
     *remaining_budget = 0;

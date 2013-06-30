@@ -24,6 +24,7 @@
 #include <rtems/score/object.h>
 #include <rtems/score/states.h>
 #include <rtems/score/thread.h>
+#include <rtems/score/threaddispatch.h>
 #include <rtems/score/threadq.h>
 #include <rtems/score/tqdata.h>
 
@@ -44,7 +45,7 @@ void _Thread_queue_Timeout(
       break;
     case OBJECTS_LOCAL:
       _Thread_queue_Process_timeout( the_thread );
-      _Thread_Unnest_dispatch();
+      _Objects_Put_without_thread_dispatch( &the_thread->Object );
       break;
   }
 }

@@ -41,10 +41,13 @@ include_rtems_score_HEADERS += include/rtems/score/schedulercbs.h
 include_rtems_score_HEADERS += include/rtems/score/scheduleredf.h
 include_rtems_score_HEADERS += include/rtems/score/schedulerpriority.h
 include_rtems_score_HEADERS += include/rtems/score/schedulersimple.h
+include_rtems_score_HEADERS += include/rtems/score/smp.h
+include_rtems_score_HEADERS += include/rtems/score/smplock.h
 include_rtems_score_HEADERS += include/rtems/score/stack.h
 include_rtems_score_HEADERS += include/rtems/score/states.h
 include_rtems_score_HEADERS += include/rtems/score/sysstate.h
 include_rtems_score_HEADERS += include/rtems/score/thread.h
+include_rtems_score_HEADERS += include/rtems/score/threaddispatch.h
 include_rtems_score_HEADERS += include/rtems/score/threadq.h
 include_rtems_score_HEADERS += include/rtems/score/threadsync.h
 include_rtems_score_HEADERS += include/rtems/score/timespec.h
@@ -61,10 +64,6 @@ include_rtems_score_HEADERS += include/rtems/score/basedefs.h
 include_rtems_score_HEADERS += include/rtems/score/atomic.h
 include_rtems_score_HEADERS += include/rtems/score/genericcpuatomic.h
 include_rtems_score_HEADERS += include/rtems/score/genericatomicops.h
-if HAS_SMP
-include_rtems_score_HEADERS += include/rtems/score/smplock.h
-include_rtems_score_HEADERS += include/rtems/score/smp.h
-endif
 
 if HAS_PTHREADS
 include_rtems_score_HEADERS += include/rtems/score/corespinlock.h
@@ -137,9 +136,9 @@ libscore_a_SOURCES += src/mpci.c src/objectmp.c src/threadmp.c
 endif
 
 if HAS_SMP
-libscore_a_SOURCES += src/isrsmp.c src/smp.c src/smplock.c \
-    src/schedulersimplesmpblock.c src/schedulersimplesmpschedule.c \
-    src/schedulersimplesmpunblock.c src/schedulersimplesmptick.c 
+libscore_a_SOURCES += src/isrsmp.c
+libscore_a_SOURCES += src/schedulersimplesmp.c
+libscore_a_SOURCES += src/smp.c
 endif
 
 ## CORE_APIMUTEX_C_FILES
@@ -200,11 +199,12 @@ libscore_a_SOURCES += src/objectallocate.c src/objectclose.c \
 
 ## SCHEDULER_C_FILES
 libscore_a_SOURCES += src/scheduler.c
+libscore_a_SOURCES += src/schedulerdefaulttick.c
+libscore_a_SOURCES += src/schedulerdefaultstartidle.c
 
 ## SCHEDULERPRIORITY_C_FILES
 libscore_a_SOURCES += src/schedulerpriority.c \
     src/schedulerpriorityallocate.c \
-    src/schedulerprioritytick.c \
     src/schedulerpriorityblock.c \
     src/schedulerpriorityenqueue.c \
     src/schedulerpriorityenqueuefirst.c \

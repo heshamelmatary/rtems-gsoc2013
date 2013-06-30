@@ -31,91 +31,6 @@
  */
 /**@{**/
 
-#if defined(RTEMS_SMP)
-
-  /*
-   * The _Thread_Dispatch_... functions are prototyped in thread.h.
-   */
-
-#else
-
-  /**
- * @brief _Thread_Dispatch_in_critical_section
-   *
-   * This routine returns true if thread dispatch indicates
-   * that we are in a critical section.
-   */
-  RTEMS_INLINE_ROUTINE bool _Thread_Dispatch_in_critical_section(void)
-  {
-     if (  _Thread_Dispatch_disable_level == 0 )
-      return false;
-
-     return true;
-  }
-
-  /**
-   * @brief Get thread dispatch disable level.
-   *
-   * This routine returns value of the the thread dispatch level.
-   */
-  RTEMS_INLINE_ROUTINE uint32_t _Thread_Dispatch_get_disable_level(void)
-  {
-    return _Thread_Dispatch_disable_level;
-  }
-
-  /**
-   * @brief Set thread dispatch disable level.
-   *
-   * This routine sets thread dispatch level to the
-   * value passed in.
-   */
-  RTEMS_INLINE_ROUTINE uint32_t _Thread_Dispatch_set_disable_level(uint32_t value)
-  {
-    _Thread_Dispatch_disable_level = value;
-    return value;
-  }
-
-  /**
-   * @brief Increase thread dispatch disable level.
-   *
-   * This rountine increments the thread dispatch level
-   */
-  RTEMS_INLINE_ROUTINE uint32_t _Thread_Dispatch_increment_disable_level(void)
-  {
-    uint32_t level = _Thread_Dispatch_disable_level;
-
-    ++level;
-    _Thread_Dispatch_disable_level = level;
-
-    return level;
-  }
-
-  /**
-   * @brief Decrease thread dispatch disable level.
-   *
-   * This routine decrements the thread dispatch level.
-   */
-  RTEMS_INLINE_ROUTINE uint32_t _Thread_Dispatch_decrement_disable_level(void)
-  {
-    uint32_t level = _Thread_Dispatch_disable_level;
-
-    --level;
-    _Thread_Dispatch_disable_level = level;
-
-    return level;
-  }
-
-  /**
-   * @brief Thread dispatch initialization.
-   *
-   * This routine initializes the thread dispatching subsystem.
-   */
-  RTEMS_INLINE_ROUTINE void _Thread_Dispatch_initialization( void )
-  {
-    _Thread_Dispatch_set_disable_level( 1 );
-  }
-
-#endif
 
 /**
  * This routine halts multitasking and returns control to
@@ -237,61 +152,6 @@ RTEMS_INLINE_ROUTINE void _Thread_Deallocate_fp( void )
 #endif
 
 /**
- * This routine prevents dispatching.
- */
-
-#if defined ( __THREAD_DO_NOT_INLINE_DISABLE_DISPATCH__ )
-void _Thread_Disable_dispatch( void );
-#else
-RTEMS_INLINE_ROUTINE void _Thread_Disable_dispatch( void )
-{
-  _Thread_Dispatch_increment_disable_level();
-  RTEMS_COMPILER_MEMORY_BARRIER();
-}
-#endif
-
-/**
- * This routine allows dispatching to occur again.  If this is
- * the outer most dispatching critical section, then a dispatching
- * operation will be performed and, if necessary, control of the
- * processor will be transferred to the heir thread.
- */
-
-#if defined ( __THREAD_DO_NOT_INLINE_ENABLE_DISPATCH__ )
-  void _Thread_Enable_dispatch( void );
-#else
-  /* inlining of enable dispatching must be true */
-  RTEMS_INLINE_ROUTINE void _Thread_Enable_dispatch( void )
-  {
-    RTEMS_COMPILER_MEMORY_BARRIER();
-    if ( _Thread_Dispatch_decrement_disable_level() == 0 )
-      _Thread_Dispatch();
-  }
-#endif
-
-/**
- * This routine allows dispatching to occur again.  However,
- * no dispatching operation is performed even if this is the outer
- * most dispatching critical section.
- */
-
-RTEMS_INLINE_ROUTINE void _Thread_Unnest_dispatch( void )
-{
-  RTEMS_COMPILER_MEMORY_BARRIER();
-  _Thread_Dispatch_decrement_disable_level();
-}
-
-/**
- * This function returns true if dispatching is disabled, and false
- * otherwise.
- */
-
-RTEMS_INLINE_ROUTINE bool _Thread_Is_dispatching_enabled( void )
-{
-  return  ( _Thread_Dispatch_in_critical_section() == false );
-}
-
-/**
  * This function returns true if dispatching is disabled, and false
  * otherwise.
  */
@@ -344,6 +204,50 @@ RTEMS_INLINE_ROUTINE void _Thread_Internal_free (
   _Objects_Free( &_Thread_Internal_information, &the_task->Object );
 }
 
+RTEMS_INLINE_ROUTINE void _Thread_Set_global_exit_status(
+  uint32_t exit_status
+)
+{
+  Thread_Control *idle = (Thread_Control *)
+    _Thread_Internal_information.local_table[ 1 ];
+
+  idle->Wait.return_code = exit_status;
+}
+
+RTEMS_INLINE_ROUTINE uint32_t _Thread_Get_global_exit_status( void )
+{
+  const Thread_Control *idle = (const Thread_Control *)
+    _Thread_Internal_information.local_table[ 1 ];
+
+  return idle->Wait.return_code;
+}
+
+/**
+ * @brief Issues a thread dispatch if necessary.
+ *
+ * @param[in] executing The executing thread.
+ * @param[in] needs_asr_dispatching Indicates whether or not the API
+ *            level signals are pending and a dispatch is necessary.
+ */
+RTEMS_INLINE_ROUTINE void _Thread_Dispatch_if_necessary(
+  Thread_Control *executing,
+  bool            needs_asr_dispatching
+)
+{
+  if ( _Thread_Dispatch_is_enabled() ) {
+    bool dispatch_necessary = needs_asr_dispatching;
+
+    if ( !_Thread_Is_heir( executing ) && executing->is_preemptible ) {
+      dispatch_necessary = true;
+      _Thread_Dispatch_necessary = dispatch_necessary;
+    }
+
+    if ( dispatch_necessary ) {
+      _Thread_Dispatch();
+    }
+  }
+}
+
 /**
  * This routine returns the C library re-enterant pointer.
  */
@@ -362,32 +266,6 @@ RTEMS_INLINE_ROUTINE void _Thread_Set_libc_reent (
 )
 {
   _Thread_libc_reent = libc_reent;
-}
-
-/**
- * This routine evaluates the current scheduling information for the
- * system and determines if a context switch is required.  This
- * is usually called after changing an execution mode such as preemptability
- * for a thread.
- *
- * @param[in] are_signals_pending specifies whether or not the API
- *            level signals are pending and a dispatch is needed.
- */
-RTEMS_INLINE_ROUTINE bool _Thread_Evaluate_is_dispatch_needed(
-  bool are_signals_pending
-)
-{
-  Thread_Control     *executing;
-
-  executing = _Thread_Executing;
-
-  if ( are_signals_pending ||
-       (!_Thread_Is_heir( executing ) && executing->is_preemptible) ) {
-    _Thread_Dispatch_necessary = true;
-    return true;
-  }
-
-  return false;
 }
 
 /** @}*/

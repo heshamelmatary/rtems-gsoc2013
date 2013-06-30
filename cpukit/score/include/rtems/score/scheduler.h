@@ -49,8 +49,12 @@ typedef struct {
   /** Implements the scheduling decision logic (policy). */
   void ( *schedule )(void);
 
-  /** Voluntarily yields the processor per the scheduling policy. */
-  void ( *yield )(void);
+  /**
+   * @brief Voluntarily yields the processor per the scheduling policy.
+   *
+   * @see _Scheduler_Yield().
+   */
+  void ( *yield )( Thread_Control *thread );
 
   /** Removes the given thread from scheduling decisions. */
   void ( *block )(Thread_Control *);
@@ -89,6 +93,12 @@ typedef struct {
   /** perform scheduler update actions required at each clock tick */
   void ( *tick )(void);
 
+  /**
+   * @brief Starts the idle thread for a particular processor.
+   *
+   * @see _Scheduler_Start_idle().
+   */
+  void ( *start_idle )( Thread_Control *thread, Per_CPU_Control *processor );
 } Scheduler_Operations;
 
 /**
@@ -138,6 +148,25 @@ extern Scheduler_Control  _Scheduler;
  *  default.
  */
 void _Scheduler_Handler_initialization( void );
+
+/**
+ * @brief Performs tick operations depending on the CPU budget algorithm for
+ * each executing thread.
+ *
+ * This routine is invoked as part of processing each clock tick.
+ */
+void _Scheduler_default_Tick( void );
+
+/**
+ * @brief Unblocks the thread.
+ *
+ * @param[in,out] thread An idle thread.
+ * @param[in] processor This parameter is unused.
+ */
+void _Scheduler_default_Start_idle(
+  Thread_Control  *thread,
+  Per_CPU_Control *processor
+);
 
 #ifndef __RTEMS_APPLICATION__
 #include <rtems/score/scheduler.inl>

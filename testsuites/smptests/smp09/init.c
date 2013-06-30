@@ -42,7 +42,7 @@ rtems_task Init(
   for ( killtime=0; killtime<1000000; killtime++ )
     ;
   
-  for ( i=0; i<rtems_smp_get_number_of_processors() -1; i++ ) {
+  for ( i=0; i<rtems_smp_get_processor_count() -1; i++ ) {
     ch = '1' + i;
 
     status = rtems_task_create(
@@ -68,7 +68,7 @@ rtems_task Init(
 
   rtems_cpu_usage_report();
 
-  locked_printf( "*** END OF TEST SMP09 ***" );
+  locked_printf( "*** END OF TEST SMP09 ***\n" );
   rtems_test_exit(0);
 }
 
@@ -83,6 +83,8 @@ rtems_task Init(
 #define CONFIGURE_MAXIMUM_TASKS            \
     (1 + CONFIGURE_SMP_MAXIMUM_PROCESSORS)
 #define CONFIGURE_RTEMS_INIT_TASKS_TABLE
+
+#define CONFIGURE_MAXIMUM_SEMAPHORES 1
 
 #define CONFIGURE_INIT
 

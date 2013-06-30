@@ -54,7 +54,7 @@ rtems_task Init(
   status = rtems_clock_tick();
   directive_failed( status, "clock tick" );
 
-  rtems_test_assert( rtems_smp_get_number_of_processors()  > 1 );
+  rtems_test_assert( rtems_smp_get_processor_count()  > 1 );
 
   cpu_num = bsp_smp_processor_id();
 
@@ -113,6 +113,8 @@ rtems_task Init(
 #define CONFIGURE_SMP_MAXIMUM_PROCESSORS  2
 
 #define CONFIGURE_MAXIMUM_TASKS           4
+
+#define CONFIGURE_MAXIMUM_SEMAPHORES 1
 
 #define CONFIGURE_INIT_TASK_PRIORITY      2
 #define CONFIGURE_INIT_TASK_INITIAL_MODES RTEMS_PREEMPT

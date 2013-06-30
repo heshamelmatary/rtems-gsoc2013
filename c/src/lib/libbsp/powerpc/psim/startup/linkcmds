@@ -9,7 +9,6 @@
 
 MEMORY {
 	RAM       : ORIGIN = 0, LENGTH = 16M
-	PSIM_REGS : ORIGIN = 0x0c000000, LENGTH = 16M
 	EMPTY     : ORIGIN = 0x0, LENGTH = 0
 }
 
@@ -51,5 +50,7 @@ SECTIONS {
 		psim_reg*(COMMON)
 	} > PSIM_REGS
 }
+
+PSIM = 0x0c000000;
 
 INCLUDE linkcmds.base

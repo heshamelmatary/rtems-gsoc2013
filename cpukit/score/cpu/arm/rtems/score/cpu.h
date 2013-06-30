@@ -138,7 +138,7 @@
 
 #define CPU_USE_DEFERRED_FP_SWITCH FALSE
 
-#if defined(ARM_MULTILIB_ARCH_V7M)
+#if defined(ARM_MULTILIB_HAS_WFI)
   #define CPU_PROVIDES_IDLE_THREAD_BODY TRUE
 #else
   #define CPU_PROVIDES_IDLE_THREAD_BODY FALSE
@@ -438,6 +438,44 @@ void _CPU_Context_restore( Context_Control *new_context )
 void _CPU_Context_volatile_clobber( uintptr_t pattern );
 
 void _CPU_Context_validate( uintptr_t pattern );
+
+#ifdef RTEMS_SMP
+  #define _CPU_Context_switch_to_first_task_smp( _context ) \
+    _CPU_Context_restore( _context )
+
+  static inline void _ARM_Data_memory_barrier( void )
+  {
+    __asm__ volatile ( "dmb" : : : "memory" );
+  }
+
+  static inline void _ARM_Data_synchronization_barrier( void )
+  {
+    __asm__ volatile ( "dsb" : : : "memory" );
+  }
+
+  static inline void _ARM_Send_event( void )
+  {
+    __asm__ volatile ( "sev" : : : "memory" );
+  }
+
+  static inline void _ARM_Wait_for_event( void )
+  {
+    __asm__ volatile ( "wfe" : : : "memory" );
+  }
+
+  static inline void _CPU_Processor_event_broadcast( void )
+  {
+    _ARM_Data_synchronization_barrier();
+    _ARM_Send_event();
+  }
+
+  static inline void _CPU_Processor_event_receive( void )
+  {
+    _ARM_Wait_for_event();
+    _ARM_Data_memory_barrier();
+  }
+#endif
+
 
 static inline uint32_t CPU_swap_u32( uint32_t value )
 {

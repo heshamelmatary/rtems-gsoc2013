@@ -82,6 +82,49 @@ extern "C" {
 #define ARM_MMU_TRANSLATION_TABLE_ENTRY_SIZE 4U
 #define ARM_MMU_TRANSLATION_TABLE_ENTRY_COUNT 4096U
 
+#define ARM_MMU_DEFAULT_CLIENT_DOMAIN 15U
+
+#define ARMV7_MMU_READ_ONLY \
+  ((ARM_MMU_DEFAULT_CLIENT_DOMAIN << ARM_MMU_SECT_DOMAIN_SHIFT) \
+    | ARM_MMU_SECT_AP_0 \
+    | ARM_MMU_SECT_AP_2 \
+    | ARM_MMU_SECT_DEFAULT)
+
+#define ARMV7_MMU_READ_ONLY_CACHED \
+  (ARMV7_MMU_READ_ONLY | ARM_MMU_SECT_TEX_0 | ARM_MMU_SECT_C | ARM_MMU_SECT_B)
+
+#define ARMV7_MMU_READ_WRITE \
+  ((ARM_MMU_DEFAULT_CLIENT_DOMAIN << ARM_MMU_SECT_DOMAIN_SHIFT) \
+    | ARM_MMU_SECT_AP_0 \
+    | ARM_MMU_SECT_DEFAULT)
+
+#define ARMV7_MMU_READ_WRITE_CACHED \
+  (ARMV7_MMU_READ_WRITE | ARM_MMU_SECT_TEX_0 | ARM_MMU_SECT_C | ARM_MMU_SECT_B)
+
+#define ARMV7_MMU_DATA_READ_ONLY \
+  ARMV7_MMU_READ_ONLY
+
+#define ARMV7_MMU_DATA_READ_ONLY_CACHED \
+  ARMV7_MMU_READ_ONLY_CACHED
+
+#define ARMV7_MMU_DATA_READ_WRITE \
+  ARMV7_MMU_READ_WRITE
+
+#define ARMV7_MMU_DATA_READ_WRITE_CACHED \
+  ARMV7_MMU_READ_WRITE_CACHED
+
+#define ARMV7_MMU_DATA_READ_WRITE_SHAREABLE \
+  (ARMV7_MMU_READ_WRITE_CACHED | ARM_MMU_SECT_S)
+
+#define ARMV7_MMU_CODE \
+  ARMV7_MMU_READ_ONLY
+
+#define ARMV7_MMU_CODE_CACHED \
+  ARMV7_MMU_READ_ONLY_CACHED
+
+#define ARMV7_MMU_DEVICE \
+  (ARMV7_MMU_READ_WRITE | ARM_MMU_SECT_B)
+
 /** @} */
 
 /**
@@ -796,6 +839,110 @@ static inline void arm_cp15_wait_for_interrupt(void)
     : ARM_SWITCH_OUTPUT
     : [sbz] "r" (sbz)
     : "memory"
+  );
+}
+
+static inline uint32_t arm_cp15_get_multiprocessor_affinity(void)
+{
+  ARM_SWITCH_REGISTERS;
+  uint32_t mpidr;
+
+  __asm__ volatile (
+    ARM_SWITCH_TO_ARM
+	  "mrc p15, 0, %[mpidr], c0, c0, 5\n"
+    ARM_SWITCH_BACK
+    : [mpidr] "=&r" (mpidr) ARM_SWITCH_ADDITIONAL_OUTPUT
+  );
+
+  return mpidr & 0xff;
+}
+
+static inline uint32_t arm_cortex_a9_get_multiprocessor_cpu_id(void)
+{
+  return arm_cp15_get_multiprocessor_affinity() & 0xff;
+}
+
+#define ARM_CORTEX_A9_ACTL_FW (1U << 0)
+#define ARM_CORTEX_A9_ACTL_L2_PREFETCH_HINT_ENABLE (1U << 1)
+#define ARM_CORTEX_A9_ACTL_L1_PREFETCH_ENABLE (1U << 2)
+#define ARM_CORTEX_A9_ACTL_WRITE_FULL_LINE_OF_ZEROS_MODE (1U << 3)
+#define ARM_CORTEX_A9_ACTL_SMP (1U << 6)
+#define ARM_CORTEX_A9_ACTL_EXCL (1U << 7)
+#define ARM_CORTEX_A9_ACTL_ALLOC_IN_ONE_WAY (1U << 8)
+#define ARM_CORTEX_A9_ACTL_PARITY_ON (1U << 9)
+
+static inline uint32_t arm_cp15_get_auxiliary_control(void)
+{
+  ARM_SWITCH_REGISTERS;
+  uint32_t val;
+
+  __asm__ volatile (
+    ARM_SWITCH_TO_ARM
+    "mrc p15, 0, %[val], c1, c0, 1\n"
+    ARM_SWITCH_BACK
+    : [val] "=&r" (val) ARM_SWITCH_ADDITIONAL_OUTPUT
+  );
+
+  return val;
+}
+
+static inline void arm_cp15_set_auxiliary_control(uint32_t val)
+{
+  ARM_SWITCH_REGISTERS;
+
+  __asm__ volatile (
+    ARM_SWITCH_TO_ARM
+    "mcr p15, 0, %[val], c1, c0, 1\n"
+    ARM_SWITCH_BACK
+    : ARM_SWITCH_OUTPUT
+    : [val] "r" (val)
+  );
+}
+
+/* ID_PFR1, Processor Feature Register 1 */
+
+static inline uint32_t arm_cp15_get_processor_feature_1(void)
+{
+  ARM_SWITCH_REGISTERS;
+  uint32_t val;
+
+  __asm__ volatile (
+    ARM_SWITCH_TO_ARM
+    "mrc p15, 0, %[val], c0, c1, 1\n"
+    ARM_SWITCH_BACK
+    : [val] "=&r" (val) ARM_SWITCH_ADDITIONAL_OUTPUT
+  );
+
+  return val;
+}
+
+/* VBAR, Vector Base Address Register, Security Extensions */
+
+static inline void *arm_cp15_get_vector_base_address(void)
+{
+  ARM_SWITCH_REGISTERS;
+  void *base;
+
+  __asm__ volatile (
+    ARM_SWITCH_TO_ARM
+    "mrc p15, 0, %[base], c12, c0, 0\n"
+    ARM_SWITCH_BACK
+    : [base] "=&r" (base) ARM_SWITCH_ADDITIONAL_OUTPUT
+  );
+
+  return base;
+}
+
+static inline void arm_cp15_set_vector_base_address(void *base)
+{
+  ARM_SWITCH_REGISTERS;
+
+  __asm__ volatile (
+    ARM_SWITCH_TO_ARM
+    "mcr p15, 0, %[base], c12, c0, 0\n"
+    ARM_SWITCH_BACK
+    : ARM_SWITCH_OUTPUT
+    : [base] "r" (base)
   );
 }
 

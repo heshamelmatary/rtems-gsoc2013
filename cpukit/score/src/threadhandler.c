@@ -28,6 +28,7 @@
 #include <rtems/score/states.h>
 #include <rtems/score/sysstate.h>
 #include <rtems/score/thread.h>
+#include <rtems/score/threaddispatch.h>
 #include <rtems/score/threadq.h>
 #include <rtems/score/userextimpl.h>
 #include <rtems/score/wkspace.h>
@@ -126,12 +127,6 @@ void _Thread_Handler( void )
      */
     if (doCons) /* && (volatile void *)_init) */ {
       INIT_NAME ();
-   
-      #if defined(RTEMS_SMP)
-        _Thread_Disable_dispatch();
-          _SMP_Request_other_cores_to_perform_first_context_switch();
-        _Thread_Enable_dispatch();
-      #endif
     }
  #endif
 

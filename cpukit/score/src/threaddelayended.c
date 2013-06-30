@@ -28,6 +28,7 @@
 #include <rtems/score/states.h>
 #include <rtems/score/sysstate.h>
 #include <rtems/score/thread.h>
+#include <rtems/score/threaddispatch.h>
 #include <rtems/score/threadq.h>
 #include <rtems/score/wkspace.h>
 
@@ -53,7 +54,7 @@ void _Thread_Delay_ended(
           | STATES_WAITING_FOR_TIME
           | STATES_INTERRUPTIBLE_BY_SIGNAL
       );
-      _Thread_Unnest_dispatch();
+      _Objects_Put_without_thread_dispatch( &the_thread->Object );
       break;
   }
 }

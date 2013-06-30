@@ -119,10 +119,6 @@ void rtems_initialize_data_structures(void)
 
   _Thread_Dispatch_initialization();
 
-  #if defined(RTEMS_SMP)
-    _SMP_Handler_initialize();
-  #endif
-
   _User_extensions_Handler_initialization();
   _ISR_Handler_initialization();
 
@@ -159,12 +155,8 @@ void rtems_initialize_data_structures(void)
     _POSIX_API_Initialize();
   #endif
 
-  /*
-   * Discover and initialize the secondary cores in an SMP system.
-   */
   #if defined(RTEMS_SMP)
-    _SMP_Processor_count =
-        bsp_smp_initialize( rtems_configuration_get_maximum_processors() );
+    _SMP_Handler_initialize();
   #endif
 
   _System_state_Set( SYSTEM_STATE_BEFORE_MULTITASKING );
@@ -231,6 +223,10 @@ void rtems_initialize_start_multitasking(void)
 
   _System_state_Set( SYSTEM_STATE_BEGIN_MULTITASKING );
 
+#ifdef RTEMS_SMP
+  _SMP_Request_other_cores_to_perform_first_context_switch();
+#endif
+
   _Thread_Start_multitasking();
 
   /*******************************************************************
@@ -241,7 +237,7 @@ void rtems_initialize_start_multitasking(void)
    *******************************************************************
    *******************************************************************
    *******************************************************************/
-  
-  status = _Per_CPU_Information[0].idle->Wait.return_code;
+
+  status = _Thread_Get_global_exit_status();
   rtems_fatal( RTEMS_FATAL_SOURCE_EXIT, status );
 }

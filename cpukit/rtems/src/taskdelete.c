@@ -38,6 +38,9 @@ rtems_status_code rtems_task_delete(
   rtems_id id
 )
 {
+#ifdef RTEMS_SMP
+  return rtems_task_suspend( id );
+#else /* RTEMS_SMP */
   register Thread_Control *the_thread;
   Objects_Locations        location;
   Objects_Information     *the_information;
@@ -51,11 +54,11 @@ rtems_status_code rtems_task_delete(
       the_information = _Objects_Get_information_id( the_thread->Object.id );
 
       #if defined(RTEMS_DEBUG)
-	if ( !the_information ) {
-	  _Thread_Enable_dispatch();
-	  return RTEMS_INVALID_ID;
-	  /* This should never happen if _Thread_Get() works right */
-	}
+        if ( !the_information ) {
+          _Objects_Put( &the_thread->Object );
+          return RTEMS_INVALID_ID;
+          /* This should never happen if _Thread_Get() works right */
+        }
       #endif
 
       #if defined(RTEMS_MULTIPROCESSING)
@@ -73,8 +76,9 @@ rtems_status_code rtems_task_delete(
 
       _RTEMS_tasks_Free( the_thread );
 
+      /* FIXME: Lock order reversal */
       _RTEMS_Unlock_allocator();
-      _Thread_Enable_dispatch();
+      _Objects_Put( &the_thread->Object );
       return RTEMS_SUCCESSFUL;
 
 #if defined(RTEMS_MULTIPROCESSING)
@@ -90,4 +94,5 @@ rtems_status_code rtems_task_delete(
 
   _RTEMS_Unlock_allocator();
   return RTEMS_INVALID_ID;
+#endif /* RTEMS_SMP */
 }

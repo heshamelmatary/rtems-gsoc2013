@@ -24,9 +24,7 @@
 #else
   #include <rtems/score/isrlevel.h>
   #include <rtems/score/timestamp.h>
-  #if defined(RTEMS_SMP)
-    #include <rtems/score/smplock.h>
-  #endif
+  #include <rtems/score/smplock.h>
 
   /*
    * NOTE: This file MUST be included on non-smp systems as well
@@ -60,36 +58,71 @@ extern "C" {
 typedef struct Thread_Control_struct Thread_Control;
 #endif
 
-#if (CPU_ALLOCATE_INTERRUPT_STACK == FALSE) && defined(RTEMS_SMP)
-  #error "RTEMS must allocate per CPU interrupt stack for SMP"
-#endif
+#ifdef RTEMS_SMP
 
 typedef enum {
+  /**
+   * @brief The per CPU controls are initialized to zero.
+   *
+   * In this state the only valid field of the per CPU controls for secondary
+   * processors is the per CPU state.  The secondary processors should perform
+   * their basic initialization now and change into the
+   * PER_CPU_STATE_READY_TO_BEGIN_MULTITASKING state once this is complete.
+   *
+   * The owner of the per CPU state field is the secondary processor in this
+   * state.
+   */
+  PER_CPU_STATE_BEFORE_INITIALIZATION,
 
   /**
-   *  This defines the constant used to indicate that the cpu code is in
-   *  its initial powered up start.
+   * @brief Secondary processor is ready to begin multitasking.
+   *
+   * The secondary processor performed its basic initialization and is ready to
+   * receive inter-processor interrupts.  Interrupt delivery must be disabled
+   * in this state, but requested inter-processor interrupts must be recorded
+   * and must be delivered once the secondary processor enables interrupts for
+   * the first time.  The main processor will wait for all secondary processors
+   * to change into this state.  In case a secondary processor does not reach
+   * this state the system will not start.  The secondary processors wait now
+   * for a change into the PER_CPU_STATE_BEGIN_MULTITASKING state set by the
+   * main processor once all secondary processors reached the
+   * PER_CPU_STATE_READY_TO_BEGIN_MULTITASKING state.
+   *
+   * The owner of the per CPU state field is the main processor in this state.
    */
-   RTEMS_BSP_SMP_CPU_INITIAL_STATE = 1,
+  PER_CPU_STATE_READY_TO_BEGIN_MULTITASKING,
 
   /**
-   *  This defines the constant used to indicate that the cpu code has
-   *  completed basic initialization and awaits further commands.
+   * @brief Multitasking begin of secondary processor is requested.
+   *
+   * The main processor completed system initialization and is about to perform
+   * a context switch to its heir thread.  Secondary processors should now
+   * issue a context switch to the heir thread.  This normally enables
+   * interrupts on the processor for the first time.
+   *
+   * The owner of the per CPU state field is the secondary processor in this
+   * state.
    */
-   RTEMS_BSP_SMP_CPU_INITIALIZED = 2,
+  PER_CPU_STATE_BEGIN_MULTITASKING,
 
   /**
-   *  This defines the constant used to indicate that the cpu code has
-   *  completed basic initialization and awaits further commands.
+   * @brief Normal multitasking state.
+   *
+   * The owner of the per CPU state field is the secondary processor in this
+   * state.
    */
-  RTEMS_BSP_SMP_CPU_UP = 3,
+  PER_CPU_STATE_UP,
 
   /**
-   *  This defines the constant used to indicate that the cpu code has
-   *  shut itself down.
+   * @brief This is the terminal state.
+   *
+   * The owner of the per CPU state field is the secondary processor in this
+   * state.
    */
-  RTEMS_BSP_SMP_CPU_SHUTDOWN = 4
-} bsp_smp_cpu_state;
+  PER_CPU_STATE_SHUTDOWN
+} Per_CPU_State;
+
+#endif /* RTEMS_SMP */
 
 /**
  *  @brief Per CPU Core Structure
@@ -127,25 +160,28 @@ typedef struct {
   /** This is the heir thread for this this CPU. */
   Thread_Control *heir;
 
-  /** This is the idle thread for this CPU. */
-  Thread_Control *idle;
-
   /** This is the time of the last context switch on this CPU. */
   Timestamp_Control time_of_last_context_switch;
 
   #if defined(RTEMS_SMP)
     /** This element is used to lock this structure */
-    SMP_lock_spinlock_simple_Control  lock;
-
-    /** This indicates that the CPU is online. */
-    uint32_t                          state;
+    SMP_lock_Control lock;
 
     /**
      *  This is the request for the interrupt.
      *
      *  @note This may become a chain protected by atomic instructions.
      */
-    uint32_t                          message;
+    uint32_t message;
+
+    /**
+     * @brief Indicates the current state of the CPU.
+     *
+     * This field is not protected by a lock.
+     *
+     * @see _Per_CPU_Change_state() and _Per_CPU_Wait_for_state().
+     */
+    Per_CPU_State state;
   #endif
 } Per_CPU_Control;
 #endif
@@ -222,6 +258,22 @@ void _SMP_Handler_initialize(void);
  */
 void _Per_CPU_Initialize(void);
 
+void _Per_CPU_Change_state(
+  Per_CPU_Control *per_cpu,
+  Per_CPU_State new_state
+);
+
+void _Per_CPU_Wait_for_state(
+  const Per_CPU_Control *per_cpu,
+  Per_CPU_State desired_state
+);
+
+#define _Per_CPU_Lock_acquire( per_cpu, isr_cookie ) \
+  _SMP_lock_ISR_disable_and_acquire( &( per_cpu )->lock, isr_cookie )
+
+#define _Per_CPU_Lock_release( per_cpu, isr_cookie ) \
+  _SMP_lock_Release_and_ISR_enable( &( per_cpu )->lock, isr_cookie )
+
 #endif
 
 /*
@@ -232,8 +284,6 @@ void _Per_CPU_Initialize(void);
   _Per_CPU_Information[bsp_smp_processor_id()].heir
 #define _Thread_Executing \
   _Per_CPU_Information[bsp_smp_processor_id()].executing
-#define _Thread_Idle \
-  _Per_CPU_Information[bsp_smp_processor_id()].idle
 #define _ISR_Nest_level \
   _Per_CPU_Information[bsp_smp_processor_id()].isr_nest_level
 #define _CPU_Interrupt_stack_low \

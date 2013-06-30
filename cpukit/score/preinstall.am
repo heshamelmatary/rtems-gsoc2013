@@ -147,6 +147,14 @@ $(PROJECT_INCLUDE)/rtems/score/schedulersimple.h: include/rtems/score/schedulers
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/schedulersimple.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulersimple.h
 
+$(PROJECT_INCLUDE)/rtems/score/smp.h: include/rtems/score/smp.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/smp.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/smp.h
+
+$(PROJECT_INCLUDE)/rtems/score/smplock.h: include/rtems/score/smplock.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/smplock.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/smplock.h
+
 $(PROJECT_INCLUDE)/rtems/score/stack.h: include/rtems/score/stack.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/stack.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/stack.h
@@ -162,6 +170,10 @@ PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/sysstate.h
 $(PROJECT_INCLUDE)/rtems/score/thread.h: include/rtems/score/thread.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/thread.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/thread.h
+
+$(PROJECT_INCLUDE)/rtems/score/threaddispatch.h: include/rtems/score/threaddispatch.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/threaddispatch.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/threaddispatch.h
 
 $(PROJECT_INCLUDE)/rtems/score/threadq.h: include/rtems/score/threadq.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/threadq.h
@@ -227,15 +239,6 @@ $(PROJECT_INCLUDE)/rtems/score/genericatomicops.h: include/rtems/score/genericat
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/genericatomicops.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/genericatomicops.h
 
-if HAS_SMP
-$(PROJECT_INCLUDE)/rtems/score/smplock.h: include/rtems/score/smplock.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
-	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/smplock.h
-PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/smplock.h
-
-$(PROJECT_INCLUDE)/rtems/score/smp.h: include/rtems/score/smp.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
-	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/smp.h
-PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/smp.h
-endif
 if HAS_PTHREADS
 $(PROJECT_INCLUDE)/rtems/score/corespinlock.h: include/rtems/score/corespinlock.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/corespinlock.h

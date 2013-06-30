@@ -472,7 +472,7 @@ typedef struct CPU_Interrupt_frame {
  *  This should be TRUE is CPU_HAS_SOFTWARE_INTERRUPT_STACK is TRUE.
  */
 
-#define CPU_ALLOCATE_INTERRUPT_STACK FALSE
+#define CPU_ALLOCATE_INTERRUPT_STACK TRUE
 
 /*
  *  Does the RTEMS invoke the user's ISR with the vector number and
@@ -996,6 +996,21 @@ void _CPU_Context_volatile_clobber( uintptr_t pattern );
 
 void _CPU_Context_validate( uintptr_t pattern );
 
+#ifdef RTEMS_SMP
+  #define _CPU_Context_switch_to_first_task_smp( _context ) \
+    _CPU_Context_restore( _context )
+
+  static inline void _CPU_Processor_event_broadcast( void )
+  {
+    __asm__ volatile ( "" : : : "memory" );
+  }
+
+  static inline void _CPU_Processor_event_receive( void )
+  {
+    __asm__ volatile ( "" : : : "memory" );
+  }
+#endif
+
 typedef struct {
   uint32_t EXC_SRR0;
   uint32_t EXC_SRR1;
@@ -1067,8 +1082,8 @@ _CPU_Initialize_altivec(void);
 
 void
 _CPU_Context_switch_altivec(
-  Context_Control *from,
-  Context_Control *to
+  ppc_context *from,
+  ppc_context *to
 );
 
 /*
@@ -1079,7 +1094,7 @@ _CPU_Context_switch_altivec(
 
 void
 _CPU_Context_restore_altivec(
-  Context_Control *ctxt
+  ppc_context *ctxt
 );
 
 /*
@@ -1090,7 +1105,7 @@ _CPU_Context_restore_altivec(
 
 void
 _CPU_Context_initialize_altivec(
-  Context_Control *ctxt
+  ppc_context *ctxt
 );
 
 void _CPU_Fatal_error(

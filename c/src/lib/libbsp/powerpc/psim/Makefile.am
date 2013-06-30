@@ -37,7 +37,7 @@ libbsp_a_SOURCES += ../../shared/bspclean.c ../../shared/bsplibc.c \
     ../../shared/bsppredriverhook.c startup/bspstart.c \
     ../../shared/bspgetworkarea.c ../../shared/bootcard.c \
     ../../powerpc/shared/startup/sbrk.c ../../shared/gnatinstallhandler.c \
-		../../powerpc/shared/startup/pgtbl_setup.c ../../powerpc/shared/startup/pgtbl_activate.c \
+    ../../powerpc/shared/startup/pgtbl_setup.c ../../powerpc/shared/startup/pgtbl_activate.c \
     startup/psim_registers.c
 
 # pclock

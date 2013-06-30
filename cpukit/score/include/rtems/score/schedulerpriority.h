@@ -52,7 +52,8 @@ extern "C" {
     _Scheduler_priority_Extract,          /* extract entry point */ \
     _Scheduler_priority_Priority_compare, /* compares two priorities */ \
     _Scheduler_priority_Release_job,      /* new period of task */ \
-    _Scheduler_priority_Tick              /* tick entry point */ \
+    _Scheduler_default_Tick,              /* tick entry point */ \
+    _Scheduler_default_Start_idle         /* start idle entry point */ \
   }
 
 /**
@@ -144,12 +145,12 @@ void _Scheduler_priority_Unblock(
 );
 
 /**
- *  @brief Remove the running THREAD to the rear of this chain.
+ *  @brief The specified THREAD yields.
  *
  *  This routine is invoked when a thread wishes to voluntarily
  *  transfer control of the processor to another thread in the queue.
  *
- *  This routine will remove the running THREAD from the ready queue
+ *  This routine will remove the specified THREAD from the ready queue
  *  and place it immediately at the rear of this chain.  Reset timeslice
  *  and yield the processor functions both use this routine, therefore if
  *  reset is true and this is the only thread on the queue then the
@@ -159,8 +160,10 @@ void _Scheduler_priority_Unblock(
  *  - INTERRUPT LATENCY:
  *    + ready chain
  *    + select heir
+ *
+ *  @param[in,out] thread The yielding thread.
  */
-void _Scheduler_priority_Yield( void );
+void _Scheduler_priority_Yield( Thread_Control *thread );
 
 /**
  *  @brief Puts @a the_thread on to the priority-based ready queue.
@@ -221,15 +224,6 @@ void _Scheduler_priority_Release_job (
   Thread_Control  *the_thread,
   uint32_t         deadline
 );
-
-/**
- *  @brief Determines if the current thread allows timeslicing.
- *
- *  This routine is invoked as part of processing each clock tick.
- *  It is responsible for determining if the current thread allows
- *  timeslicing and, if so, when its timeslice expires.
- */
-void _Scheduler_priority_Tick( void );
 
 /**
  *  This is the major bit map.

@@ -595,7 +595,7 @@ void _Heap_Iterate(
 /**
  * @brief Greedy allocate that empties the heap.
  *
- * Afterward the heap has at most @a block_count allocateable blocks of sizes
+ * Afterwards the heap has at most @a block_count allocatable blocks of sizes
  * specified by @a block_sizes.  The @a block_sizes must point to an array with
  * @a block_count members.  All other blocks are used.
  *
@@ -605,6 +605,20 @@ Heap_Block *_Heap_Greedy_allocate(
   Heap_Control *heap,
   const uintptr_t *block_sizes,
   size_t block_count
+);
+
+/**
+ * @brief Greedy allocate all blocks except the largest free block.
+ *
+ * Afterwards the heap has at most one allocatable block.  This block is the
+ * largest free block if it exists.  The allocatable size of this block is
+ * stored in @a allocatable_size.  All other blocks are used.
+ *
+ * @see _Heap_Greedy_free().
+ */
+Heap_Block *_Heap_Greedy_allocate_all_except_largest(
+  Heap_Control *heap,
+  uintptr_t *allocatable_size
 );
 
 /**
@@ -734,6 +748,7 @@ Heap_Block *_Heap_Block_allocate(
   #define _Heap_Protection_block_initialize( heap, block ) ((void) 0)
   #define _Heap_Protection_block_check( heap, block ) ((void) 0)
   #define _Heap_Protection_block_error( heap, block ) ((void) 0)
+  #define _Heap_Protection_free_all_delayed_blocks( heap ) ((void) 0)
 #else
   static inline void _Heap_Protection_block_initialize(
     Heap_Control *heap,
@@ -757,6 +772,16 @@ Heap_Block *_Heap_Block_allocate(
   )
   {
     (*heap->Protection.block_error)( heap, block );
+  }
+
+  static inline void _Heap_Protection_free_all_delayed_blocks( Heap_Control *heap )
+  {
+    uintptr_t large = 0
+      - (uintptr_t) HEAP_BLOCK_HEADER_SIZE
+      - (uintptr_t) HEAP_ALLOC_BONUS
+      - (uintptr_t) 1;
+    void *p = _Heap_Allocate( heap, large );
+    _Heap_Free( heap, p );
   }
 #endif
 

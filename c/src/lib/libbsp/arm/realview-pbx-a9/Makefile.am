@@ -35,6 +35,7 @@ include_bsp_HEADERS += ../../shared/tod.h
 include_bsp_HEADERS += ../shared/include/start.h
 include_bsp_HEADERS += ../shared/include/arm-a9mpcore-irq.h
 include_bsp_HEADERS += ../shared/include/arm-a9mpcore-regs.h
+include_bsp_HEADERS += ../shared/include/arm-a9mpcore-start.h
 include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
 include_bsp_HEADERS += ../shared/include/arm-gic.h
 include_bsp_HEADERS += ../shared/include/arm-gic-irq.h
@@ -60,6 +61,8 @@ project_lib_DATA = start.$(OBJEXT)
 project_lib_DATA += startup/linkcmds
 
 EXTRA_DIST =
+EXTRA_DIST += startup/linkcmds.realview_pbx_a9_qemu
+EXTRA_DIST += startup/linkcmds.realview_pbx_a9_qemu_smp
 
 ###############################################################################
 #                  LibBSP                                                     #
@@ -124,6 +127,10 @@ libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c
+
+if HAS_SMP
+libbsp_a_SOURCES += ../shared/arm-a9mpcore-smp.c
+endif
 
 ###############################################################################
 #                  Special Rules                                              #

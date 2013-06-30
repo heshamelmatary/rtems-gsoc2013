@@ -20,6 +20,8 @@
 #ifndef _RTEMS_BSPSMP_H
 #define _RTEMS_BSPSMP_H
 
+#include <rtems/score/cpuopts.h>
+
 #if defined (RTEMS_SMP)
 #include <rtems/score/percpu.h>
 
@@ -48,21 +50,24 @@ extern "C" {
 
 
 #ifndef ASM
+
 /**
- *  @brief Initialize secondary CPUs.
+ * @brief Performs BSP specific SMP initialization in the context of the main
+ * processor.
  *
- *  This method is invoked by RTEMS during initialization to bring the
- *  secondary CPUs out of reset.
+ * This function is invoked on the main processor by RTEMS during
+ * initialization.  All interrupt stacks are allocated at this point in case
+ * the CPU port allocates the interrupt stacks.
  *
- *  @param [in] maximum is the maximum number of CPU cores that RTEMS
- *              can handle
+ * The BSP may start secondary processors now.
  *
- *  @retval This method returns the number of cores available in the
- *          system.
+ * @param[in] configured_cpu_count The count of processors requested by the
+ * application configuration.
+ *
+ * @return The count of processors available for the application in the system.
+ * This value is less than or equal to the configured count of processors.
  */
-int bsp_smp_initialize(
-  int maximum
-);
+uint32_t bsp_smp_initialize( uint32_t configured_cpu_count );
 
 /**
  *  @brief Obtain current CPU index.
@@ -73,21 +78,6 @@ int bsp_smp_initialize(
  *  @retval This method returns the current CPU index.
  */
 int bsp_smp_processor_id(void) RTEMS_COMPILER_PURE_ATTRIBUTE;
-
-/**
- *  @brief Make request of another CPU.
- *
- *  This method is invoked by RTEMS when it needs to make a request
- *  of another CPU.  It should be implemented using some type of
- *  interprocessor interrupt.
- *
- *  @param [in] cpu is the target CPU for this request.
- *  @param [in] message is message to send
- */
-void rtems_smp_send_message(
-  int       cpu,
-  uint32_t  message
-);
 
 /**
  *  @brief Generate an interprocessor broadcast interrupt.
@@ -129,35 +119,28 @@ void bsp_smp_interrupt_cpu(
 int   bsp_smp_processor_id( void );
 
 /**
- *  This method is invoked by @ref rtems_smp_secondary_cpu_initialize
- *  to allow the BSP to perform some intialization.  The @a cpu
- *  parameter indicates the secondary CPU that the code is executing on
- *  and is currently being initialized.
+ * @brief Performs high-level initialization of a secondary processor and runs
+ * the application threads.
  *
- *  @note This is called by @ref rtems_smp_secondary_cpu_initialize.
+ * The low-level initialization code must call this function to hand over the
+ * control of this processor to RTEMS.  Interrupts must be disabled.  It must
+ * be possible to send inter-processor interrupts to this processor.  Since
+ * interrupts are disabled the inter-processor interrupt delivery is postponed
+ * until interrupts are enabled the first time.  This is usually a side-effect
+ * of the context switch to the first thread.
+ *
+ * The pre-requisites for the call to this function are
+ * - disabled interrupts,
+ * - delivery of inter-processor interrupts is possible,
+ * - a valid stack pointer and enough stack space,
+ * - a valid code memory, and
+ * - a valid BSS section.
+ *
+ * This function must not be called by the main processor.  This function does
+ * not return to the caller.
  */
-void bsp_smp_secondary_cpu_initialize(int cpu);
-
-/**
- *  @brief Initialize secondary CPU and coordinates.
- *
- *  This method is the C entry point which secondary CPUs should
- *  arrange to call.  It performs OS initialization for the secondary
- *  CPU and coordinates bring it to a useful state.
- *
- *  @note This is provided by RTEMS.
- */
-void rtems_smp_secondary_cpu_initialize(void);
-
-/**
- *  This method is invoked by the BSP to initialize the per CPU structure
- *  for the specified @a cpu while it is bringing the secondary CPUs
- *  out of their reset state and into a useful state.
- *
- *  @param [in] cpu indicates the CPU whose per cpu structure is to
- *              be initialized.
- */
-void rtems_smp_initialize_per_cpu(int cpu);
+void rtems_smp_secondary_cpu_initialize( void )
+  RTEMS_COMPILER_NO_RETURN_ATTRIBUTE;
 
 /**
  *  @brief Process the incoming interprocessor request.
@@ -166,12 +149,6 @@ void rtems_smp_initialize_per_cpu(int cpu);
  *  to process the incoming interprocessor request.
  */
 void rtems_smp_process_interrupt(void);
-
-void bsp_smp_wait_for(
-  volatile unsigned int *address,
-  unsigned int           desired,
-  int                    maximum_usecs
-);
 
 #endif
 

@@ -54,7 +54,7 @@
 
 DEFINE_FUNCTION_ARM(_CPU_Context_switch)
 /* Start saving context */
-	mrs	r2, cpsr
+	mrs	r2, CPSR
 	stmia	r0,  {r2, r4, r5, r6, r7, r8, r9, r10, r11, r13, r14}
 
 #ifdef ARM_MULTILIB_VFP_D32
@@ -64,6 +64,9 @@ DEFINE_FUNCTION_ARM(_CPU_Context_switch)
 
 /* Start restoring context */
 _restore:
+#ifdef RTEMS_SMP
+	clrex
+#endif
 
 #ifdef ARM_MULTILIB_VFP_D32
 	add	r3, r1, #ARM_CONTEXT_CONTROL_D8_OFFSET
@@ -71,7 +74,7 @@ _restore:
 #endif
 
 	ldmia	r1,  {r2, r4, r5, r6, r7, r8, r9, r10, r11, r13, r14}
-	msr	cpsr, r2
+	msr	CPSR_fsxc, r2
 #ifdef __thumb__
 	bx	lr
 	nop

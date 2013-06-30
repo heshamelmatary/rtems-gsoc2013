@@ -50,18 +50,6 @@
   #define RTEMS_SCORE_THREAD_ENABLE_USER_PROVIDED_STACK_VIA_API
 #endif
 
-#if defined(RTEMS_SMP) || \
-    defined(RTEMS_HEAVY_STACK_DEBUG) || \
-    defined(RTEMS_HEAVY_MALLOC_DEBUG)
-  #define __THREAD_DO_NOT_INLINE_DISABLE_DISPATCH__
-#endif
-
-#if defined(RTEMS_SMP) || \
-   (CPU_INLINE_ENABLE_DISPATCH == FALSE) || \
-   (__RTEMS_DO_NOT_INLINE_THREAD_ENABLE_DISPATCH__ == 1)
-  #define __THREAD_DO_NOT_INLINE_ENABLE_DISPATCH__
-#endif
-
 /*
  *  Deferred floating point context switches are not currently
  *  supported when in SMP configuration.
@@ -396,6 +384,30 @@ struct Thread_Control_struct {
 #endif
   /** This field is true if the thread is preemptible. */
   bool                                  is_preemptible;
+#if defined(RTEMS_SMP)
+  /**
+   * @brief This field is true if the thread is scheduled.
+   *
+   * A thread is scheduled if it is ready and the scheduler allocated a
+   * processor for it.  A scheduled thread is assigned to exactly one
+   * processor.  There are exactly processor count scheduled threads in the
+   * system.
+   */
+  bool                                  is_scheduled;
+
+  /**
+   * @brief This field is true if the thread is executing.
+   *
+   * A thread is executing if it executes on a processor.  An executing thread
+   * executes on exactly one processor.  There are exactly processor count
+   * executing threads in the system.  An executing thread may have a heir
+   * thread and thread dispatching is necessary.  On SMP a thread dispatch on a
+   * remote processor needs help from an inter-processor interrupt, thus it
+   * will take some time to complete the state change.  A lot of things can
+   * happen in the meantime.
+   */
+  bool                                  is_executing;
+#endif
 #if __RTEMS_ADA__
   /** This field is the GNAT self context pointer. */
   void                                 *rtems_ada_self;
@@ -419,6 +431,10 @@ struct Thread_Control_struct {
 
   /** This pointer holds per-thread data for the scheduler and ready queue. */
   void                                 *scheduler_info;
+
+#ifdef RTEMS_SMP
+  Per_CPU_Control                      *cpu;
+#endif
 
   /** This field contains information about the starting state of
    *  this thread.
@@ -461,21 +477,6 @@ SCORE_EXTERN Objects_Information _Thread_Internal_information;
  *  which initiated the system.
  */
 SCORE_EXTERN Context_Control _Thread_BSP_context;
-
-/**
- *  The following declares the dispatch critical section nesting
- *  counter which is used to prevent context switches at inopportune
- *  moments.
- */
-SCORE_EXTERN volatile uint32_t   _Thread_Dispatch_disable_level;
-
-#if defined(RTEMS_SMP)
-  /**
-   * The following declares the smp spinlock to be used to control
-   * the dispatch critical section accesses across cpus.
-   */
-  SCORE_EXTERN SMP_lock_spinlock_nested_Control _Thread_Dispatch_disable_level_lock;
-#endif
 
 /**
  *  The following holds how many user extensions are in the system.  This
@@ -533,26 +534,6 @@ void _Thread_Create_idle(void);
  *    + select heir
  */
 void _Thread_Start_multitasking( void );
-
-/**
- *  @brief Dispatch thread.
- *
- *  This routine is responsible for transferring control of the
- *  processor from the executing thread to the heir thread. Once the
- *  heir is running an attempt is made to dispatch any ASRs.
- *  As part of this process, it is responsible for the following actions:
- *     + saving the context of the executing thread
- *     + restoring the context of the heir thread
- *     + dispatching any signals for the resulting executing thread
-
- *  ALTERNATE ENTRY POINTS:
- *    void _Thread_Enable_dispatch();
- *
- *  - INTERRUPT LATENCY:
- *    + dispatch thread
- *    + no dispatch thread
- */
-void _Thread_Dispatch( void );
 
 /**
  *  @brief Allocate the requested stack space for the thread.
@@ -618,13 +599,17 @@ bool _Thread_Initialize(
  *  @param entry_point
  *  @param pointer_argument
  *  @param numeric_argument
+ *  @param[in,out] processor The processor if used to start an idle thread
+ *  during system initialization.  Must be set to @c NULL to start a normal
+ *  thread.
  */
 bool _Thread_Start(
   Thread_Control            *the_thread,
   Thread_Start_types         the_prototype,
   void                      *entry_point,
   void                      *pointer_argument,
-  Thread_Entry_numeric_type  numeric_argument
+  Thread_Entry_numeric_type  numeric_argument,
+  Per_CPU_Control           *processor
 );
 
 /**
@@ -896,57 +881,6 @@ void _Thread_blocking_operation_Cancel(
   Thread_Control                   *the_thread,
   ISR_Level                         level
 );
-#if defined(RTEMS_SMP)
-
-  /**
-   *  @brief Initializes the thread dispatching subsystem.
-   *
-   *  This routine initializes the thread dispatching subsystem.
-   */
-  void _Thread_Dispatch_initialization(void);
-
-  /**
-   *  @brief Checks if thread dispatch says that we are in a critical section.
-   *
-   * This routine returns true if thread dispatch indicates
-   * that we are in a critical section.
-   */
-  bool _Thread_Dispatch_in_critical_section(void);
-
-  /**
-   *  @brief Returns value of the the thread dispatch level.
-   *
-   * This routine returns value of the the thread dispatch level.
-   */
-  uint32_t _Thread_Dispatch_get_disable_level(void);
-
-  /**
-   *  @brief Sets thread dispatch level to the value passed in.
-   *
-   * This routine sets thread dispatch level to the
-   * value passed in.
-   */
-  uint32_t _Thread_Dispatch_set_disable_level(uint32_t value);
-
-  /**
-   *  @brief Increments the thread dispatch level.
-   *
-   * This rountine increments the thread dispatch level
-   */
-  uint32_t _Thread_Dispatch_increment_disable_level(void);
-
-  /**
-   *  @brief Decrements the thread dispatch level.
-   *
-   * This routine decrements the thread dispatch level.
-   */
-  uint32_t _Thread_Dispatch_decrement_disable_level(void);
-
-#else
-  /*
-   * The _Thread_Dispatch_... functions are in thread.inl
-   */
-#endif
 
 #ifndef __RTEMS_APPLICATION__
 #include <rtems/score/thread.inl>

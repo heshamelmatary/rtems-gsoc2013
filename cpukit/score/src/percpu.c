@@ -31,34 +31,64 @@
 
   void _SMP_Handler_initialize(void)
   {
-    int         cpu;
-    size_t      size;
-    uintptr_t   ptr;
-
-    /*
-     *  Initialize per CPU structures.
-     */
-    size = (_SMP_Processor_count) * sizeof(Per_CPU_Control);
-    memset( _Per_CPU_Information, '\0', size );
+    uint32_t max_cpus = rtems_configuration_get_maximum_processors();
+    uint32_t cpu;
 
     /*
      *  Initialize per cpu pointer table
      */
-    size = rtems_configuration_get_interrupt_stack_size();
     _Per_CPU_Information_p[0] = &_Per_CPU_Information[0];
-    for (cpu=1 ; cpu < rtems_configuration_get_maximum_processors(); cpu++ ) {
+    for ( cpu = 1 ; cpu < max_cpus; ++cpu ) {
 
       Per_CPU_Control *p = &_Per_CPU_Information[cpu];
 
       _Per_CPU_Information_p[cpu] = p;
 
-      p->interrupt_stack_low = _Workspace_Allocate_or_fatal_error( size );
+#if CPU_ALLOCATE_INTERRUPT_STACK == TRUE
+      {
+        size_t size = rtems_configuration_get_interrupt_stack_size();
+        uintptr_t ptr;
 
-      ptr = (uintptr_t) _Addresses_Add_offset( p->interrupt_stack_low, size );
-      ptr &= ~(CPU_STACK_ALIGNMENT - 1);
-      p->interrupt_stack_high = (void *)ptr;
-      p->state = RTEMS_BSP_SMP_CPU_INITIAL_STATE;
-      RTEMS_COMPILER_MEMORY_BARRIER();
+        p->interrupt_stack_low = _Workspace_Allocate_or_fatal_error( size );
+
+        ptr = (uintptr_t) _Addresses_Add_offset( p->interrupt_stack_low, size );
+        ptr &= ~(CPU_STACK_ALIGNMENT - 1);
+        p->interrupt_stack_high = (void *)ptr;
+      }
+#endif
+    }
+
+    /*
+     * Discover and initialize the secondary cores in an SMP system.
+     */
+    max_cpus = bsp_smp_initialize( max_cpus );
+
+    _SMP_Processor_count = max_cpus;
+
+    for ( cpu = 1 ; cpu < max_cpus; ++cpu ) {
+      _Per_CPU_Wait_for_state(
+        &_Per_CPU_Information[ cpu ],
+        PER_CPU_STATE_READY_TO_BEGIN_MULTITASKING
+      );
+    }
+  }
+
+  void _Per_CPU_Change_state(
+    Per_CPU_Control *per_cpu,
+    Per_CPU_State new_state
+  )
+  {
+    per_cpu->state = new_state;
+    _CPU_Processor_event_broadcast();
+  }
+
+  void _Per_CPU_Wait_for_state(
+    const Per_CPU_Control *per_cpu,
+    Per_CPU_State desired_state
+  )
+  {
+    while ( per_cpu->state != desired_state ) {
+      _CPU_Processor_event_receive();
     }
   }
 #else

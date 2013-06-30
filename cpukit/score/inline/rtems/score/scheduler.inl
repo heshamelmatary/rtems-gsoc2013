@@ -55,16 +55,18 @@ RTEMS_INLINE_ROUTINE void _Scheduler_Schedule( void )
 }
 
 /**
- * @brief Scheduler yield.
+ * @brief Scheduler yield with a particular thread.
  *
- * This routine is invoked when a thread wishes to voluntarily
- * transfer control of the processor to another thread. This routine
- * always operates on the scheduler that 'owns' the currently executing
- * thread.
+ * This routine is invoked when a thread wishes to voluntarily transfer control
+ * of the processor to another thread.
+ *
+ * @param[in] thread The yielding thread.
  */
-RTEMS_INLINE_ROUTINE void _Scheduler_Yield( void )
+RTEMS_INLINE_ROUTINE void _Scheduler_Yield(
+  Thread_Control *thread
+)
 {
-  _Scheduler.Operations.yield();
+  ( *_Scheduler.Operations.yield )( thread );
 }
 
 /**
@@ -206,6 +208,22 @@ RTEMS_INLINE_ROUTINE void _Scheduler_Release_job(
 RTEMS_INLINE_ROUTINE void _Scheduler_Tick( void )
 {
   _Scheduler.Operations.tick();
+}
+
+/**
+ * @brief Starts the idle thread for a particular processor.
+ *
+ * @param[in,out] thread The idle thread for the processor.
+ * @parma[in,out] processor The processor for the idle thread.
+ *
+ * @see _Thread_Create_idle().
+ */
+RTEMS_INLINE_ROUTINE void _Scheduler_Start_idle(
+  Thread_Control *thread,
+  Per_CPU_Control *processor
+)
+{
+  ( *_Scheduler.Operations.start_idle )( thread, processor );
 }
 
 /** @} */
