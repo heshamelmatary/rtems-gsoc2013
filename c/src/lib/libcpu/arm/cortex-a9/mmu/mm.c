@@ -20,7 +20,7 @@
 
 #include <libcpu/mm.h>
 #include <bsp/start.h>
-#include <bsp/arm-cp15-start.h>
+#include <libcpu/arm-cp15-start.h>
 #include <bsp/linker-symbols.h>
 
 #include <rtems/score/mm.h>

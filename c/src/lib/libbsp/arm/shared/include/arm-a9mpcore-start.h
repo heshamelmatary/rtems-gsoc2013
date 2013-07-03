@@ -18,6 +18,7 @@
 #include <rtems/bspsmp.h>
 
 #include <libcpu/arm-cp15.h>
+#include <libcpu/arm-cp15-start.h>
 
 #include <bsp.h>
 #include <bsp/start.h>
