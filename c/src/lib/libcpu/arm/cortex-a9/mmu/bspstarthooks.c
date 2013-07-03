@@ -17,7 +17,6 @@
 #include <bsp/arm-cp15-start.h>
 #include <bsp/arm-a9mpcore-start.h>
 #include <bsp/linker-symbols.h>
-#include <rtems/score/mm.h>
 
 #ifdef RTEMS_SMP
   #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_SHAREABLE
@@ -103,7 +102,6 @@ BSP_START_TEXT_SECTION void bsp_start_hook_1(void)
 {
   arm_a9mpcore_start_hook_1();
   bsp_start_copy_sections();
-  //setup_mmu_and_cache();
-  _CPU_Memory_management_Initialize();
+  setup_mmu_and_cache();
   bsp_start_clear_bss();
 }

@@ -30,8 +30,8 @@ rtems_task Init(
   /* FIXME: Make these addresses target-independent */
   Memory_management_Entry mme1 = {
     .name = "Valid Entry-1",
-    .base = 0x00100000,
-    .size = 0x200000,
+    .base = 0x0C000000U,
+    .size = 0x0CFFFFFFU,
     .installed = false,
     .bsp_mme = NULL
   };
@@ -59,9 +59,9 @@ rtems_task Init(
   printf("Checking MMU exception 1: Read from Unmapped block\n");
   //a = *a1++;
 
-  a1 = (char*)0xffffffffU + 0x2000U;
-  printf("Checking MMU exception 2: Write to Unmapped block\n");
-  *a1++ = 0xCC;
+  //a1 = (char*)0xffffffffU + 0x2000U;
+  //printf("Checking MMU exception 2: Write to Unmapped block\n");
+  //*a1++ = 0xCC;
 
   // this one isn't an exception.
   a2 = mme1.base;

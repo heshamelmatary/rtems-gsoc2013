@@ -36,7 +36,6 @@ include_bsp_HEADERS += ../shared/include/start.h
 include_bsp_HEADERS += ../shared/include/arm-a9mpcore-irq.h
 include_bsp_HEADERS += ../shared/include/arm-a9mpcore-regs.h
 include_bsp_HEADERS += ../shared/include/arm-a9mpcore-start.h
-include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
 include_bsp_HEADERS += ../shared/include/arm-gic.h
 include_bsp_HEADERS += ../shared/include/arm-gic-irq.h
 include_bsp_HEADERS += ../shared/include/arm-gic-regs.h
@@ -123,7 +122,11 @@ libbsp_a_SOURCES += ../../../libcpu/arm/shared/include/cache_.h
 libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 
 # MMU
-libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
+#libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
+libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-set-ttb-entries.c
+libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/mm.c
+
+include_libcpu_HEADERS += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-start.h
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c
