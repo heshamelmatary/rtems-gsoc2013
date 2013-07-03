@@ -46,11 +46,11 @@ rtems_task Init(
 
   printf("Test 1: Installing Entry-1 \
 and set it as Read only\n");
-  _Memory_management_Install_entry( &mme1, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
+  //_Memory_management_Install_entry( &mme1, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
 
   printf("Test 2 : Installing Entry-2\
 and set it as Write enabled\n");
-  _Memory_management_Install_entry( &mme2, RTEMS_MM_REGION_PROTECTION_WRITE);
+  //_Memory_management_Install_entry( &mme2, RTEMS_MM_REGION_PROTECTION_WRITE);
 
   printf( "\n\n*** End of mmtest1 ***\n" );
 
