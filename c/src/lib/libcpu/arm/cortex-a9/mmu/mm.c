@@ -109,6 +109,10 @@ void _CPU_Memory_management_Initialize(void)
 
 void _CPU_Memory_management_Install_entry() { };
 
+void dummy_data_abort_exception_handler(void)
+{
+  printk("Entered exception handler \n");
+}
 
 #ifdef __cplusplus
 }

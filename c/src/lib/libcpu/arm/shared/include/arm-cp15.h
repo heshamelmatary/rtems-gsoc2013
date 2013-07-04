@@ -962,6 +962,11 @@ void arm_cp15_set_exception_handler(
   void (*handler)(void)
 );
 
+/**
+ * @brief dummy exception handler for data aborts to help in debugging
+ */
+void dummy_data_abort_exception_handler(void);
+
 /** @} */
 
 #ifdef __cplusplus
