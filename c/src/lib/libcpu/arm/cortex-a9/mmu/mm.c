@@ -34,6 +34,24 @@ extern "C" {
   #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_CACHED
 #endif
 
+static void translate_attributes(
+  uint32_t high_level_attr,
+  uint32_t *ARM_CPU_ATTR
+)
+{
+
+  /* Clear flags attributes */
+  *ARM_CPU_ATTR = 0;
+
+  if( high_level_attr & 0x1 )
+    *ARM_CPU_ATTR |= ARMV7_MMU_READ_ONLY;
+
+  /* Write access */
+  if ( high_level_attr & 0x2 )
+    *ARM_CPU_ATTR |= MMU_DATA_READ_WRITE;
+} 
+
+
 BSP_START_DATA_SECTION static const arm_cp15_start_section_config
 rvpbxa9_mmu_config_table[] = {
   {
@@ -86,17 +104,17 @@ rvpbxa9_mmu_config_table[] = {
     .flags = ARMV7_MMU_DEVICE
   }, {
     .begin = 0x0C000000U,
-    .end =  0x0CFFFFFFU,
-    .flags = ARMV7_MMU_READ_ONLY
-  }
+    .end = 0x0CFFFFFFU,
+    .flags = MMU_DATA_READ_WRITE
+  } 
 };
 
 void _CPU_Memory_management_Initialize(void)
-{
-	uint32_t ctrl = arm_cp15_start_setup_mmu_and_cache(
-    0,
-    ARM_CP15_CTRL_AFE | ARM_CP15_CTRL_Z
-  );
+{	
+  uint32_t ctrl = arm_cp15_start_setup_mmu_and_cache(
+    		  0,
+    		  ARM_CP15_CTRL_AFE | ARM_CP15_CTRL_Z
+  		 );
 
   arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(
     ctrl,
@@ -107,7 +125,25 @@ void _CPU_Memory_management_Initialize(void)
   );
 }
 
-void _CPU_Memory_management_Install_entry() { };
+void _CPU_Memory_management_Install_entry(Memory_management_Entry *mme, uint32_t attr)
+{
+  /* required as arm_cp15_set_translation_table_entries needs a pointer to end not value */
+  uint32_t end = (uint32_t)mme->base + (uint32_t)mme->size;
+  uint32_t section_flags;
+  
+  /* translate flags from high-level to ARM specific MMU flags */
+  translate_attributes(attr, &section_flags);
+
+  arm_cp15_set_translation_table_entries(mme->base, end, section_flags);
+  mme->installed = true;
+};
+
+void _CPU_Memory_management_Uninstall_entry(Memory_management_Entry *mme)
+{
+  uint32_t end = (uint32_t)mme->base + (uint32_t)mme->size;
+  arm_cp15_unset_translation_table_entries(mme->base, end);
+  mme->installed = false;
+}
 
 void dummy_data_abort_exception_handler(void)
 {

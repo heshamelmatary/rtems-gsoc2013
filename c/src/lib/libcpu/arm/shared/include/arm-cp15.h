@@ -7,6 +7,7 @@
  */
 
 /*
+ * Copyright (c) 2013 Hesham AL-Matary
  * Copyright (c) 2009-2013 embedded brains GmbH.  All rights reserved.
  *
  *  embedded brains GmbH
@@ -955,6 +956,15 @@ uint32_t arm_cp15_set_translation_table_entries(
   const void *begin,
   const void *end,
   uint32_t section_flags
+);
+
+/**
+ * @brief Unsets the @a sections entry for the address range [@a begin, @a end).
+ * Unset section entry by set its value to Zero 
+ */
+uint32_t arm_cp15_unset_translation_table_entries(
+  const void *begin,
+  const void *end
 );
 
 void arm_cp15_set_exception_handler(
