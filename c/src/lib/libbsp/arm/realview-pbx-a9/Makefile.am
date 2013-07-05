@@ -45,7 +45,7 @@ include_bsp_HEADERS += ../shared/include/arm-pl011-regs.h
 include_bsp_HEADERS += include/irq.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
-include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
+include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h
 
 ###############################################################################
 #                  Data                                                       #
@@ -88,7 +88,6 @@ libbsp_a_SOURCES += ../../shared/src/stackalloc.c
 libbsp_a_SOURCES += ../shared/abort/simple_abort.c
 libbsp_a_SOURCES += ../shared/startup/bsp-start-memcpy.S
 libbsp_a_SOURCES += ../shared/arm-cp15-set-exception-handler.c
-libbsp_a_SOURCES += ../shared/arm-cp15-set-ttb-entries.c
 
 # Startup
 libbsp_a_SOURCES += startup/bspreset.c

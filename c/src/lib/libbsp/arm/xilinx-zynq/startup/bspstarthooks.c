@@ -14,7 +14,7 @@
 
 #include <bsp.h>
 #include <bsp/start.h>
-#include <bsp/arm-cp15-start.h>
+#include <libcpu/arm-cp15-start.h>
 #include <bsp/arm-a9mpcore-start.h>
 #include <bsp/linker-symbols.h>
 
