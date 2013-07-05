@@ -34,24 +34,6 @@ extern "C" {
   #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_CACHED
 #endif
 
-static void translate_attributes(
-  uint32_t high_level_attr,
-  uint32_t *ARM_CPU_ATTR
-)
-{
-
-  /* Clear flags attributes */
-  *ARM_CPU_ATTR = 0;
-
-  if( high_level_attr & 0x1 )
-    *ARM_CPU_ATTR |= ARMV7_MMU_READ_ONLY;
-
-  /* Write access */
-  if ( high_level_attr & 0x2 )
-    *ARM_CPU_ATTR |= MMU_DATA_READ_WRITE;
-} 
-
-
 BSP_START_DATA_SECTION static const arm_cp15_start_section_config
 rvpbxa9_mmu_config_table[] = {
   {
@@ -106,8 +88,31 @@ rvpbxa9_mmu_config_table[] = {
     .begin = 0x0C000000U,
     .end = 0x0CFFFFFFU,
     .flags = MMU_DATA_READ_WRITE
-  } 
+  }, {
+    // Map page table itself
+    .begin = (uint32_t) bsp_translation_table_base,
+    // 16 KB L1 section entries
+    .end = (uint32_t) bsp_translation_table_base + 0x4000,
+    .flags = MMU_DATA_READ_WRITE
+  }
 };
+
+static void translate_attributes(
+  uint32_t high_level_attr,
+  uint32_t *ARM_CPU_ATTR
+)
+{
+
+  /* Clear flags attributes */
+  *ARM_CPU_ATTR = 0;
+
+  if( high_level_attr & 0x1 )
+    *ARM_CPU_ATTR |= ARMV7_MMU_READ_ONLY;
+
+  /* Write access */
+  if ( high_level_attr & 0x2 )
+    *ARM_CPU_ATTR |= MMU_DATA_READ_WRITE;
+} 
 
 void _CPU_Memory_management_Initialize(void)
 {	
@@ -127,6 +132,13 @@ void _CPU_Memory_management_Initialize(void)
 
 void _CPU_Memory_management_Install_entry(Memory_management_Entry *mme, uint32_t attr)
 {
+
+  /* Check if entry is already installed */
+  if (mme->installed)
+  {
+    printk("Entry is installed. Must be uninstalled first !\n");
+    return;
+  }
   /* required as arm_cp15_set_translation_table_entries needs a pointer to end not value */
   uint32_t end = (uint32_t)mme->base + (uint32_t)mme->size;
   uint32_t section_flags;
@@ -140,6 +152,14 @@ void _CPU_Memory_management_Install_entry(Memory_management_Entry *mme, uint32_t
 
 void _CPU_Memory_management_Uninstall_entry(Memory_management_Entry *mme)
 {
+  
+  /* Check if entry is already installed or not */
+  if (!mme->installed)
+  {
+    printk("Entry is not installed. Must be installed first !\n");
+    return;
+  }
+
   uint32_t end = (uint32_t)mme->base + (uint32_t)mme->size;
   arm_cp15_unset_translation_table_entries(mme->base, end);
   mme->installed = false;
@@ -149,6 +169,7 @@ void dummy_data_abort_exception_handler(void)
 {
   printk("Entered exception handler \n");
 }
+
 
 #ifdef __cplusplus
 }
