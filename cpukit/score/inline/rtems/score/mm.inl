@@ -29,6 +29,10 @@
  */
 RTEMS_INLINE_ROUTINE void _Memory_management_Initialize( void )
 {
+#ifdef RTEMS_SMP   
+   _SMP_lock_Initialize( &mm_lock );
+#endif 
+
   _CPU_Memory_management_Initialize();
 }
 
@@ -40,7 +44,15 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
   uint32_t attr
 )
 {
+#ifdef RTEMS_SMP   
+  _SMP_lock_Acquire( &mm_lock );
+#endif
+
   _CPU_Memory_management_Install_entry(mme, attr);
+
+#ifdef RTEMS_SMP    
+  _SMP_lock_Release( &mm_lock );
+#endif
 }
 
 /**
@@ -50,7 +62,16 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Uninstall_entry(
   Memory_management_Entry *mme
 )
 {
+#ifdef RTEMS_SMP   
+  _SMP_lock_Acquire( &mm_lock );
+#endif
+
   _CPU_Memory_management_Uninstall_entry(mme);
+
+#ifdef RTEMS_SMP    
+  _SMP_lock_Release( &mm_lock );
+#endif
+
 }
 
 /** @}*/

@@ -24,6 +24,10 @@
 
 #include <inttypes.h>
 
+#ifdef RTEMS_SMP
+#include <rtems/score/smplock.h>
+#endif
+
 #ifdef __cplusplus
   extern "C" {
 #endif
@@ -45,6 +49,10 @@ typedef struct {
   /* points to structure defining the BSP specific MM entry */
   void *bsp_mme;
 } Memory_management_Entry;
+
+#ifdef RTEMS_SMP
+SMP_lock_Control mm_lock;
+#endif
 
 #ifndef __RTEMS_APPLICATION__
 #include <rtems/score/mm.inl>

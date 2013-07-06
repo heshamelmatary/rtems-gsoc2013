@@ -22,7 +22,6 @@
 #include <bsp/start.h>
 #include <libcpu/arm-cp15-start.h>
 #include <bsp/linker-symbols.h>
-
 #include <rtems/score/mm.h>
 
 #ifdef __cplusplus
@@ -168,6 +167,33 @@ void _CPU_Memory_management_Uninstall_entry(Memory_management_Entry *mme)
 void dummy_data_abort_exception_handler(void)
 {
   printk("Entered exception handler \n");
+  /* Assembly code copied from armv7m-exception-default.c */
+  /*__asm__ volatile (
+    "sub sp, %[cpufsz]\n"
+    "stm sp, {r0-r12}\n"
+    "mov r2, lr\n"
+    "mrs r1, msp\n"
+    "mrs r0, psp\n"
+    "cmn r2, #3\n"
+    "itt ne\n"
+    "movne r0, r1\n"
+    "addne r0, %[cpufsz]\n"
+    "add r2, r0, %[v7mlroff]\n"
+    "add r1, sp, %[cpulroff]\n"
+    "ldm r2, {r3-r5}\n"
+    "stm r1, {r3-r5}\n"
+    "mrs r1, ipsr\n"
+    "str r1, [sp, %[cpuvecoff]]\n"
+    "mov r0, sp\n"
+    "b _ARM_Exception_default\n"
+    :
+    : [cpufsz] "i" (sizeof(CPU_Exception_frame)),
+      [v7mfsz] "i" (sizeof(ARMV7M_Exception_frame)),
+      [cpuspoff] "J" (offsetof(CPU_Exception_frame, register_sp)),
+      [cpulroff] "i" (offsetof(CPU_Exception_frame, register_lr)),
+      [v7mlroff] "i" (offsetof(ARMV7M_Exception_frame, register_lr)),
+      [cpuvecoff] "J" (offsetof(CPU_Exception_frame, vector))
+  );*/
 }
 
 
