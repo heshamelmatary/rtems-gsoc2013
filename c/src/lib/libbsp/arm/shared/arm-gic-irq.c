@@ -96,10 +96,10 @@ rtems_status_code bsp_interrupt_facility_initialize(void)
     _ARMV4_Exception_interrupt
   );
 
-  /*arm_cp15_set_exception_handler(
+  arm_cp15_set_exception_handler(
     ARM_EXCEPTION_DATA_ABORT,
     dummy_data_abort_exception_handler
-  );*/
+  );
 
   for (id = 0; id < id_count; ++id) {
     gic_id_set_priority(dist, id, PRIORITY_DEFAULT);

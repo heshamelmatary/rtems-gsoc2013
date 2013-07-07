@@ -73,8 +73,8 @@ rtems_task Init(
   printf("Checking MMU exception 4: Read from readonly block\n");
   a = *a2++;
 
-  //printf("Checking MMU exception 5: Write to readonly block  \n");
-  //*a2++ = 0xCC;
+  printf("Checking MMU exception 5: Write to readonly block  \n");
+  *a2++ = 0xCC;
 
   printf("Test 6: Uninstalling Entry-2 \n");
   _Memory_management_Uninstall_entry( &mme2);

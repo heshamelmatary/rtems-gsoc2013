@@ -46,6 +46,7 @@ include_bsp_HEADERS += include/irq.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
 include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h
+include_libcpu_HEADERS += ../../../libcpu/arm/shared/include/arm_cp15_print_fsr.h
 
 ###############################################################################
 #                  Data                                                       #

@@ -23,6 +23,11 @@
 #include <libcpu/arm-cp15-start.h>
 #include <bsp/linker-symbols.h>
 #include <rtems/score/mm.h>
+#include <libcpu/arm_cp15_print_fsr.h>
+//#include <rtems/score/armv7m.h>
+//#include <bsp/irq.h>
+//#include <rtems/score/cpu.h>
+//
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,6 +37,19 @@ extern "C" {
 #else
   #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_CACHED
 #endif
+
+#define DEBUG 1
+
+typedef struct {
+  uint32_t register_r0;
+  uint32_t register_r1;
+  uint32_t register_r2;
+  uint32_t register_r3;
+  uint32_t register_r12;
+  void *register_lr;
+  void *register_pc;
+  uint32_t register_xpsr;
+} ARMV7M_Exception_frame;
 
 BSP_START_DATA_SECTION static const arm_cp15_start_section_config
 rvpbxa9_mmu_config_table[] = {
@@ -164,11 +182,26 @@ void _CPU_Memory_management_Uninstall_entry(Memory_management_Entry *mme)
   mme->installed = false;
 }
 
-void dummy_data_abort_exception_handler(void)
+static void print_data(ARMV7M_Exception_frame *frame)
 {
+  printk("fault at address 0x%x \n",frame->register_lr);
+}
+
+void __attribute__((naked)) dummy_data_abort_exception_handler(void)
+{
+
+#if DEBUG
   printk("Entered exception handler \n");
+
+ uint32_t address_fault = (uint32_t)arm_cp15_get_fault_address();
+ printk("Data fault address at  0x%x\n",address_fault);
+
+ uint32_t fsr = (uint32_t) arm_cp15_get_data_fault_status();
+ arm_cp15_print_fault_status_description(fsr);
+#endif
   /* Assembly code copied from armv7m-exception-default.c */
-  /*__asm__ volatile (
+/*#ifdef ARM_MULTILIB_ARCH_V7M
+  __asm__ volatile (
     "sub sp, %[cpufsz]\n"
     "stm sp, {r0-r12}\n"
     "mov r2, lr\n"
@@ -185,7 +218,7 @@ void dummy_data_abort_exception_handler(void)
     "mrs r1, ipsr\n"
     "str r1, [sp, %[cpuvecoff]]\n"
     "mov r0, sp\n"
-    "b _ARM_Exception_default\n"
+    "b print_data\n"
     :
     : [cpufsz] "i" (sizeof(CPU_Exception_frame)),
       [v7mfsz] "i" (sizeof(ARMV7M_Exception_frame)),
@@ -193,7 +226,9 @@ void dummy_data_abort_exception_handler(void)
       [cpulroff] "i" (offsetof(CPU_Exception_frame, register_lr)),
       [v7mlroff] "i" (offsetof(ARMV7M_Exception_frame, register_lr)),
       [cpuvecoff] "J" (offsetof(CPU_Exception_frame, vector))
-  );*/
+  );
+#endif*/
+exit(0);
 }
 
 
