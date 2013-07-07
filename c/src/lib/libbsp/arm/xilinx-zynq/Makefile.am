@@ -47,6 +47,7 @@ include_bsp_HEADERS += include/zynq-uart-regs.h
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
 include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h
 include_libcpu_HEADERS += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-start.h
+include_libcpu_HEADERS += ../../../libcpu/arm/shared/include/arm_cp15_print_fsr.h
 
 ###############################################################################
 #                  Data                                                       #
