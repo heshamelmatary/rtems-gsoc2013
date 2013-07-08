@@ -40,6 +40,8 @@ extern "C" {
 
 #define DEBUG 1
 
+extern _ARMV4_Exception_data_abort_default;
+
 typedef struct {
   uint32_t register_r0;
   uint32_t register_r1;
@@ -199,35 +201,8 @@ void __attribute__((naked)) dummy_data_abort_exception_handler(void)
  uint32_t fsr = (uint32_t) arm_cp15_get_data_fault_status();
  arm_cp15_print_fault_status_description(fsr);
 #endif
-  /* Assembly code copied from armv7m-exception-default.c */
-/*#ifdef ARM_MULTILIB_ARCH_V7M
-  __asm__ volatile (
-    "sub sp, %[cpufsz]\n"
-    "stm sp, {r0-r12}\n"
-    "mov r2, lr\n"
-    "mrs r1, msp\n"
-    "mrs r0, psp\n"
-    "cmn r2, #3\n"
-    "itt ne\n"
-    "movne r0, r1\n"
-    "addne r0, %[cpufsz]\n"
-    "add r2, r0, %[v7mlroff]\n"
-    "add r1, sp, %[cpulroff]\n"
-    "ldm r2, {r3-r5}\n"
-    "stm r1, {r3-r5}\n"
-    "mrs r1, ipsr\n"
-    "str r1, [sp, %[cpuvecoff]]\n"
-    "mov r0, sp\n"
-    "b print_data\n"
-    :
-    : [cpufsz] "i" (sizeof(CPU_Exception_frame)),
-      [v7mfsz] "i" (sizeof(ARMV7M_Exception_frame)),
-      [cpuspoff] "J" (offsetof(CPU_Exception_frame, register_sp)),
-      [cpulroff] "i" (offsetof(CPU_Exception_frame, register_lr)),
-      [v7mlroff] "i" (offsetof(ARMV7M_Exception_frame, register_lr)),
-      [cpuvecoff] "J" (offsetof(CPU_Exception_frame, vector))
-  );
-#endif*/
+
+//TODO: Call rtems_fatal
 exit(0);
 }
 
