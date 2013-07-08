@@ -1,0 +1,3 @@
+ Tests for libmm behavior on SMP environments.
+ Create tasks for each core and start it.
+ Check for memory consistency and page tables and memory attributes validity.

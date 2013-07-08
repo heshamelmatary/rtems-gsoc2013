@@ -1,0 +1,7 @@
+This test case try to do the following : 
+
+Install entries with specific memory attributes (e.g read only region).
+Check for memory protection violations (writing to read only blocks).
+Reading from read only blocks.
+Write/Read to/from unmapped region (error!).
+Write to a valid entry that was installed and then uninstalled (error!).
