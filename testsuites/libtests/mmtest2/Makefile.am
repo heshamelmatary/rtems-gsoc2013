@@ -1,4 +1,3 @@
-
 rtems_tests_PROGRAMS = mmtest2
 mmtest2_SOURCES = init.c system.h
 

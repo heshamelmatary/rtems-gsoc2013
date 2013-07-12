@@ -48,6 +48,7 @@ smpatomic04/Makefile
 smpatomic05/Makefile
 smpatomic06/Makefile
 smpatomic07/Makefile
+smpmmtest01/Makefile
 smplock01/Makefile
 smpschedule01/Makefile
 ])
