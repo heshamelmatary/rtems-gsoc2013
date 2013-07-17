@@ -24,7 +24,7 @@
 
 #ifdef ARM_MULTILIB_ARCH_V7M
   BSP_START_DATA_SECTION const ARMV7M_MPU_Region
-    lpc24xx_start_config_mpu_region [] = {
+    arm_start_config_mpu_region [] = {
       #if defined(LPC24XX_EMC_IS42S32800D7) \
         || defined(LPC24XX_EMC_W9825G2JB75I) \
         || defined(LPC24XX_EMC_IS42S32800B)
@@ -80,7 +80,7 @@
   };
 
   BSP_START_DATA_SECTION const size_t
-    lpc24xx_start_config_mpu_region_count =
-      sizeof(lpc24xx_start_config_mpu_region)
-        / sizeof(lpc24xx_start_config_mpu_region [0]);
+    arm_start_config_mpu_region_count =
+      sizeof(arm_start_config_mpu_region)
+        / sizeof(arm_start_config_mpu_region [0]);
 #endif

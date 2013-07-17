@@ -26,6 +26,7 @@
 #include <bsp/lpc24xx.h>
 #include <bsp/lpc-emc.h>
 #include <bsp/start-config.h>
+#include <libcpu/mm.h>
 
 static BSP_START_TEXT_SECTION void lpc24xx_cpu_delay(unsigned ticks)
 {
@@ -491,24 +492,6 @@ static BSP_START_TEXT_SECTION void lpc24xx_stop_usb(void)
   #endif
 }
 
-static BSP_START_TEXT_SECTION void lpc24xx_init_mpu(void)
-{
-  #ifdef ARM_MULTILIB_ARCH_V7M
-    volatile ARMV7M_MPU *mpu = _ARMV7M_MPU;
-    size_t region_count = lpc24xx_start_config_mpu_region_count;
-    size_t i = 0;
-
-    for (i = 0; i < region_count; ++i) {
-      mpu->rbar = lpc24xx_start_config_mpu_region [i].rbar;
-      mpu->rasr = lpc24xx_start_config_mpu_region [i].rasr;
-    }
-
-    if (region_count > 0) {
-      mpu->ctrl = ARMV7M_MPU_CTRL_ENABLE;
-    }
-  #endif
-}
-
 BSP_START_TEXT_SECTION void bsp_start_hook_0(void)
 {
   lpc24xx_init_main_oscillator();
@@ -522,7 +505,7 @@ BSP_START_TEXT_SECTION void bsp_start_hook_1(void)
   lpc24xx_init_memory_map();
   lpc24xx_init_memory_accelerator();
   lpc24xx_init_emc_dynamic();
-  lpc24xx_init_mpu();
+  _CPU_Memory_management_Initialize();
   lpc24xx_stop_gpdma();
   lpc24xx_stop_ethernet();
   lpc24xx_stop_usb();

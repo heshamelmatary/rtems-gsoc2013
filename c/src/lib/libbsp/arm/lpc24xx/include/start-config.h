@@ -107,10 +107,10 @@ extern BSP_START_DATA_SECTION const size_t
 #ifdef ARM_MULTILIB_ARCH_V7M
 
 extern BSP_START_DATA_SECTION const ARMV7M_MPU_Region
-  lpc24xx_start_config_mpu_region [];
+  arm_start_config_mpu_region [];
 
 extern BSP_START_DATA_SECTION const size_t
-  lpc24xx_start_config_mpu_region_count;
+  arm_start_config_mpu_region_count;
 
 #endif /* ARM_MULTILIB_ARCH_V7M */
 
