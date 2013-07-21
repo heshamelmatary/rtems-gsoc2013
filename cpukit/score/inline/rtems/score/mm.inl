@@ -48,7 +48,7 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
   _SMP_lock_Acquire( &mm_lock );
 #endif
 
-  _CPU_Memory_management_Install_entry(mme, attr);
+  _CPU_Memory_management_Install_entry(mme->base, mme->size, attr);
 
 #ifdef RTEMS_SMP    
   _SMP_lock_Release( &mm_lock );
@@ -66,7 +66,7 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Uninstall_entry(
   _SMP_lock_Acquire( &mm_lock );
 #endif
 
-  _CPU_Memory_management_Uninstall_entry(mme);
+  _CPU_Memory_management_Uninstall_entry(mme->base, mme->size);
 
 #ifdef RTEMS_SMP    
   _SMP_lock_Release( &mm_lock );

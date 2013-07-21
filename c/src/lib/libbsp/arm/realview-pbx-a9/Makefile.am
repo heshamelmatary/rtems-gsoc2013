@@ -121,7 +121,7 @@ libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
 libbsp_a_SOURCES += ../../../libcpu/arm/shared/include/cache_.h
 libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 
-# MMU
+# LIBMM 
 #libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-set-ttb-entries.c
 libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/mm.c

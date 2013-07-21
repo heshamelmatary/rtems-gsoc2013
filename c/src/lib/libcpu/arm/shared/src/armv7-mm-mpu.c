@@ -65,7 +65,7 @@ void _CPU_Memory_management_Initialize(void)
 #endif /* ARM_MULTILIB_ARCH_V7M */
 }
 
-_CPU_Memory_management_Install_entry(Memory_management_Entry *mme, uint32_t attr)
+_CPU_Memory_management_Install_entry(uintptr_t base, size_t size, uint32_t attr)
 {
 #ifdef ARM_MULTILIB_ARCH_V7M
   volatile ARMV7M_MPU *mpu = _ARMV7M_MPU;
@@ -83,8 +83,8 @@ _CPU_Memory_management_Install_entry(Memory_management_Entry *mme, uint32_t attr
   ARMV7M_MPU_Region region =
     ARMV7M_MPU_REGION_INITIALIZER(
           0,
-          mme->base,
-          mme->size,
+          base,
+          size,
           mpu_attr
     );
   

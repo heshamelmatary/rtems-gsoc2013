@@ -149,39 +149,23 @@ void _CPU_Memory_management_Initialize(void)
   );
 }
 
-void _CPU_Memory_management_Install_entry(Memory_management_Entry *mme, uint32_t attr)
+void _CPU_Memory_management_Install_entry(uintptr_t base,size_t size, uint32_t attr)
 {
 
-  /* Check if entry is already installed */
-  if (mme->installed)
-  {
-    printk("Entry is installed. Must be uninstalled first !\n");
-    return;
-  }
   /* required as arm_cp15_set_translation_table_entries needs a pointer to end not value */
-  uint32_t end = (uint32_t)mme->base + (uint32_t)mme->size;
+  uint32_t end = (uint32_t)base + (uint32_t)size;
   uint32_t section_flags;
   
   /* translate flags from high-level to ARM specific MMU flags */
   translate_attributes(attr, &section_flags);
 
-  arm_cp15_set_translation_table_entries(mme->base, end, section_flags);
-  mme->installed = true;
+  arm_cp15_set_translation_table_entries(base, end, section_flags);
 };
 
-void _CPU_Memory_management_Uninstall_entry(Memory_management_Entry *mme)
+void _CPU_Memory_management_Uninstall_entry(uintptr_t base, size_t size)
 {
-  
-  /* Check if entry is already installed or not */
-  if (!mme->installed)
-  {
-    printk("Entry is not installed. Must be installed first !\n");
-    return;
-  }
-
-  uint32_t end = (uint32_t)mme->base + (uint32_t)mme->size;
-  arm_cp15_unset_translation_table_entries(mme->base, end);
-  mme->installed = false;
+  uint32_t end = (uint32_t)base + (uint32_t)size;
+  arm_cp15_unset_translation_table_entries(base, end);
 }
 
 static void print_data(ARMV7M_Exception_frame *frame)

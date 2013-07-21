@@ -196,7 +196,8 @@ void mmu_init(mmu_sect_map_t *map)
 
 /* Changing Page table attributes to new attributes */
 void arm_Region_Change_Attr(
-    arm920_mm_mme *mme,
+    uintptr_t base,
+    size_t size,
     uint32_t AP,
     uint32_t CB
 )
@@ -211,11 +212,11 @@ void arm_Region_Change_Attr(
   int c;
   int b;
 
-  sectionsNumber = mme->pagesNumber;
+  sectionsNumber = size / MMU_SECT_SIZE;
 
   lvl1_pt = &_ttbl_base;
-  PTEIndex = ((mme->vAddress & 0xfff00000U) >> 20U);
-  paddr = (mme->vAddress & 0xfff00000U);
+  PTEIndex = ((base & 0xfff00000U) >> 20U);
+  paddr = (base & 0xfff00000U);
 
   disable_mmu();
 
@@ -249,9 +250,6 @@ void arm_Region_Change_Attr(
         b
     );
   }
-
-  mme->ap = AP; /* Default when installing entry */
-  mme->cb = CB; /* Default */
 
   enable_mmu();
 
@@ -301,15 +299,14 @@ void _CPU_Memory_management_Initialize( void )
  * and set its value for then allocate a new lvl2 page table
  * and activate it. */
 void _CPU_Memory_management_Install_entry(
-  Memory_management_Entry *mme,
+  uintptr_t base,
+  size_t size,
   uint32_t attr
 )
 {
-  arm920_mm_mme *arm_mme;
   uint32_t arm_mmu_attr;
   uintptr_t      *lvl1_pt;
   int             sectionsNumber; /* 1MB sections */
-  size_t          size; /* per Byte */
   int             PTEIndex;
   uintptr_t        paddr;
   uintptr_t        paddr_base;
@@ -317,15 +314,9 @@ void _CPU_Memory_management_Install_entry(
   int             i;
 
   lvl1_pt = &_ttbl_base;
-  PTEIndex = ((mme->base & 0xfff00000U) >> 20U);
-  paddr = mme->base & 0xfff00000U;
-  size = mme->size;
-
-  /* FIXME: OK to malloc here? */
-  arm_mme = (arm920_mm_mme *)malloc(sizeof(arm920_mm_mme));
-
-  if ( arm_mme == NULL )
-    return RTEMS_NO_MEMORY;
+  PTEIndex = ((base & 0xfff00000U) >> 20U);
+  paddr = base & 0xfff00000U;
+  size = size;
 
   sectionsNumber = (size / MMU_SECT_SIZE);
 
@@ -346,19 +337,6 @@ void _CPU_Memory_management_Install_entry(
     );
   }
 
-  arm_mme->vAddress = mme->base;
-  /* for level 1 page table ptAddress is the same as ptlvl1Address */
-  arm_mme->ptAddress = lvl1_pt;
-  arm_mme->ptlvl1Address = lvl1_pt;
-  arm_mme->pagesNumber = sectionsNumber;
-  //arm_mme->type = LVL1_PT; /* Default value now */
-  arm_mme->ap   = ARM_MMU_AP_NO_ACCESS; /* Default when installing entry */
-  arm_mme->cb   = ARM_MMU_WT; /* Default */
-  arm_mme->domain = 0;
-
-  /* install a pointer to high-level API to bsp_mm_mme */
-  mme->bsp_mme = arm_mme;
-
   enable_mmu();
 
   return RTEMS_SUCCESSFUL;
@@ -368,29 +346,23 @@ void _CPU_Memory_management_Install_entry(
  * access/cache attributes to its defaults. Note that bsp mme
  * will still exist even after uninstalling mme.
  */
-void _CPU_Memory_management_Uninstall_Entry(
-  Memory_management_Entry *mme
+void _CPU_Memory_management_Uninstall_entry(
+  uintptr_t base,
+  size_t size
 )
 {
-  arm920_mm_mme *arm_mme;
   uintptr_t      *lvl1_pt;
   int             sectionsNumber; /* 1MB sections */
-  size_t          size; /* per Byte */
   int             PTEIndex;
   uintptr_t       paddr;
   uintptr_t       paddr_base;
   int             i;
 
-  arm_mme = (arm920_mm_mme *) mme->bsp_mme;
-
-  if ( arm_mme == NULL )
-    return RTEMS_UNSATISFIED;
-
-  sectionsNumber = arm_mme->pagesNumber;
+  sectionsNumber = size / MMU_SECT_SIZE;
 
   lvl1_pt = &_ttbl_base;
-  PTEIndex = ((mme->base & 0xfff00000U) >> 20U);
-  paddr = mme->base & 0xfff00000U;
+  PTEIndex = ((base & 0xfff00000U) >> 20U);
+  paddr = base & 0xfff00000U;
 
   disable_mmu();
 
@@ -407,27 +379,9 @@ void _CPU_Memory_management_Uninstall_Entry(
     );
   }
 
-  arm_mme->ap   = ARM_MMU_AP_NO_ACCESS; /* Default */
-  arm_mme->cb   = ARM_MMU_WT; /* Default */
-
-  free(arm_mme); /* FIXME */
   enable_mmu();
 
   return RTEMS_SUCCESSFUL;
-}
-
-void _CPU_Memory_management_Set_entry_attr(
-  Memory_management_Entry *mme,
-  uint32_t attr
-){
-  uint32_t arm_mmu_attr;
-  translate_attributes(attr, &arm_mmu_attr);
-  arm920_mm_mme *arm_mme = (arm920_mm_mme *)(mme->bsp_mme);
-  return arm_Region_Change_Attr(
-      arm_mme,
-      arm_mmu_attr,
-      ARM_MMU_WT
-  );
 }
 
 /* set all the level 1 entrys to be invalid descriptors */

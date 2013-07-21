@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2013 Hesham AL-Matary
  * Copyright (c) 2013 Gedare Bloom.
  *
  * The license and distribution terms for this file may be
@@ -11,8 +12,6 @@
 
 void _CPU_Memory_management_Initialize( void ) { }
 
-void _CPU_Memory_management_Install_entry( Memory_management_Entry *mpe ) { }
+void _CPU_Memory_management_Install_entry( uintptr_t base, size_t size, uint32_t flags ) { }
 
-void _CPU_Memory_management_Set_read_only( Memory_management_Entry *mpe ) { }
-
-void _CPU_Memory_management_Set_write( Memory_management_Entry *mpe ) { }
+void _CPU_Memory_management_Uninstall_entry( uintptr_t base, size_t size ) { }

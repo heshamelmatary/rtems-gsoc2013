@@ -143,7 +143,8 @@ void _CPU_Memory_management_Set_entry_attr(
 }
 
 void _CPU_Memory_management_Install_entry(
-    Memory_management_Entry *mme,
+    uintptr_t base,
+    size_t sizee,
     uint32_t attr
 )
 {
