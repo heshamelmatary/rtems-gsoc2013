@@ -5,6 +5,7 @@
  */
 
 /*
+ * Copyright (c) 2013 Hesham AL-Matary
  * Copyright (c) 2013 Gedare Bloom.
  *
  * The license and distribution terms for this file may be
@@ -40,7 +41,8 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Initialize( void )
  * @brief Calls _CPU_Memory_management_Install_entry.
  */
 RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
-  Memory_management_Entry *mme,
+  uintptr_t base,
+  size_t size,
   uint32_t attr
 )
 {
@@ -48,7 +50,7 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
   _SMP_lock_Acquire( &mm_lock );
 #endif
 
-  _CPU_Memory_management_Install_entry(mme->base, mme->size, attr);
+  _CPU_Memory_management_Install_entry(base, size, attr);
 
 #ifdef RTEMS_SMP    
   _SMP_lock_Release( &mm_lock );
@@ -59,14 +61,15 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
  * @brief Calls _CPU_Memory_management_Uninstall_entry.
  */
 RTEMS_INLINE_ROUTINE void _Memory_management_Uninstall_entry(
-  Memory_management_Entry *mme
+  uintptr_t base,
+  size_t size
 )
 {
 #ifdef RTEMS_SMP   
   _SMP_lock_Acquire( &mm_lock );
 #endif
 
-  _CPU_Memory_management_Uninstall_entry(mme->base, mme->size);
+  _CPU_Memory_management_Uninstall_entry(base, size);
 
 #ifdef RTEMS_SMP    
   _SMP_lock_Release( &mm_lock );
