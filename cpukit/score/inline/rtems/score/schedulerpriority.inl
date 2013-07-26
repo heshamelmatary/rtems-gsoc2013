@@ -24,6 +24,8 @@
 #ifndef _RTEMS_SCORE_SCHEDULERPRIORITY_INL
 #define _RTEMS_SCORE_SCHEDULERPRIORITY_INL
 
+#include <rtems/score/chainimpl.h>
+#include <rtems/score/thread.h>
 #include <rtems/score/wkspace.h>
 
 /**

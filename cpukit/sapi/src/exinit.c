@@ -32,7 +32,7 @@
 #include <rtems/system.h>
 #include <rtems/config.h>
 #include <rtems/debug.h>
-#include <rtems/extension.h>
+#include <rtems/extensionimpl.h>
 #include <rtems/fatal.h>
 #include <rtems/init.h>
 #include <rtems/io.h>
@@ -52,7 +52,7 @@
 #include <rtems/score/thread.h>
 #include <rtems/score/tod.h>
 #include <rtems/score/userextimpl.h>
-#include <rtems/score/watchdog.h>
+#include <rtems/score/watchdogimpl.h>
 #include <rtems/score/wkspace.h>
 
 #include <rtems/sptables.h>

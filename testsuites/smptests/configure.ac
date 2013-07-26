@@ -22,6 +22,8 @@ RTEMS_PROG_CC_FOR_TARGET
 RTEMS_PROG_CXX_FOR_TARGET
 RTEMS_CANONICALIZE_TOOLS
 
+RTEMS_CHECK_CPUOPTS([RTEMS_ATOMIC])
+
 RTEMS_CHECK_CUSTOM_BSP(RTEMS_BSP)
 RTEMS_CHECK_CPUOPTS([RTEMS_MULTIPROCESSING])
 RTEMS_CHECK_CXX(RTEMS_BSP)
@@ -30,12 +32,13 @@ RTEMS_CHECK_CPUOPTS([RTEMS_SMP])
 
 AM_CONDITIONAL(SMPTESTS,test "$rtems_cv_RTEMS_SMP" = "yes")
 
+AM_CONDITIONAL([ATOMIC],[test x"$rtems_cv_RTEMS_ATOMIC" = xyes])
+
 # Explicitly list all Makefiles here
 AC_CONFIG_FILES([Makefile
 smp01/Makefile
 smp02/Makefile
 smp03/Makefile
-smp04/Makefile
 smp05/Makefile
 smp06/Makefile
 smp07/Makefile
@@ -51,5 +54,6 @@ smpatomic07/Makefile
 smpmmtest01/Makefile
 smplock01/Makefile
 smpschedule01/Makefile
+smpunsupported01/Makefile
 ])
 AC_OUTPUT

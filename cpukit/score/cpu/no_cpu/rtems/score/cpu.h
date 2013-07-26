@@ -1404,6 +1404,29 @@ static inline uint32_t CPU_swap_u32(
 
 #ifdef RTEMS_SMP
   /**
+   * @brief Returns the index of the current processor.
+   *
+   * An architecture specific method must be used to obtain the index of the
+   * current processor in the system.  The set of processor indices is the
+   * range of integers starting with zero up to the processor count minus one.
+   */
+  RTEMS_COMPILER_PURE_ATTRIBUTE static inline uint32_t
+    _CPU_SMP_Get_current_processor( void )
+  {
+    return 123;
+  }
+
+  /**
+   * @brief Sends an inter-processor interrupt to the specified target
+   * processor.
+   *
+   * This operation is undefined for target processor indices out of range.
+   *
+   * @param[in] target_processor_index The target processor index.
+   */
+  void _CPU_SMP_Send_interrupt( uint32_t target_processor_index );
+
+  /**
    * @brief Broadcasts a processor event.
    *
    * Some architectures provide a low-level synchronization primitive for
@@ -1412,9 +1435,9 @@ static inline uint32_t CPU_swap_u32(
    * transactions.  This function must ensure that preceding store operations
    * can be observed by other processors.
    *
-   * @see _CPU_Processor_event_receive().
+   * @see _CPU_SMP_Processor_event_receive().
    */
-  static inline void _CPU_Processor_event_broadcast( void )
+  static inline void _CPU_SMP_Processor_event_broadcast( void )
   {
     __asm__ volatile ( "" : : : "memory" );
   }
@@ -1425,9 +1448,9 @@ static inline uint32_t CPU_swap_u32(
    * This function will wait for the processor event and may wait forever if no
    * such event arrives.
    *
-   * @see _CPU_Processor_event_broadcast().
+   * @see _CPU_SMP_Processor_event_broadcast().
    */
-  static inline void _CPU_Processor_event_receive( void )
+  static inline void _CPU_SMP_Processor_event_receive( void )
   {
     __asm__ volatile ( "" : : : "memory" );
   }

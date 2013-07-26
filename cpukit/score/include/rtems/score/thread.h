@@ -50,15 +50,6 @@
   #define RTEMS_SCORE_THREAD_ENABLE_USER_PROVIDED_STACK_VIA_API
 #endif
 
-/*
- *  Deferred floating point context switches are not currently
- *  supported when in SMP configuration.
- */
-#if defined(RTEMS_SMP)
-  #undef  CPU_USE_DEFERRED_FP_SWITCH
-  #define CPU_USE_DEFERRED_FP_SWITCH FALSE
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -66,6 +57,7 @@ extern "C" {
 #include <rtems/score/percpu.h>
 #include <rtems/score/context.h>
 #include <rtems/score/cpu.h>
+#include <rtems/score/isr.h>
 #if defined(RTEMS_MULTIPROCESSING)
 #include <rtems/score/mppkt.h>
 #endif
@@ -498,6 +490,7 @@ SCORE_EXTERN uint32_t   _Thread_Ticks_per_timeslice;
 SCORE_EXTERN Thread_Control *_Thread_Allocated_fp;
 #endif
 
+#if !defined(__DYNAMIC_REENT__)
 /**
  * The C library re-enter-rant global pointer. Some C library implementations
  * such as newlib have a single global pointer that changed during a context
@@ -505,6 +498,8 @@ SCORE_EXTERN Thread_Control *_Thread_Allocated_fp;
  * holds a pointer to the task specific data.
  */
 SCORE_EXTERN struct _reent **_Thread_libc_reent;
+#endif
+
 /**
  *  @brief Initialize thread handler.
  *
@@ -881,6 +876,34 @@ void _Thread_blocking_operation_Cancel(
   Thread_Control                   *the_thread,
   ISR_Level                         level
 );
+
+/**
+ * @brief Returns the thread control block of the executing thread.
+ *
+ * This function can be called in any context.  On SMP configurations
+ * interrupts are disabled to ensure that the processor index is used
+ * consistently.
+ *
+ * @return The thread control block of the executing thread.
+ */
+RTEMS_INLINE_ROUTINE Thread_Control *_Thread_Get_executing( void )
+{
+  Thread_Control *executing;
+
+  #if defined( RTEMS_SMP )
+    ISR_Level level;
+
+    _ISR_Disable( level );
+  #endif
+
+  executing = _Thread_Executing;
+
+  #if defined( RTEMS_SMP )
+    _ISR_Enable( level );
+  #endif
+
+  return executing;
+}
 
 #ifndef __RTEMS_APPLICATION__
 #include <rtems/score/thread.inl>

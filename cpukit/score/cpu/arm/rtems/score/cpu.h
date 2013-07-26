@@ -443,6 +443,22 @@ void _CPU_Context_validate( uintptr_t pattern );
   #define _CPU_Context_switch_to_first_task_smp( _context ) \
     _CPU_Context_restore( _context )
 
+  RTEMS_COMPILER_PURE_ATTRIBUTE static inline uint32_t
+    _CPU_SMP_Get_current_processor( void )
+  {
+    uint32_t mpidr;
+
+    /* Use ARMv7 Multiprocessor Affinity Register (MPIDR) */
+    __asm__ volatile (
+      "mrc p15, 0, %[mpidr], c0, c0, 5\n"
+      : [mpidr] "=&r" (mpidr)
+    );
+
+    return mpidr & 0xffU;
+  }
+
+  void _CPU_SMP_Send_interrupt( uint32_t target_processor_index );
+
   static inline void _ARM_Data_memory_barrier( void )
   {
     __asm__ volatile ( "dmb" : : : "memory" );
@@ -463,13 +479,13 @@ void _CPU_Context_validate( uintptr_t pattern );
     __asm__ volatile ( "wfe" : : : "memory" );
   }
 
-  static inline void _CPU_Processor_event_broadcast( void )
+  static inline void _CPU_SMP_Processor_event_broadcast( void )
   {
     _ARM_Data_synchronization_barrier();
     _ARM_Send_event();
   }
 
-  static inline void _CPU_Processor_event_receive( void )
+  static inline void _CPU_SMP_Processor_event_receive( void )
   {
     _ARM_Wait_for_event();
     _ARM_Data_memory_barrier();

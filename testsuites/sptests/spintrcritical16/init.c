@@ -15,6 +15,8 @@
 #include <tmacros.h>
 #include <intrcritical.h>
 
+#include <rtems/rtems/semimpl.h>
+
 /* forward declarations to avoid warnings */
 rtems_task Init(rtems_task_argument argument);
 rtems_timer_service_routine test_release_from_isr(rtems_id  timer, void *arg);
@@ -82,7 +84,7 @@ rtems_task Init(
   directive_failed( sc, "rtems_semaphore_create of SM1" );
 
   Main_task = rtems_task_self();
-  Main_TCB  = _Thread_Executing;
+  Main_TCB  = _Thread_Get_executing();
 
   interrupt_critical_section_test_support_initialize( test_release_from_isr );
 

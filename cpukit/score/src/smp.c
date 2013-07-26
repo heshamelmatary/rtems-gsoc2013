@@ -30,7 +30,7 @@
 
 void rtems_smp_secondary_cpu_initialize( void )
 {
-  int              self = bsp_smp_processor_id();
+  uint32_t         self = _SMP_Get_current_processor();
   Per_CPU_Control *per_cpu = &_Per_CPU_Information[ self ];
   Thread_Control  *heir;
 
@@ -67,49 +67,47 @@ void rtems_smp_secondary_cpu_initialize( void )
 
 void rtems_smp_process_interrupt( void )
 {
-  int              self = bsp_smp_processor_id();
+  uint32_t         self = _SMP_Get_current_processor();
   Per_CPU_Control *per_cpu = &_Per_CPU_Information[ self ];
-  uint32_t         message;
-  ISR_Level        level;
 
 
-  _Per_CPU_Lock_acquire( per_cpu, level );
-  message = per_cpu->message;
-  per_cpu->message = 0;
-  _Per_CPU_Lock_release( per_cpu, level );
+  if ( per_cpu->message != 0 ) {
+    uint32_t  message;
+    ISR_Level level;
 
-  #if defined(RTEMS_DEBUG)
-    {
-      void *sp = __builtin_frame_address(0);
-      if ( !(message & RTEMS_BSP_SMP_SHUTDOWN) ) {
-        printk( "ISR on CPU %d -- (0x%02x) (0x%p)\n", self, message, sp );
-	if ( message & RTEMS_BSP_SMP_CONTEXT_SWITCH_NECESSARY )
-	  printk( "context switch necessary\n" );
-	if ( message & RTEMS_BSP_SMP_SIGNAL_TO_SELF )
-	  printk( "signal to self\n" );
-	if ( message & RTEMS_BSP_SMP_SHUTDOWN )
-	  printk( "shutdown\n" );
+    _Per_CPU_Lock_acquire( per_cpu, level );
+    message = per_cpu->message;
+    per_cpu->message = 0;
+    _Per_CPU_Lock_release( per_cpu, level );
+
+    #if defined(RTEMS_DEBUG)
+      {
+        void *sp = __builtin_frame_address(0);
+        if ( !(message & RTEMS_BSP_SMP_SHUTDOWN) ) {
+          printk( "ISR on CPU %d -- (0x%02x) (0x%p)\n", self, message, sp );
+          if ( message & RTEMS_BSP_SMP_SIGNAL_TO_SELF )
+            printk( "signal to self\n" );
+          if ( message & RTEMS_BSP_SMP_SHUTDOWN )
+            printk( "shutdown\n" );
+        }
+        printk( "Dispatch level %d\n", _Thread_Dispatch_get_disable_level() );
       }
- 
-      printk( "Dispatch level %d\n", _Thread_Dispatch_get_disable_level() );
+    #endif
+
+    if ( ( message & RTEMS_BSP_SMP_SHUTDOWN ) != 0 ) {
+      _ISR_Disable_on_this_core( level );
+
+      _Thread_Dispatch_set_disable_level( 0 );
+
+      _Per_CPU_Change_state( per_cpu, PER_CPU_STATE_SHUTDOWN );
+
+      _CPU_Fatal_halt( self );
+      /* does not continue past here */
     }
-  #endif
-
-  if ( message & RTEMS_BSP_SMP_SHUTDOWN ) {
-    _ISR_Disable_on_this_core( level );
-
-    while ( _Thread_Dispatch_decrement_disable_level() != 0 ) {
-      /* Release completely */
-    }
-
-    _Per_CPU_Change_state( per_cpu, PER_CPU_STATE_SHUTDOWN );
-
-    _CPU_Fatal_halt( self );
-    /* does not continue past here */
   }
 }
 
-void _SMP_Send_message( int cpu, uint32_t message )
+void _SMP_Send_message( uint32_t cpu, uint32_t message )
 {
   Per_CPU_Control *per_cpu = &_Per_CPU_Information[ cpu ];
   ISR_Level level;
@@ -123,14 +121,14 @@ void _SMP_Send_message( int cpu, uint32_t message )
   per_cpu->message |= message;
   _Per_CPU_Lock_release( per_cpu, level );
 
-  bsp_smp_interrupt_cpu( cpu );
+  _CPU_SMP_Send_interrupt( cpu );
 }
 
 void _SMP_Broadcast_message( uint32_t message )
 {
-  int self = bsp_smp_processor_id();
-  int ncpus = _SMP_Get_processor_count();
-  int cpu;
+  uint32_t self = _SMP_Get_current_processor();
+  uint32_t ncpus = _SMP_Get_processor_count();
+  uint32_t cpu;
 
   for ( cpu = 0 ; cpu < ncpus ; ++cpu ) {
     if ( cpu != self ) {
@@ -148,9 +146,9 @@ void _SMP_Broadcast_message( uint32_t message )
 
 void _SMP_Request_other_cores_to_perform_first_context_switch( void )
 {
-  int self = bsp_smp_processor_id();
-  int ncpus = _SMP_Get_processor_count();
-  int cpu;
+  uint32_t self = _SMP_Get_current_processor();
+  uint32_t ncpus = _SMP_Get_processor_count();
+  uint32_t cpu;
 
   for ( cpu = 0 ; cpu < ncpus ; ++cpu ) {
     Per_CPU_Control *per_cpu = &_Per_CPU_Information[ cpu ];
@@ -167,9 +165,9 @@ void _SMP_Request_other_cores_to_perform_first_context_switch( void )
 void _SMP_Request_other_cores_to_dispatch( void )
 {
   if ( _System_state_Is_up( _System_state_Get() ) ) {
-    int self = bsp_smp_processor_id();
-    int ncpus = _SMP_Get_processor_count();
-    int cpu;
+    uint32_t self = _SMP_Get_current_processor();
+    uint32_t ncpus = _SMP_Get_processor_count();
+    uint32_t cpu;
 
     for ( cpu = 0 ; cpu < ncpus ; ++cpu ) {
       const Per_CPU_Control *per_cpu = &_Per_CPU_Information[ cpu ];
@@ -179,7 +177,7 @@ void _SMP_Request_other_cores_to_dispatch( void )
           && per_cpu->state == PER_CPU_STATE_UP
           && per_cpu->dispatch_necessary
       ) {
-        _SMP_Send_message( cpu, RTEMS_BSP_SMP_CONTEXT_SWITCH_NECESSARY );
+        _SMP_Send_message( cpu, 0 );
       }
     }
   }
@@ -187,9 +185,9 @@ void _SMP_Request_other_cores_to_dispatch( void )
 
 void _SMP_Request_other_cores_to_shutdown( void )
 {
-  int self = bsp_smp_processor_id();
-  int ncpus = _SMP_Get_processor_count();
-  int cpu;
+  uint32_t self = _SMP_Get_current_processor();
+  uint32_t ncpus = _SMP_Get_processor_count();
+  uint32_t cpu;
 
   _SMP_Broadcast_message( RTEMS_BSP_SMP_SHUTDOWN );
 

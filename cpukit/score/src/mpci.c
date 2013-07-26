@@ -33,7 +33,7 @@
 #include <rtems/score/watchdog.h>
 #include <rtems/score/sysstate.h>
 
-#include <rtems/score/coresem.h>
+#include <rtems/score/coresemimpl.h>
 #include <rtems/config.h>
 
 RTEMS_STATIC_ASSERT(
@@ -132,7 +132,8 @@ void _MPCI_Create_server( void )
     THREAD_START_NUMERIC,
     (void *) _MPCI_Receive_server,
     NULL,
-    0
+    0,
+    NULL
   );
 }
 
@@ -288,14 +289,20 @@ Thread _MPCI_Receive_server(
   MPCI_Packet_processor     the_function;
   Thread_Control           *executing;
 
-  executing = _Thread_Executing;
+  executing = _Thread_Get_executing();
 
   for ( ; ; ) {
 
     executing->receive_packet = NULL;
 
     _Thread_Disable_dispatch();
-    _CORE_semaphore_Seize( &_MPCI_Semaphore, 0, true, WATCHDOG_NO_TIMEOUT );
+    _CORE_semaphore_Seize(
+      &_MPCI_Semaphore,
+      executing,
+      0,
+      true,
+      WATCHDOG_NO_TIMEOUT
+    );
     _Thread_Enable_dispatch();
 
     for ( ; ; ) {

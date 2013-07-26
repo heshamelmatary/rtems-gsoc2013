@@ -23,8 +23,8 @@
 #include <rtems/score/mpci.h>
 #include <rtems/score/mppkt.h>
 #include <rtems/score/object.h>
-#include <rtems/rtems/options.h>
-#include <rtems/rtems/region.h>
+#include <rtems/rtems/optionsimpl.h>
+#include <rtems/rtems/regionimpl.h>
 #include <rtems/score/thread.h>
 #include <rtems/rtems/support.h>
 

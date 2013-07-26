@@ -15,6 +15,13 @@
 #include "system.h"
 
 #include <stdio.h>
+#include <inttypes.h>
+
+static void success(void)
+{
+  locked_printf( "*** END OF TEST SMP03 ***\n" );
+  rtems_test_exit( 0 );
+}
 
 void Loop() {
   volatile int i;
@@ -26,18 +33,18 @@ void PrintTaskInfo(
   const char *task_name
 )
 {
-  int               cpu_num;
+  uint32_t cpu_num;
 
-  cpu_num = bsp_smp_processor_id();
+  cpu_num = rtems_smp_get_current_processor();
 
-  locked_printf("  CPU %d running task %s\n", cpu_num, task_name );
+  locked_printf("  CPU %" PRIu32 " running task %s\n", cpu_num, task_name );
 }
 
 rtems_task Init(
   rtems_task_argument argument
 )
 {
-  int               i;
+  uint32_t          i;
   char              ch = '0';
   rtems_id          id;
   rtems_status_code status;
@@ -46,6 +53,10 @@ rtems_task Init(
   locked_print_initialize();
 
   locked_printf( "\n\n***  SMP03 TEST ***\n" );
+
+  if ( rtems_smp_get_processor_count() == 1 ) {
+    success();
+  }
 
   /* Initialize the TaskRan array */
   TaskRan[0] = true;
@@ -97,8 +108,7 @@ rtems_task Init(
         TestFinished = false;
     }
     if (TestFinished) {
-      locked_printf( "*** END OF TEST SMP03 ***\n" );
-      rtems_test_exit( 0 );
+      success();
     }
   }
 

@@ -24,9 +24,11 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <rtems.h>
 #include <rtems/libio_.h>
+#include <rtems/rtems/barrierimpl.h>
 
 #include "pipe.h"
 

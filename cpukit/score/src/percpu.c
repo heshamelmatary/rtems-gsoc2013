@@ -19,6 +19,7 @@
 #endif
 
 #include <rtems/system.h>
+#include <rtems/score/address.h>
 #include <rtems/score/thread.h>
 #include <rtems/score/percpu.h>
 #include <rtems/score/wkspace.h>
@@ -28,6 +29,7 @@
 #if defined(RTEMS_SMP)
 
   #include <rtems/score/smp.h>
+  #include <rtems/bspsmp.h>
 
   void _SMP_Handler_initialize(void)
   {
@@ -79,7 +81,7 @@
   )
   {
     per_cpu->state = new_state;
-    _CPU_Processor_event_broadcast();
+    _CPU_SMP_Processor_event_broadcast();
   }
 
   void _Per_CPU_Wait_for_state(
@@ -88,7 +90,7 @@
   )
   {
     while ( per_cpu->state != desired_state ) {
-      _CPU_Processor_event_receive();
+      _CPU_SMP_Processor_event_receive();
     }
   }
 #else

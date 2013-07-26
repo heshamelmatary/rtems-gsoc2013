@@ -42,6 +42,10 @@ include_bsp_HEADERS += ../shared/include/arm-gic-regs.h
 include_bsp_HEADERS += ../shared/include/arm-gic-tm27.h
 include_bsp_HEADERS += ../shared/include/arm-pl011.h
 include_bsp_HEADERS += ../shared/include/arm-pl011-regs.h
+include_bsp_HEADERS += ../shared/include/arm-pl050.h
+include_bsp_HEADERS += ../shared/include/arm-pl050-regs.h
+include_bsp_HEADERS += ../shared/include/arm-pl111-fb.h
+include_bsp_HEADERS += ../shared/include/arm-pl111-regs.h
 include_bsp_HEADERS += include/irq.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
@@ -109,7 +113,9 @@ libbsp_a_SOURCES += ../../shared/console_control.c
 libbsp_a_SOURCES += ../../shared/console_read.c
 libbsp_a_SOURCES += ../../shared/console_select.c
 libbsp_a_SOURCES += ../../shared/console_write.c
+libbsp_a_SOURCES += ../../shared/get-serial-mouse-ps2.c
 libbsp_a_SOURCES += ../shared/arm-pl011.c
+libbsp_a_SOURCES += ../shared/arm-pl050.c
 libbsp_a_SOURCES += console/console-config.c
 
 # Clock
@@ -130,6 +136,10 @@ include_libcpu_HEADERS += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-start.h
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c
+
+# Framebuffer
+libbsp_a_SOURCES += ../shared/arm-pl111-fb.c
+libbsp_a_SOURCES += startup/fb-config.c
 
 if HAS_SMP
 libbsp_a_SOURCES += ../shared/arm-a9mpcore-smp.c

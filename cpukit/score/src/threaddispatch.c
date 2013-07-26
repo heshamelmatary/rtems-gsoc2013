@@ -26,7 +26,6 @@
 #include <rtems/score/object.h>
 #include <rtems/score/priority.h>
 #include <rtems/score/states.h>
-#include <rtems/score/sysstate.h>
 #include <rtems/score/thread.h>
 #include <rtems/score/threaddispatch.h>
 #include <rtems/score/threadq.h>
@@ -143,6 +142,7 @@ void _Thread_Dispatch( void )
       }
     #endif
 
+#if !defined(__DYNAMIC_REENT__)
     /*
      * Switch libc's task specific data.
      */
@@ -150,6 +150,7 @@ void _Thread_Dispatch( void )
       executing->libc_reent = *_Thread_libc_reent;
       *_Thread_libc_reent = heir->libc_reent;
     }
+#endif
 
     _User_extensions_Thread_switch( executing, heir );
 

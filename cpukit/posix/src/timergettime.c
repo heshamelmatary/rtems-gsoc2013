@@ -28,7 +28,8 @@
 #include <rtems/score/thread.h>
 #include <rtems/score/tod.h>
 #include <rtems/score/timespec.h>
-#include <rtems/posix/timer.h>
+#include <rtems/score/watchdogimpl.h>
+#include <rtems/posix/timerimpl.h>
 
 /*
  *          - When a timer is initialized, the value of the time in

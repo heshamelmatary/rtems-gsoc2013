@@ -19,6 +19,7 @@
 #endif
 
 #include <rtems/system.h>
+#include <rtems/rtems/asrimpl.h>
 #include <rtems/rtems/status.h>
 #include <rtems/rtems/asr.h>
 #include <rtems/score/isr.h>
@@ -79,7 +80,7 @@ rtems_status_code rtems_signal_catch(
   ASR_Information    *asr;
 
 /* XXX normalize mode */
-  executing = _Thread_Executing;
+  executing = _Thread_Get_executing();
   api = (RTEMS_API_Control*)executing->API_Extensions[ THREAD_API_RTEMS ];
   asr = &api->Signal;
 

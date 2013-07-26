@@ -93,7 +93,11 @@ extern "C" {
 
 #define CPU_ALL_TASKS_ARE_FP             FALSE
 #define CPU_IDLE_TASK_IS_FP              FALSE
-#define CPU_USE_DEFERRED_FP_SWITCH       TRUE
+#if defined(RTEMS_SMP)
+  #define CPU_USE_DEFERRED_FP_SWITCH     FALSE
+#else
+  #define CPU_USE_DEFERRED_FP_SWITCH     TRUE
+#endif
 #endif /* __SSE__ */
 
 #define CPU_STACK_GROWS_UP               FALSE
@@ -455,12 +459,16 @@ uint32_t   _CPU_ISR_Get_level( void );
   #define _CPU_Context_switch_to_first_task_smp( _the_context ) \
      _CPU_Context_restore( (_the_context) );
 
-  static inline void _CPU_Processor_event_broadcast( void )
+  RTEMS_COMPILER_PURE_ATTRIBUTE uint32_t _CPU_SMP_Get_current_processor( void );
+
+  void _CPU_SMP_Send_interrupt( uint32_t target_processor_index );
+
+  static inline void _CPU_SMP_Processor_event_broadcast( void )
   {
     __asm__ volatile ( "" : : : "memory" );
   }
 
-  static inline void _CPU_Processor_event_receive( void )
+  static inline void _CPU_SMP_Processor_event_receive( void )
   {
     __asm__ volatile ( "" : : : "memory" );
   }

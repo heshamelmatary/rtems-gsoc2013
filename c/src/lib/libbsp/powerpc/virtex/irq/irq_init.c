@@ -38,6 +38,8 @@
 #include <bsp/irq-generic.h>
 #include <bsp/vectors.h>
 
+#include <libcpu/powerpc-utility.h>
+
 /*
  * Acknowledge a mask of interrupts.
  */
@@ -81,30 +83,23 @@ static void BSP_irq_disable_at_opbintc (rtems_irq_number irqnum)
  */
 static void BSP_irq_handle_at_opbintc(void)
 {
-  uint32_t ipr, mask, i, c;
+  uint32_t ipr, i, c;
+
+  /* Get pending interrupts */
   ipr = get_ipr();
 
-  c = 0;
-  mask = 0;
+  if (ipr != 0) {
+    /* Acknowledge all pending interrupts now and service them afterwards */
+    set_iar(ipr);
 
-  for (i = 0;
-       (i < BSP_OPBINTC_PER_IRQ_NUMBER)
-	 && (ipr != 0);
-       i++) {
-    c = (1 << i);
+    do {
+      /* Get highest priority pending interrupt */
+      uint32_t i = 31 - ppc_count_leading_zeros(ipr);
 
-    if ((ipr & c) != 0) {
-      /* interrupt is asserted */
-      mask |= c;
-      ipr &= ~c;
+      ipr &= ~(1U << i);
 
       bsp_interrupt_handler_dispatch(i+BSP_OPBINTC_IRQ_LOWEST_OFFSET);
-    }
-  }
-
-  if (mask) {
-    /* ack all the interrupts we serviced */
-    set_iar(mask);
+    } while (ipr != 0);
   }
 }
 

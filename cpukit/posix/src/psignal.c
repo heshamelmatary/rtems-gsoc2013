@@ -31,12 +31,13 @@
 #include <rtems/config.h>
 #include <rtems/score/isr.h>
 #include <rtems/score/thread.h>
-#include <rtems/score/tqdata.h>
+#include <rtems/score/threadq.h>
+#include <rtems/score/watchdogimpl.h>
 #include <rtems/score/wkspace.h>
 #include <rtems/seterr.h>
 #include <rtems/posix/threadsup.h>
 #include <rtems/posix/psignalimpl.h>
-#include <rtems/posix/pthread.h>
+#include <rtems/posix/pthreadimpl.h>
 #include <rtems/posix/time.h>
 #include <stdio.h>
 
@@ -94,9 +95,6 @@ Thread_queue_Control _POSIX_signals_Wait_queue;
 Chain_Control _POSIX_signals_Inactive_siginfo;
 Chain_Control _POSIX_signals_Siginfo[ SIG_ARRAY_MAX ];
 
-Watchdog_Control _POSIX_signals_Alarm_timer;
-Watchdog_Control _POSIX_signals_Ualarm_timer;
-
 /*
  *  XXX - move these
  */
@@ -118,14 +116,16 @@ static void _POSIX_signals_Post_switch_hook(
   int                 signo;
   ISR_Level           level;
   int                 hold_errno;
+  Thread_Control     *executing;
 
+  executing = _Thread_Get_executing();
   api = the_thread->API_Extensions[ THREAD_API_POSIX ];
 
   /*
    *  We need to ensure that if the signal handler executes a call
    *  which overwrites the unblocking status, we restore it.
    */
-  hold_errno = _Thread_Executing->Wait.return_code;
+  hold_errno = executing->Wait.return_code;
 
   /*
    * api may be NULL in case of a thread close in progress
@@ -162,7 +162,7 @@ static void _POSIX_signals_Post_switch_hook(
     }
   }
 
-  _Thread_Executing->Wait.return_code = hold_errno;
+  executing->Wait.return_code = hold_errno;
 }
 
 API_extensions_Post_switch_control _POSIX_signals_Post_switch = {
@@ -227,10 +227,4 @@ void _POSIX_signals_Manager_Initialization(void)
   } else {
     _Chain_Initialize_empty( &_POSIX_signals_Inactive_siginfo );
   }
-
-  /*
-   *  Initialize the Alarm Timer
-   */
-  _Watchdog_Initialize( &_POSIX_signals_Alarm_timer, NULL, 0, NULL );
-  _Watchdog_Initialize( &_POSIX_signals_Ualarm_timer, NULL, 0, NULL );
 }

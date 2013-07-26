@@ -1000,12 +1000,28 @@ void _CPU_Context_validate( uintptr_t pattern );
   #define _CPU_Context_switch_to_first_task_smp( _context ) \
     _CPU_Context_restore( _context )
 
-  static inline void _CPU_Processor_event_broadcast( void )
+  RTEMS_COMPILER_PURE_ATTRIBUTE static inline uint32_t
+    _CPU_SMP_Get_current_processor( void )
+  {
+    uint32_t pir;
+
+    /* Use Book E Processor ID Register (PIR) */
+    __asm__ volatile (
+      "mfspr %[pir], 286"
+      : [pir] "=&r" (pir)
+    );
+
+    return pir;
+  }
+
+  void _CPU_SMP_Send_interrupt( uint32_t target_processor_index );
+
+  static inline void _CPU_SMP_Processor_event_broadcast( void )
   {
     __asm__ volatile ( "" : : : "memory" );
   }
 
-  static inline void _CPU_Processor_event_receive( void )
+  static inline void _CPU_SMP_Processor_event_receive( void )
   {
     __asm__ volatile ( "" : : : "memory" );
   }

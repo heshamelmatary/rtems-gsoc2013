@@ -22,11 +22,11 @@
 #include <pthread.h>
 
 #include <rtems/system.h>
-#include <rtems/score/coremutex.h>
+#include <rtems/score/coremuteximpl.h>
 #if defined(RTEMS_MULTIPROCESSING)
 #include <rtems/score/mpci.h>
 #endif
-#include <rtems/posix/mutex.h>
+#include <rtems/posix/muteximpl.h>
 
 
 /*
