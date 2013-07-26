@@ -4,6 +4,7 @@ include $(top_srcdir)/../../../../automake/compile.am
 include $(top_srcdir)/../../bsp.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -18,6 +19,8 @@ noinst_PROGRAMS =
 
 include_HEADERS += ../../shared/include/coverhd.h
 include_HEADERS += ../../shared/tod.h
+
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 project_lib_DATA =
 
@@ -122,6 +125,9 @@ libbsp_a_SOURCES += i2c/mpc8540_i2c.c i2c/i2c_init.c
 include_bsp_HEADERS += ../shared/motorola/vpd.h
 # vpd
 libbsp_a_SOURCES += ../shared/motorola/vpd.c
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 if HAS_NETWORKING
 include_bsp_HEADERS += network/if_tsec_pub.h

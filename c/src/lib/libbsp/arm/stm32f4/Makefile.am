@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I ../../../../aclocal
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 ###############################################################################
 #                  Data                                                       #
@@ -48,6 +49,8 @@ include_bsp_HEADERS += include/usart.h
 include_bsp_HEADERS += include/stm32f4.h
 include_bsp_HEADERS += include/io.h
 include_bsp_HEADERS += include/rcc.h
+
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 ###############################################################################
 #                  LibBSP                                                     #
@@ -110,6 +113,9 @@ libbsp_a_SOURCES += ../../shared/timerstub.c
 libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
 libbsp_a_SOURCES += ../../../libcpu/arm/shared/cache/cache_.h
 libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 ###############################################################################
 #                  Special Rules                                              #

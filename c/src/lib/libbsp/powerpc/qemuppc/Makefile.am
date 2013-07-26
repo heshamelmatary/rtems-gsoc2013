@@ -4,6 +4,7 @@ include $(top_srcdir)/../../../../automake/compile.am
 include $(top_srcdir)/../../bsp.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -16,6 +17,8 @@ DISTCLEANFILES = include/bspopts.h
 noinst_PROGRAMS =
 
 nodist_include_HEADERS += ../../shared/include/coverhd.h
+
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 noinst_LIBRARIES = libbspstart.a
 libbspstart_a_SOURCES = start/start.S
@@ -57,6 +60,9 @@ irq_SOURCES += irq/irq_init.c
 noinst_LIBRARIES += libbsp.a
 libbsp_a_SOURCES = $(startup_SOURCES) $(clock_SOURCES) $(console_SOURCES) \
     $(irq_SOURCES)
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 libbsp_a_LIBADD = ../../../libcpu/@RTEMS_CPU@/shared/cpuIdent.rel \
     ../../../libcpu/@RTEMS_CPU@/shared/cache.rel \

@@ -5,6 +5,7 @@ SUBDIRS = . tools
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -15,7 +16,9 @@ nodist_include_HEADERS = include/bspopts.h
 nodist_include_HEADERS += ../../shared/include/coverhd.h
 
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
+
 noinst_PROGRAMS =
 
 noinst_LIBRARIES = libbspstart.a
@@ -26,6 +29,9 @@ dist_project_lib_DATA += startup/linkcmds
 
 noinst_LIBRARIES += libbsp.a
 libbsp_a_SOURCES =
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 include_ndsdir = $(includedir)/nds
 include_nds_HEADERS = touchscreen/touchscreen.h sound/sound.h

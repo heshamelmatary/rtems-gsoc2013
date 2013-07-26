@@ -3,16 +3,19 @@ ACLOCAL_AMFLAGS = -I ../../../../aclocal
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
 include_HEADERS = include/bsp.h
 include_HEADERS += ../../shared/include/tm27.h
+
 include_bsp_HEADERS = include/irq.h
 include_bsp_HEADERS += include/swi.h
 
 nodist_include_HEADERS = include/bspopts.h
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
 noinst_PROGRAMS =
 
@@ -41,6 +44,9 @@ libbsp_a_SOURCES += ../../shared/clock_driver_simidle.c
 libbsp_a_SOURCES += ../../shared/timerstub.c
 # above
 libbsp_a_SOURCES += ../shared/abort/abort.c
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 #libbsp_a_LIBADD = ../../../libcpu/@RTEMS_CPU@/shared/arm920.rel \
 #    ../../../libcpu/@RTEMS_CPU@/@RTEMS_CPU_MODEL@/clock.rel \

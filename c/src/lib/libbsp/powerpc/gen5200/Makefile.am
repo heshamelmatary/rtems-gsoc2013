@@ -7,6 +7,7 @@ include_bestcommdir = $(include_bspdir)/bestcomm
 include_bestcomm_includedir = $(include_bestcommdir)/include
 include_bestcomm_include_mgt5200dir = $(include_bestcomm_includedir)/mgt5200
 include_bestcomm_task_apidir = $(include_bestcommdir)/task_api
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -15,6 +16,7 @@ include_HEADERS = include/bsp.h include/i2cdrv.h \
 include_HEADERS += include/tm27.h
 
 nodist_include_HEADERS = include/bspopts.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
 
 noinst_PROGRAMS =
@@ -151,6 +153,9 @@ libbsp_a_SOURCES += startup/bspstart.c
 libbsp_a_SOURCES += startup/cpuinit.c 
 libbsp_a_SOURCES += startup/uboot_support.c
 libbsp_a_SOURCES += startup/bestcomm.c
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 if HAS_NETWORKING
 libbsp_a_SOURCES += network_5200/network.c

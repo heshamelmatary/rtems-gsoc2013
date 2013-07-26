@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I ../../../../aclocal
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -11,6 +12,7 @@ include_HEADERS += include/tm27.h
 
 nodist_include_HEADERS = include/bspopts.h
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
 
 SUBDIRS = . tools
@@ -49,6 +51,8 @@ libbsp_a_SOURCES += i2c/i2c.c i2c/i2cdrv.c
 libbsp_a_SOURCES += tod/ds1307.c tod/todcfg.c ../../shared/tod.c
 # nvram
 libbsp_a_SOURCES += nvram/nvram.c
+# LIBMM 
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 libbsp_a_LIBADD = \
     ../../../libcpu/@RTEMS_CPU@/shared/cache.rel \

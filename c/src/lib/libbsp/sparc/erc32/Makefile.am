@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I ../../../../aclocal
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -17,6 +18,8 @@ noinst_PROGRAMS =
 
 include_HEADERS += include/erc32.h
 include_HEADERS += ../../shared/include/coverhd.h
+
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 noinst_LIBRARIES = libbspstart.a
 libbspstart_a_SOURCES = ../../sparc/shared/start.S
@@ -64,6 +67,9 @@ libbsp_a_SOURCES += \
     ../../shared/src/irq-legacy.c \
     ../../shared/src/irq-server.c \
     ../../shared/src/irq-shell.c
+
+# LIBMM 
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 if HAS_SMP
 libbsp_a_SOURCES += ../../shared/smp/getcpuid.c ../../shared/smp/smp_stub.c

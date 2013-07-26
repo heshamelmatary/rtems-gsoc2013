@@ -4,6 +4,7 @@ include $(top_srcdir)/../../../../automake/compile.am
 include $(top_srcdir)/../../bsp.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -11,6 +12,7 @@ include_HEADERS = include/bsp.h
 include_HEADERS += include/tm27.h
 include_HEADERS += ../shared/include/asm.h 
 include_HEADERS += ../shared/include/traptable.h 
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 ## these are the include files used by the boot process from HelenOS Sparc64
 include_bootdir = $(includedir)/boot
@@ -120,6 +122,8 @@ noinst_LIBRARIES = libbsp.a
 libbsp_a_SOURCES = $(startup_SOURCES) $(mmu_SOURCES) $(clock_SOURCES) $(console_SOURCES) \
     $(timer_SOURCES)
 
+# LIBMM 
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 libbsp_a_LIBADD = \
       ../../../libcpu/@RTEMS_CPU@/shared/shared-score.rel \

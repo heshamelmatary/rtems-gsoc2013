@@ -4,6 +4,7 @@ include $(top_srcdir)/../../../../automake/compile.am
 include $(top_srcdir)/../../bsp.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -25,6 +26,7 @@ include_boot_HEADERS = ../shared/helenos/boot/include/align.h \
 
 nodist_include_HEADERS = include/bspopts.h    
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h 
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
 noinst_PROGRAMS =
 
@@ -68,6 +70,9 @@ timer_SOURCES = ../../shared/timerstub.c
 noinst_LIBRARIES = libbsp.a
 libbsp_a_SOURCES = $(startup_SOURCES) $(clock_SOURCES) $(console_SOURCES) \
     $(timer_SOURCES)
+
+# LIBMM 
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 libbsp_a_LIBADD = \
       ../../../libcpu/@RTEMS_CPU@/shared/shared-score.rel \

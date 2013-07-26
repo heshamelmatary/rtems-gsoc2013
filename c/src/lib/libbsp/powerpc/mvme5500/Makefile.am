@@ -4,6 +4,7 @@ include $(top_srcdir)/../../../../automake/compile.am
 include $(top_srcdir)/../../bsp.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -14,6 +15,8 @@ nodist_include_HEADERS = include/bspopts.h
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
 DISTCLEANFILES = include/bspopts.h
 nodist_include_HEADERS += ../../shared/include/coverhd.h
+
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 noinst_PROGRAMS =
 
@@ -84,6 +87,9 @@ include_bsp_HEADERS += ../../shared/vmeUniverse/VME.h vme/VMEConfig.h \
 libbsp_a_SOURCES += ../../shared/vmeUniverse/vmeUniverse.c\
 	../shared/vme/vmeconfig.c ../../shared/vmeUniverse/bspVmeDmaList.c\
 	../shared/vme/vme_universe.c
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 if HAS_NETWORKING
 include_bsp_HEADERS += network/if_100MHz/GT64260eth.h \

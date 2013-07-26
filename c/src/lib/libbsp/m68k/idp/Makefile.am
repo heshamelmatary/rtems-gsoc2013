@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I ../../../../aclocal
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -11,6 +12,7 @@ include_HEADERS += ../../shared/include/tm27.h
 
 nodist_include_HEADERS = include/bspopts.h
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
 
 include_HEADERS += include/leds.h
@@ -39,6 +41,8 @@ libbsp_a_SOURCES += console/console.c console/leds.c console/mc68ec.c \
     console/duart.c ../../shared/dummy_printk_support.c
 # timer
 libbsp_a_SOURCES += timer/timer.c timer/timerisr.S
+# LIBMM 
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 EXTRA_DIST = include/README
 EXTRA_DIST += times

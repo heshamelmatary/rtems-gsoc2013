@@ -7,6 +7,7 @@ EXTRA_DIST      =
 
 include $(top_srcdir)/../../../../automake/compile.am
 include $(top_srcdir)/../../bsp.am
+include_libcpudir = $(includedir)/libcpu
 
 include_bspdir = $(includedir)/bsp
 
@@ -23,6 +24,8 @@ nodist_include_HEADERS += ../../shared/include/tm27.h
 DISTCLEANFILES += include/bspopts.h
 
 include_bsp_HEADERS =
+
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 #start
 EXTRA_DIST += ../../powerpc/shared/start/rtems_crti.S
@@ -132,6 +135,9 @@ libbsp_a_SOURCES += ../shared/vme/vmeconfig.c \
     ../../shared/vmeUniverse/vmeUniverse.c \
     ../../shared/vmeUniverse/vmeTsi148.c \
     ../../shared/vmeUniverse/bspVmeDmaList.c
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 #network
 if HAS_NETWORKING

@@ -51,6 +51,7 @@ include_bsp_HEADERS += include/i2c.h
 include_bsp_HEADERS += include/emc.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
+include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h
 
 ###############################################################################
 #                  Data                                                       #
@@ -151,6 +152,9 @@ libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 ###############################################################################
 #                  Network                                                    #

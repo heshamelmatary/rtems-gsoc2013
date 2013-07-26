@@ -4,6 +4,7 @@ ACLOCAL_AMFLAGS = -I ../../../../aclocal
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -16,6 +17,7 @@ include_bsp_HEADERS =
 nodist_include_HEADERS     = include/bspopts.h
 nodist_include_HEADERS    += include/coverhd.h
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES             = include/bspopts.h
 
 # start
@@ -57,6 +59,9 @@ libbsp_a_SOURCES += mmu/mmu.c
 #vectors
 include_bsp_HEADERS += ../../../libcpu/@RTEMS_CPU@/@exceptions@/bspsupport/vectors.h
 include_bsp_HEADERS += ../../../libcpu/@RTEMS_CPU@/@exceptions@/bspsupport/irq_supp.h
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 libbsp_a_LIBADD = ../../../libcpu/@RTEMS_CPU@/@exceptions@/rtems-cpu.rel \
                   ../../../libcpu/@RTEMS_CPU@/@exceptions@/exc_bspsupport.rel \

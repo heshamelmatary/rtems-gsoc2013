@@ -9,6 +9,7 @@ endif
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -17,6 +18,7 @@ include_HEADERS += include/tm27.h
 
 nodist_include_HEADERS = include/bspopts.h
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
 
 noinst_PROGRAMS =
@@ -129,6 +131,9 @@ libbsp_a_SOURCES += ../../shared/vmeUniverse/vmeUniverse.c \
     ../../powerpc/shared/vme/vmeconfig.c \
     ../../powerpc/shared/vme/vme_universe.c \
     ../../powerpc/shared/vme/VMEConfig.h
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 if QEMU
 if HAS_NETWORKING

@@ -6,12 +6,14 @@ ACLOCAL_AMFLAGS = -I ../../../../aclocal
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
 include_HEADERS = include/bsp.h
 include_HEADERS += ../../shared/include/tm27.h
 include_bsp_HEADERS = ../shared/liblnk/regs.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 #isr
 include_bsp_HEADERS += ../../shared/include/irq-generic.h
 include_bsp_HEADERS += ../../shared/include/irq-info.h
@@ -86,6 +88,9 @@ libbsp_a_SOURCES += irq/maxvectors.c
 libbsp_a_SOURCES += irq/vectorisrs.c
 libbsp_a_SOURCES += irq/interruptmask.c
 libbsp_a_SOURCES += ../shared/irq/i8259.c
+
+# LIBMM 
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am

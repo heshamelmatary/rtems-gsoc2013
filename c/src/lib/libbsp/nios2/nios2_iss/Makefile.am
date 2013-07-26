@@ -5,12 +5,14 @@ include $(top_srcdir)/../../../../automake/compile.am
 dist_project_lib_DATA = bsp_specs
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 include_HEADERS = include/bsp.h
 include_HEADERS += ../../shared/include/tm27.h
 
 nodist_include_HEADERS = include/bspopts.h
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
 
 include_HEADERS += ../../shared/include/coverhd.h
@@ -38,6 +40,8 @@ libbsp_a_SOURCES += clock/clock.c ../../../shared/clockdrv_shell.h
 libbsp_a_SOURCES += console/console.c ../../shared/console-polled.c
 # timer
 libbsp_a_SOURCES += timer/timer.c
+# LIBMM 
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 include $(srcdir)/preinstall.am
 include $(top_srcdir)/../../../../automake/local.am

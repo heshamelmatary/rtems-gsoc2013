@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I ../../../../aclocal
 include $(top_srcdir)/../../../../automake/compile.am
 
 include_bspdir = $(includedir)/bsp
+include_libcpudir = $(includedir)/libcpu
 
 dist_project_lib_DATA = bsp_specs
 
@@ -28,6 +29,8 @@ include_bsp_HEADERS = include/irq.h \
 	../shared/include/start.h \
 	../shared/include/tictac.h \
 	../shared/include/linker-symbols.h
+
+include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 
 noinst_LIBRARIES = libbspstart.a
 libbspstart_a_SOURCES = start/start.S
@@ -80,6 +83,9 @@ libbsp_a_SOURCES += ../../shared/console.c \
         ../../shared/console_read.c \
         ../../shared/console_write.c \
         ../../shared/console_control.c
+
+# LIBMM
+libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 libbsp_a_LIBADD = ../../../libcpu/@RTEMS_CPU@/shared/cpuIdent.rel \
 	../../../libcpu/@RTEMS_CPU@/shared/cache.rel \
