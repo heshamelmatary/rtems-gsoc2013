@@ -7,6 +7,7 @@
  */
 
 /*
+ * Copyright (c) 2013. Hesham AL-Matary
  * Copyright (c) 2013 by Alan Cudmore
  * based on work by:
  * Copyright (c) 2009
@@ -25,6 +26,8 @@
 #include <bsp/start.h>
 #include <bsp/raspberrypi.h>
 #include <bsp/mmu.h>
+#include <bsp/linker-symbols.h>
+#include <rtems/score/mm.h>
 
 static void BSP_START_TEXT_SECTION raspberrypi_cache_setup(void)
 {
@@ -45,7 +48,10 @@ static void BSP_START_TEXT_SECTION raspberrypi_cache_setup(void)
 
 void BSP_START_TEXT_SECTION bsp_start_hook_0(void)
 {
-  raspberrypi_cache_setup();
+  //raspberrypi_cache_setup();
+  /* FIXME: Simple merge of previous mmu code to test 
+   * debug. This code must be cleaned/modified later */ 
+  _CPU_Memory_management_Initialize();
 }
 
 

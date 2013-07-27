@@ -130,7 +130,8 @@ libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 libbsp_a_SOURCES += startup/bspstarthooks.c
 
 # LIBMM
-libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
+libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-set-ttb-entries.c
+libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/mm.c
 
 ###############################################################################
 # Network                                                    #
