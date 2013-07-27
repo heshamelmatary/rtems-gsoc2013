@@ -44,12 +44,10 @@
 #include <rtems/score/heap.h>
 #include <rtems/score/interr.h>
 #include <rtems/score/isr.h>
-#if defined(RTEMS_MULTIPROCESSING)
-#include <rtems/score/mpci.h>
-#endif
 #include <rtems/score/priority.h>
-#include <rtems/score/scheduler.h>
-#include <rtems/score/thread.h>
+#include <rtems/score/prioritybitmapimpl.h>
+#include <rtems/score/schedulerimpl.h>
+#include <rtems/score/threadimpl.h>
 #include <rtems/score/tod.h>
 #include <rtems/score/userextimpl.h>
 #include <rtems/score/watchdogimpl.h>

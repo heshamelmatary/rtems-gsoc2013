@@ -18,12 +18,8 @@
 #include "config.h"
 #endif
 
-#include <rtems/system.h>
-#include <rtems/score/isr.h>
 #include <rtems/score/coresemimpl.h>
-#include <rtems/score/states.h>
-#include <rtems/score/thread.h>
-#include <rtems/score/threadq.h>
+#include <rtems/score/statesimpl.h>
 
 void _CORE_semaphore_Initialize(
   CORE_semaphore_Control          *the_semaphore,

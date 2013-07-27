@@ -31,7 +31,7 @@
 #include <rtems/rtems/messageimpl.h>
 #if defined(RTEMS_MULTIPROCESSING)
 #include <rtems/rtems/mp.h>
-#include <rtems/score/mpci.h>
+#include <rtems/score/mpciimpl.h>
 #endif
 #include <rtems/rtems/partimpl.h>
 #include <rtems/score/priority.h>
@@ -77,7 +77,7 @@ void print_formula(void);
 /*
  *  This assumes the default Priority Scheduler
  */
-#include <rtems/score/prioritybitmap.h>
+#include <rtems/score/prioritybitmapimpl.h>
 #include <rtems/score/schedulerpriority.h>
 
 /* Priority scheduling uninitialized (globals) consumption */
@@ -304,7 +304,7 @@ uninitialized =
 #endif
 
 #if defined(RTEMS_MULTIPROCESSING)
-/*mpci.h*/      (sizeof _MPCI_Remote_blocked_threads)     +
+/*mpciimpl.h*/  (sizeof _MPCI_Remote_blocked_threads)     +
                 (sizeof _MPCI_Semaphore)                  +
                 (sizeof _MPCI_table)                      +
                 (sizeof _MPCI_Receive_server_tcb)         +

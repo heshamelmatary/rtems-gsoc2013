@@ -19,6 +19,8 @@
 #endif
 
 #include <rtems/score/schedulersimplesmp.h>
+#include <rtems/score/schedulersimpleimpl.h>
+#include <rtems/score/wkspace.h>
 
 static Scheduler_simple_smp_Control *_Scheduler_simple_smp_Instance( void )
 {

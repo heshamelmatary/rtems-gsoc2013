@@ -20,9 +20,7 @@
 #include <rtems/score/context.h>
 #include <rtems/score/interr.h>
 #include <rtems/score/isr.h>
-#include <rtems/score/object.h>
 #include <rtems/score/priority.h>
-#include <rtems/score/states.h>
 #include <rtems/score/threaddispatch.h>
 
 #define NO_OWNER_CPU 0xffffffffU

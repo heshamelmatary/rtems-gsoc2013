@@ -16,14 +16,16 @@
  *  http://www.rtems.com/license/LICENSE.
  */
 
-#ifndef _RTEMS_SCORE_SCHEDULERSIMPLE_H
-# error "Never use <rtems/score/schedulersimple.inl> directly; include <rtems/score/schedulersimple.h> instead."
-#endif
+#ifndef _RTEMS_SCORE_SCHEDULERSIMPLEIMPL_H
+#define _RTEMS_SCORE_SCHEDULERSIMPLEIMPL_H
 
-#ifndef _RTEMS_SCORE_SCHEDULERSIMPLE_INL
-#define _RTEMS_SCORE_SCHEDULERSIMPLE_INL
-
+#include <rtems/score/schedulersimple.h>
+#include <rtems/score/chainimpl.h>
 #include <rtems/score/thread.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @addtogroup ScoreScheduler
@@ -95,6 +97,10 @@ RTEMS_INLINE_ROUTINE void _Scheduler_simple_Insert_priority_fifo(
 }
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* end of include file */
