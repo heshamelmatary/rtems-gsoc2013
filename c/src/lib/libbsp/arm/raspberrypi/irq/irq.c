@@ -119,6 +119,8 @@ void bsp_interrupt_handler_default(rtems_vector_number vector)
 
 rtems_status_code bsp_interrupt_facility_initialize(void)
 {
-   raspberrypi_set_exception_handler(ARM_EXCEPTION_IRQ, _ARMV4_Exception_interrupt);
+  // raspberrypi_set_exception_handler(ARM_EXCEPTION_IRQ, _ARMV4_Exception_interrupt);
+   raspberrypi_set_exception_handler(ARM_EXCEPTION_IRQ, dummy_data_abort_exception_handler);
+   raspberrypi_set_exception_handler(ARM_EXCEPTION_DATA_ABORT, dummy_data_abort_exception_handler);
    return RTEMS_SUCCESSFUL;
 }

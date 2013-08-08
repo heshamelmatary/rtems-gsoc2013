@@ -15,8 +15,6 @@
 extern "C" {
 #endif
 
-void _CPU_Memory_management_Initialize(void);
-
 #ifdef __cplusplus
 }
 #endif

@@ -140,6 +140,7 @@ extern "C" {
 #define ARM_CP15_CTRL_NMFI (1U << 27)
 #define ARM_CP15_CTRL_EE (1U << 25)
 #define ARM_CP15_CTRL_VE (1U << 24)
+#define ARM_CP15_CTRL_XP (1U << 23) // ARMv6
 #define ARM_CP15_CTRL_U (1U << 22)
 #define ARM_CP15_CTRL_FI (1U << 21)
 #define ARM_CP15_CTRL_UWXN (1U << 20)

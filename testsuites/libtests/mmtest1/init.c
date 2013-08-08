@@ -5,8 +5,8 @@
  */
 
 /*
+ * Copyright (c) 2012-2013 Hesham Al-Matary.
  * Copyright (c) 2013 Gedare Bloom.
- * Copyright (c) 2012 Hesham Al-Matary.
  *
  * The license and distribution terms for this file may be
  * found in the file LICENSE in this distribution or at

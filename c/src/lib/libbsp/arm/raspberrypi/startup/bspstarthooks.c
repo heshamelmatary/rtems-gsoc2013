@@ -48,9 +48,11 @@ static void BSP_START_TEXT_SECTION raspberrypi_cache_setup(void)
 
 void BSP_START_TEXT_SECTION bsp_start_hook_0(void)
 {
-  //raspberrypi_cache_setup();
   /* FIXME: Simple merge of previous mmu code to test 
    * debug. This code must be cleaned/modified later */ 
+  //raspberrypi_cache_setup(); 
+
+  //raspberrypi_cache_setup();
   _CPU_Memory_management_Initialize();
 }
 

@@ -20,6 +20,8 @@
 #ifndef _RTEMS_SCORE_MM_INL
 #define _RTEMS_SCORE_MM_INL
 
+#include <stdlib.h>
+
 /**
  * @addtogroup SuperCoreMM
  */
@@ -28,10 +30,10 @@
 /**
  * @brief Calls _CPU_Memory_management_Initialize.
  */
-RTEMS_INLINE_ROUTINE void _Memory_management_Initialize( void )
+void _Memory_management_Initialize( void )
 {
 #ifdef RTEMS_SMP   
-   _SMP_lock_Initialize( &mm_lock );
+  _SMP_lock_Initialize( &mm_lock );
 #endif 
 
   _CPU_Memory_management_Initialize();
@@ -40,7 +42,7 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Initialize( void )
 /**
  * @brief Calls _CPU_Memory_management_Install_entry.
  */
-RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
+void _Memory_management_Install_entry(
   uintptr_t base,
   size_t size,
   uint32_t attr
@@ -60,7 +62,7 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
 /**
  * @brief Calls _CPU_Memory_management_Uninstall_entry.
  */
-RTEMS_INLINE_ROUTINE void _Memory_management_Uninstall_entry(
+void _Memory_management_Uninstall_entry(
   uintptr_t base,
   size_t size
 )

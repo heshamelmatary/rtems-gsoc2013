@@ -29,18 +29,18 @@ rtems_task Init(
 
   puts( "\n\n*** Start of mmtest2 ***\n" );
 
-  printf("Test 1: Installing Entry-1 and set it as read only\n");
-  _Memory_management_Install_entry( 0x0C000000U, 0x1000U, RTEMS_MM_REGION_PROTECTION_READ_ONLY );
+  //printf("Test 1: Installing Entry-1 and set it as read only\n");
+  //_Memory_management_Install_entry( 0x00100000, 0x200000, RTEMS_MM_REGION_PROTECTION_READ_ONLY );
 
   printf("Test 2: Installing Entry-2 and set it as write enabled\n");
-  _Memory_management_Install_entry( 0x0C100000U, 0x1000U, RTEMS_MM_REGION_PROTECTION_WRITE );
+  _Memory_management_Install_entry( 0x00400000, 0x100000, RTEMS_MM_REGION_PROTECTION_WRITE );
 
   // TODO: Make fatal tests withing exception handler */
   /* FIXME: make addresses target-independent */
 
-  a1 = (char *) 0x0C100000U;
+  a1 = (char *) 0x00400000;
   printf("Test 3: Write to write enabled block\n");
-  *a1 = 0xCC;
+  //*a1 = 0xCC;
 
   a1 = (char*)0xffffffffU;
   printf("Checking MMU exception 1: Read from Unmapped block\n");
@@ -51,7 +51,7 @@ rtems_task Init(
   *a1++ = 0xCC;
 
   // this one isn't an exception.
-  a2 = (char *) 0x0C000000U;
+  a2 = (char *) 0x00100000;
   printf("Checking MMU exception 4: Read from readonly block\n");
   a = *a2++;
 
@@ -59,9 +59,9 @@ rtems_task Init(
   *a2++ = 0xCC;
 
   printf("Test 6: Uninstalling Entry-2 \n");
-  _Memory_management_Uninstall_entry(0x0C100000U, 0x1000U);
+  _Memory_management_Uninstall_entry(0x00400000, 0x100000);
   
-  a1 = (char *) 0x0C100000U;
+  a1 = (char *) 0x00400000;
   printf("Checking MMU exception 6: Write to uninstalled block \n");
   *a1 = 0xCC;
 

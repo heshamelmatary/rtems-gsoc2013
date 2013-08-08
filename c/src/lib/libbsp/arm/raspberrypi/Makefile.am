@@ -132,7 +132,7 @@ libbsp_a_SOURCES += startup/bspstarthooks.c
 
 # LIBMM
 libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-set-ttb-entries.c
-libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/mm.c
+libbsp_a_SOURCES += ../../../libcpu/arm/ARM1176JZF-S/mmu/mm.c
 include_libcpu_HEADERS += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-start.h
 ###############################################################################
 # Network                                                    #
