@@ -19,7 +19,7 @@
 #endif
 
 #include <rtems/rtems/clock.h>
-#include <rtems/score/tod.h>
+#include <rtems/score/todimpl.h>
 #include <rtems/config.h>
 
 rtems_status_code rtems_clock_get_tod(
@@ -33,7 +33,7 @@ rtems_status_code rtems_clock_get_tod(
   if ( !time_buffer )
     return RTEMS_INVALID_ADDRESS;
 
-  if ( !_TOD.is_set )
+  if ( !_TOD_Is_set() )
     return RTEMS_NOT_DEFINED;
 
   /* Obtain the current time */

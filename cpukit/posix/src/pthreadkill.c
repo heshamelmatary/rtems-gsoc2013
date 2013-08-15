@@ -69,9 +69,6 @@ int pthread_kill(
         api->signals_pending |= signo_to_mask( sig );
 
         (void) _POSIX_signals_Unblock_thread( the_thread, sig, NULL );
-
-        if ( _ISR_Is_in_progress() && _Thread_Is_executing( the_thread ) )
-          _Thread_Dispatch_necessary = true;
       }
       _Objects_Put( &the_thread->Object );
       return 0;

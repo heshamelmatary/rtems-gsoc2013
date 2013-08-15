@@ -24,6 +24,39 @@
 #include <rtems/score/threadimpl.h>
 #include <rtems/config.h>
 
+static void _RTEMS_Tasks_Dispatch_if_necessary(
+  Thread_Control *executing,
+  bool            needs_asr_dispatching
+)
+{
+  if ( _Thread_Dispatch_is_enabled() ) {
+    bool dispatch_necessary = needs_asr_dispatching;
+
+    /*
+     * FIXME: This locking approach is brittle.  It only works since the
+     * current simple SMP scheduler has no support for the non-preempt mode.
+     */
+#if defined( RTEMS_SMP )
+    ISR_Level level;
+
+    _ISR_Disable( level );
+#endif
+
+    if ( !_Thread_Is_heir( executing ) && executing->is_preemptible ) {
+      dispatch_necessary = true;
+      _Thread_Dispatch_necessary = dispatch_necessary;
+    }
+
+#if defined( RTEMS_SMP )
+    _ISR_Enable( level );
+#endif
+
+    if ( dispatch_necessary ) {
+      _Thread_Dispatch();
+    }
+  }
+}
+
 rtems_status_code rtems_task_mode(
   rtems_mode  mode_set,
   rtems_mode  mask,
@@ -101,7 +134,7 @@ rtems_status_code rtems_task_mode(
     }
   }
 
-  _Thread_Dispatch_if_necessary( executing, needs_asr_dispatching );
+  _RTEMS_Tasks_Dispatch_if_necessary( executing, needs_asr_dispatching );
 
   return RTEMS_SUCCESSFUL;
 }

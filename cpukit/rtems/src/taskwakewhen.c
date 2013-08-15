@@ -21,7 +21,7 @@
 #include <rtems/rtems/tasks.h>
 #include <rtems/rtems/clock.h>
 #include <rtems/score/threadimpl.h>
-#include <rtems/score/tod.h>
+#include <rtems/score/todimpl.h>
 #include <rtems/score/watchdogimpl.h>
 
 rtems_status_code rtems_task_wake_when(
@@ -30,7 +30,7 @@ rtems_status_code rtems_task_wake_when(
 {
   Watchdog_Interval   seconds;
 
-  if ( !_TOD.is_set )
+  if ( !_TOD_Is_set() )
     return RTEMS_NOT_DEFINED;
 
   if ( !time_buffer )

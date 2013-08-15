@@ -36,7 +36,7 @@
 #include <rtems/posix/priorityimpl.h>
 #include <rtems/posix/psignalimpl.h>
 #include <rtems/posix/config.h>
-#include <rtems/posix/key.h>
+#include <rtems/posix/keyimpl.h>
 #include <rtems/posix/time.h>
 #include <rtems/score/timespec.h>
 
@@ -235,6 +235,9 @@ static bool _POSIX_Threads_Create_extension(
     created->Object.id,
     created
   );
+
+  /** initialize thread's key vaule node chain */
+  _Chain_Initialize_empty( &api->Key_Chain );
 
   return true;
 }

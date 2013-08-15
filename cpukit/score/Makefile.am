@@ -17,6 +17,7 @@ include_rtems_scoredir = $(includedir)/rtems/score
 include_rtems_score_HEADERS = include/rtems/score/address.h
 include_rtems_score_HEADERS += include/rtems/score/apiext.h
 include_rtems_score_HEADERS += include/rtems/score/apimutex.h
+include_rtems_score_HEADERS += include/rtems/score/assert.h
 include_rtems_score_HEADERS += include/rtems/score/chain.h
 include_rtems_score_HEADERS += include/rtems/score/chainimpl.h
 include_rtems_score_HEADERS += include/rtems/score/context.h
@@ -37,6 +38,7 @@ include_rtems_score_HEADERS += include/rtems/score/isr.h
 include_rtems_score_HEADERS += include/rtems/score/isrlevel.h
 include_rtems_score_HEADERS += inline/rtems/score/mm.inl
 include_rtems_score_HEADERS += include/rtems/score/mm.h
+include_rtems_score_HEADERS += include/rtems/score/isrlock.h
 include_rtems_score_HEADERS += include/rtems/score/freechain.h
 include_rtems_score_HEADERS += include/rtems/score/object.h
 include_rtems_score_HEADERS += include/rtems/score/objectimpl.h
@@ -71,6 +73,7 @@ include_rtems_score_HEADERS += include/rtems/score/timespec.h
 include_rtems_score_HEADERS += include/rtems/score/timestamp.h
 include_rtems_score_HEADERS += include/rtems/score/timestamp64.h
 include_rtems_score_HEADERS += include/rtems/score/tod.h
+include_rtems_score_HEADERS += include/rtems/score/todimpl.h
 include_rtems_score_HEADERS += include/rtems/score/userext.h
 include_rtems_score_HEADERS += include/rtems/score/userextimpl.h
 include_rtems_score_HEADERS += include/rtems/score/watchdog.h
@@ -105,8 +108,6 @@ endif
 
 ## src
 
-AM_CPPFLAGS += -D__RTEMS_INSIDE__
-
 noinst_LIBRARIES = libscore.a
 libscore_a_SOURCES =
 libscore_a_CPPFLAGS = $(AM_CPPFLAGS)
@@ -117,7 +118,6 @@ libscore_a_SOURCES += src/mpci.c src/objectmp.c src/threadmp.c
 endif
 
 if HAS_SMP
-libscore_a_SOURCES += src/isrsmp.c
 libscore_a_SOURCES += src/schedulersimplesmp.c
 libscore_a_SOURCES += src/smp.c
 endif
@@ -180,8 +180,11 @@ libscore_a_SOURCES += src/objectallocate.c src/objectclose.c \
 
 ## SCHEDULER_C_FILES
 libscore_a_SOURCES += src/scheduler.c
-libscore_a_SOURCES += src/schedulerdefaulttick.c
+libscore_a_SOURCES += src/schedulerdefaultallocatefree.c
+libscore_a_SOURCES += src/schedulerdefaultreleasejob.c
 libscore_a_SOURCES += src/schedulerdefaultstartidle.c
+libscore_a_SOURCES += src/schedulerdefaulttick.c
+libscore_a_SOURCES += src/schedulerdefaultupdate.c
 
 ## SCHEDULERPRIORITY_C_FILES
 libscore_a_SOURCES += src/schedulerpriority.c \
@@ -192,7 +195,6 @@ libscore_a_SOURCES += src/schedulerpriority.c \
     src/schedulerpriorityextract.c \
     src/schedulerpriorityfree.c \
     src/schedulerpriorityprioritycompare.c \
-    src/schedulerpriorityreleasejob.c \
     src/schedulerpriorityschedule.c \
     src/schedulerpriorityunblock.c \
     src/schedulerpriorityupdate.c \
@@ -300,13 +302,13 @@ libscore_a_SOURCES += src/ts64addto.c src/ts64dividebyinteger.c \
 ## TOD_C_FILES
 libscore_a_SOURCES += src/coretod.c src/coretodset.c src/coretodget.c \
     src/coretodgetuptimetimespec.c src/coretodtickle.c \
+    src/coretodsecondssinceepoch.c \
     src/coretodtickspersec.c
 
 ## WATCHDOG_C_FILES
 libscore_a_SOURCES += src/watchdog.c src/watchdogadjust.c \
     src/watchdogadjusttochain.c src/watchdoginsert.c src/watchdogremove.c \
-    src/watchdogtickle.c src/watchdogreport.c src/watchdogreportchain.c \
-    src/watchdognanoseconds.c
+    src/watchdogtickle.c src/watchdogreport.c src/watchdogreportchain.c
 
 ## USEREXT_C_FILES
 libscore_a_SOURCES += src/userextaddset.c \
@@ -317,6 +319,7 @@ libscore_a_SOURCES += src/apiext.c src/chain.c src/chainappend.c \
     src/chainextract.c src/chainget.c src/chaininsert.c \
     src/chainappendempty.c src/chainprependempty.c src/chaingetempty.c \
     src/chainnodecount.c \
+    src/assertthreaddispatchingrepressed.c \
     src/interr.c src/isr.c src/wkspace.c src/wkstringduplicate.c
 
 EXTRA_DIST = src/Unlimited.txt

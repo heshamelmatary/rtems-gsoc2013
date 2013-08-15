@@ -126,9 +126,15 @@ extern "C" {
 #define CPU_BIG_ENDIAN                           FALSE
 #define CPU_LITTLE_ENDIAN                        TRUE
 
+#define CPU_PER_CPU_CONTROL_SIZE 0
+
 /* structures */
 
 #ifndef ASM
+
+typedef struct {
+  /* There is no CPU specific per-CPU state */
+} CPU_Per_CPU_control;
 
 /*
  *  Basic integer context for the i386 family.
@@ -493,10 +499,11 @@ uint32_t   _CPU_ISR_Get_level( void );
 
 #define _CPU_Fatal_halt( _error ) \
   { \
+    uint32_t _error_lvalue = ( _error ); \
     __asm__ volatile ( "cli ; \
                     movl %0,%%eax ; \
                     hlt" \
-                    : "=r" ((_error)) : "0" ((_error)) \
+                    : "=r" ((_error_lvalue)) : "0" ((_error_lvalue)) \
     ); \
   }
 

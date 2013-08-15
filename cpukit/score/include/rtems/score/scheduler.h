@@ -126,6 +126,46 @@ typedef struct {
 extern Scheduler_Control  _Scheduler;
 
 /**
+ * @brief Returns an arbitrary non-NULL value.
+ *
+ * @param[in] thread Unused.
+ *
+ * @return An arbitrary non-NULL value.
+ */
+void *_Scheduler_default_Allocate(
+  Thread_Control *thread
+);
+
+/**
+ * @brief Does nothing.
+ *
+ * @param[in] thread Unused.
+ */
+void _Scheduler_default_Free(
+  Thread_Control *thread
+);
+
+/**
+ * @brief Does nothing.
+ *
+ * @param[in] thread Unused.
+ */
+void _Scheduler_default_Update(
+  Thread_Control *the_thread
+);
+
+/**
+ * @brief Does nothing.
+ *
+ * @param[in] thread Unused.
+ * @param[in] deadline Unused.
+ */
+void _Scheduler_default_Release_job(
+  Thread_Control *thread,
+  uint32_t        deadline
+);
+
+/**
  * @brief Performs tick operations depending on the CPU budget algorithm for
  * each executing thread.
  *

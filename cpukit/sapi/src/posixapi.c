@@ -30,9 +30,10 @@
 #include <rtems/posix/barrierimpl.h>
 #include <rtems/posix/condimpl.h>
 #include <rtems/posix/config.h>
-#include <rtems/posix/key.h>
+#include <rtems/posix/keyimpl.h>
 #include <rtems/posix/mqueueimpl.h>
 #include <rtems/posix/muteximpl.h>
+#include <rtems/posix/onceimpl.h>
 #include <rtems/posix/posixapi.h>
 #include <rtems/posix/priorityimpl.h>
 #include <rtems/posix/psignalimpl.h>
@@ -66,6 +67,7 @@ void _POSIX_API_Initialize(void)
   _POSIX_Key_Manager_initialization();
   _POSIX_Mutex_Manager_initialization();
   _POSIX_Message_queue_Manager_initialization();
+  _POSIX_Once_Manager_initialization();
   _POSIX_Semaphore_Manager_initialization();
   _POSIX_Timer_Manager_initialization();
   _POSIX_Barrier_Manager_initialization();

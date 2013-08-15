@@ -3,8 +3,6 @@ include $(top_srcdir)/automake/compile.am
 
 EXTRA_DIST =
 
-AM_CPPFLAGS += -D__RTEMS_INSIDE__
-
 noinst_LIBRARIES = libposix.a
 libposix_a_CPPFLAGS = $(AM_CPPFLAGS)
 libposix_a_SOURCES =
@@ -30,10 +28,12 @@ include_rtems_posix_HEADERS += include/rtems/posix/cond.h
 include_rtems_posix_HEADERS += include/rtems/posix/condimpl.h
 include_rtems_posix_HEADERS += include/rtems/posix/config.h
 include_rtems_posix_HEADERS += include/rtems/posix/key.h
+include_rtems_posix_HEADERS += include/rtems/posix/keyimpl.h
 include_rtems_posix_HEADERS += include/rtems/posix/mqueue.h
 include_rtems_posix_HEADERS += include/rtems/posix/mqueueimpl.h
 include_rtems_posix_HEADERS += include/rtems/posix/mutex.h
 include_rtems_posix_HEADERS += include/rtems/posix/muteximpl.h
+include_rtems_posix_HEADERS += include/rtems/posix/onceimpl.h
 include_rtems_posix_HEADERS += include/rtems/posix/posixapi.h
 include_rtems_posix_HEADERS += include/rtems/posix/priorityimpl.h
 include_rtems_posix_HEADERS += include/rtems/posix/psignal.h
@@ -53,8 +53,6 @@ include_rtems_posix_HEADERS += include/rtems/posix/rwlock.h
 include_rtems_posix_HEADERS += include/rtems/posix/rwlockimpl.h
 include_rtems_posix_HEADERS += include/rtems/posix/spinlock.h
 include_rtems_posix_HEADERS += include/rtems/posix/spinlockimpl.h
-
-include_rtems_posix_HEADERS += inline/rtems/posix/key.inl
 
 ## src
 libposix_a_SOURCES += src/aio_cancel.c src/aio_error.c src/aio_fsync.c \
@@ -118,6 +116,9 @@ libposix_a_SOURCES += src/mutexattrdestroy.c src/mutexattrgetprioceiling.c \
     src/mutexlocksupp.c src/mutexsetprioceiling.c src/mutextimedlock.c \
     src/mutextranslatereturncode.c src/mutextrylock.c src/mutexunlock.c
 
+## ONCE_C_FILES
+libposix_a_SOURCES += src/once.c src/pthreadonce.c
+
 ## PTHREAD_C_FILES
 libposix_a_SOURCES += src/pthreadatfork.c src/pthreadattrdestroy.c \
     src/pthreadattrgetdetachstate.c src/pthreadattrgetinheritsched.c \
@@ -134,7 +135,7 @@ libposix_a_SOURCES += src/pthreadatfork.c src/pthreadattrdestroy.c \
     src/pthreadexit.c src/pthreadgetcpuclockid.c \
     src/pthreadgetschedparam.c \
     src/pthreadinitthreads.c src/pthreadjoin.c src/pthreadkill.c \
-    src/pthreadonce.c src/pthreadself.c \
+    src/pthreadself.c \
     src/pthreadsetschedparam.c src/pthreadsigmask.c \
     src/psxpriorityisvalid.c src/psxtransschedparam.c
 

@@ -165,7 +165,7 @@
  * operating system support for a FIQ, she can trigger a software interrupt and
  * service the request in a two-step process.
  */
-#define CPU_MODES_INTERRUPT_MASK 0x80
+#define CPU_MODES_INTERRUPT_MASK 0x1
 
 #define CPU_CONTEXT_FP_SIZE sizeof( Context_Control_fp )
 
@@ -208,6 +208,8 @@
 
 #define CPU_USE_GENERIC_BITFIELD_DATA TRUE
 
+#define CPU_PER_CPU_CONTROL_SIZE 0
+
 /** @} */
 
 #ifdef ARM_MULTILIB_VFP_D32
@@ -232,6 +234,10 @@ extern "C" {
  * @addtogroup ScoreCPU
  */
 /**@{**/
+
+typedef struct {
+  /* There is no CPU specific per-CPU state */
+} CPU_Per_CPU_control;
 
 typedef struct {
 #if defined(ARM_MULTILIB_ARCH_V4)

@@ -51,6 +51,10 @@ $(PROJECT_INCLUDE)/rtems/score/apimutex.h: include/rtems/score/apimutex.h $(PROJ
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/apimutex.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/apimutex.h
 
+$(PROJECT_INCLUDE)/rtems/score/assert.h: include/rtems/score/assert.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/assert.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/assert.h
+
 $(PROJECT_INCLUDE)/rtems/score/chain.h: include/rtems/score/chain.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/chain.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/chain.h
@@ -130,6 +134,10 @@ PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/mm.inl
 $(PROJECT_INCLUDE)/rtems/score/mm.h: include/rtems/score/mm.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/mm.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/mm.h
+
+$(PROJECT_INCLUDE)/rtems/score/isrlock.h: include/rtems/score/isrlock.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/isrlock.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/isrlock.h
 
 $(PROJECT_INCLUDE)/rtems/score/freechain.h: include/rtems/score/freechain.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/freechain.h
@@ -266,6 +274,10 @@ PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/timestamp64.h
 $(PROJECT_INCLUDE)/rtems/score/tod.h: include/rtems/score/tod.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/tod.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/tod.h
+
+$(PROJECT_INCLUDE)/rtems/score/todimpl.h: include/rtems/score/todimpl.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/todimpl.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/todimpl.h
 
 $(PROJECT_INCLUDE)/rtems/score/userext.h: include/rtems/score/userext.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/userext.h

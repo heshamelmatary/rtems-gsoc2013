@@ -20,8 +20,10 @@
 #define _RTEMS_SCORE_THREADIMPL_H
 
 #include <rtems/score/thread.h>
+#include <rtems/score/isr.h>
 #include <rtems/score/objectimpl.h>
 #include <rtems/score/statesimpl.h>
+#include <rtems/score/todimpl.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,7 +118,7 @@ void _Thread_Create_idle(void);
  *    + ready chain
  *    + select heir
  */
-void _Thread_Start_multitasking( void );
+void _Thread_Start_multitasking( Context_Control *context );
 
 /**
  *  @brief Allocate the requested stack space for the thread.
@@ -525,6 +527,13 @@ RTEMS_INLINE_ROUTINE void _Thread_Unblock (
 
 RTEMS_INLINE_ROUTINE void _Thread_Restart_self( void )
 {
+#if defined(RTEMS_SMP)
+  ISR_Level level;
+
+  _Per_CPU_ISR_disable_and_acquire( _Per_CPU_Get(), level );
+  ( void ) level;
+#endif
+
 #if ( CPU_HARDWARE_FP == TRUE ) || ( CPU_SOFTWARE_FP == TRUE )
   if ( _Thread_Executing->fp_context != NULL )
     _Context_Restore_fp( &_Thread_Executing->fp_context );
@@ -631,30 +640,41 @@ RTEMS_INLINE_ROUTINE uint32_t _Thread_Get_global_exit_status( void )
   return idle->Wait.return_code;
 }
 
-/**
- * @brief Issues a thread dispatch if necessary.
- *
- * @param[in] executing The executing thread.
- * @param[in] needs_asr_dispatching Indicates whether or not the API
- *            level signals are pending and a dispatch is necessary.
- */
-RTEMS_INLINE_ROUTINE void _Thread_Dispatch_if_necessary(
+RTEMS_INLINE_ROUTINE void _Thread_Signal_notification( Thread_Control *thread )
+{
+  if ( _ISR_Is_in_progress() && _Thread_Is_executing( thread ) ) {
+    _Thread_Dispatch_necessary = true;
+  } else {
+#if defined(RTEMS_SMP)
+    if ( thread->is_executing ) {
+      const Per_CPU_Control *cpu_of_executing = _Per_CPU_Get();
+      Per_CPU_Control *cpu_of_thread = thread->cpu;
+
+      if ( cpu_of_executing != cpu_of_thread ) {
+        cpu_of_thread->dispatch_necessary = true;
+        _Per_CPU_Send_interrupt( cpu_of_thread );
+      }
+    }
+#endif
+  }
+}
+
+RTEMS_INLINE_ROUTINE void _Thread_Update_cpu_time_used(
   Thread_Control *executing,
-  bool            needs_asr_dispatching
+  Timestamp_Control *time_of_last_context_switch
 )
 {
-  if ( _Thread_Dispatch_is_enabled() ) {
-    bool dispatch_necessary = needs_asr_dispatching;
+  Timestamp_Control uptime;
+  Timestamp_Control ran;
 
-    if ( !_Thread_Is_heir( executing ) && executing->is_preemptible ) {
-      dispatch_necessary = true;
-      _Thread_Dispatch_necessary = dispatch_necessary;
-    }
-
-    if ( dispatch_necessary ) {
-      _Thread_Dispatch();
-    }
-  }
+  _TOD_Get_uptime( &uptime );
+  _Timestamp_Subtract(
+    time_of_last_context_switch,
+    &uptime,
+    &ran
+  );
+  *time_of_last_context_switch = uptime;
+  _Timestamp_Add_to( &executing->cpu_time_used, &ran );
 }
 
 #if !defined(__DYNAMIC_REENT__)

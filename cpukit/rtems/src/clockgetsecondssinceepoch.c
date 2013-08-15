@@ -19,7 +19,7 @@
 #endif
 
 #include <rtems/rtems/clock.h>
-#include <rtems/score/tod.h>
+#include <rtems/score/todimpl.h>
 
 rtems_status_code rtems_clock_get_seconds_since_epoch(
   rtems_interval *the_interval
@@ -28,7 +28,7 @@ rtems_status_code rtems_clock_get_seconds_since_epoch(
   if ( !the_interval )
     return RTEMS_INVALID_ADDRESS;
 
-  if ( !_TOD.is_set )
+  if ( !_TOD_Is_set() )
     return RTEMS_NOT_DEFINED;
 
   *the_interval = _TOD_Seconds_since_epoch();

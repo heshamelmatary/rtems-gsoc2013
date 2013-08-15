@@ -48,7 +48,7 @@
 #include <rtems/score/prioritybitmapimpl.h>
 #include <rtems/score/schedulerimpl.h>
 #include <rtems/score/threadimpl.h>
-#include <rtems/score/tod.h>
+#include <rtems/score/todimpl.h>
 #include <rtems/score/userextimpl.h>
 #include <rtems/score/watchdogimpl.h>
 #include <rtems/score/wkspace.h>
@@ -219,13 +219,13 @@ void rtems_initialize_start_multitasking(void)
 {
   uint32_t status;
 
-  _System_state_Set( SYSTEM_STATE_BEGIN_MULTITASKING );
+  _System_state_Set( SYSTEM_STATE_UP );
 
-#ifdef RTEMS_SMP
+#if defined(RTEMS_SMP)
   _SMP_Request_other_cores_to_perform_first_context_switch();
 #endif
 
-  _Thread_Start_multitasking();
+  _Thread_Start_multitasking( &_Thread_BSP_context );
 
   /*******************************************************************
    *******************************************************************

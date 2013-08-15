@@ -39,12 +39,9 @@
     /*
      *  Initialize per cpu pointer table
      */
-    _Per_CPU_Information_p[0] = &_Per_CPU_Information[0];
     for ( cpu = 1 ; cpu < max_cpus; ++cpu ) {
 
-      Per_CPU_Control *p = &_Per_CPU_Information[cpu];
-
-      _Per_CPU_Information_p[cpu] = p;
+      Per_CPU_Control *p = _Per_CPU_Get_by_index( cpu );
 
 #if CPU_ALLOCATE_INTERRUPT_STACK == TRUE
       {
@@ -68,8 +65,10 @@
     _SMP_Processor_count = max_cpus;
 
     for ( cpu = 1 ; cpu < max_cpus; ++cpu ) {
+      const Per_CPU_Control *per_cpu = _Per_CPU_Get_by_index( cpu );
+
       _Per_CPU_Wait_for_state(
-        &_Per_CPU_Information[ cpu ],
+        per_cpu,
         PER_CPU_STATE_READY_TO_BEGIN_MULTITASKING
       );
     }
@@ -99,5 +98,5 @@
    * statically allocated per cpu structure.  And the fields are initialized
    * as individual elements just like it has always been done.
    */
-  Per_CPU_Control _Per_CPU_Information[1];
+  Per_CPU_Control_envelope _Per_CPU_Information[1];
 #endif
