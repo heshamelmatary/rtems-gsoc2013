@@ -9,7 +9,7 @@
 #ifndef __LIBCPU_MM_H
 #define __LIBCPU_MM_H
 
-#include <rtems/score/mm.h>
+#include <rtems/score/mmimpl.h>
 
 #ifdef __cplusplus
 extern "C" {

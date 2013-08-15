@@ -13,14 +13,30 @@
  * http://www.rtems.com/license/LICENSE.
  */
 
-#ifndef _RTEMS_SCORE_MM_H
-# error "Never use <rtems/score/mm.inl> directly; include <rtems/score/mm.h> instead."
+#ifndef _RTEMS_SCORE_MMIMPL_H
+#define _RTEMS_SCORE_MMIMPL_H
+
+#ifdef RTEMS_SMP
+#include <rtems/score/smplock.h>
 #endif
 
-#ifndef _RTEMS_SCORE_MM_INL
-#define _RTEMS_SCORE_MM_INL
+#include <rtems/score/mm.h>
 
-#include <stdlib.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * @brief _Memory_management_Region Flags defs
+ *  
+ */
+#define RTEMS_MM_REGION_PROTECTION_READ_ONLY   0x1
+#define RTEMS_MM_REGION_PROTECTION_WRITE  0x2
+//#define RTEMS_MM_REGION_PROTECTION_EXEC   0x4
+
+#ifdef RTEMS_SMP
+SMP_lock_Control mm_lock;
+#endif
 
 /**
  * @addtogroup SuperCoreMM
@@ -30,7 +46,7 @@
 /**
  * @brief Calls _CPU_Memory_management_Initialize.
  */
-void _Memory_management_Initialize( void )
+RTEMS_INLINE_ROUTINE void _Memory_management_Initialize( void )
 {
 #ifdef RTEMS_SMP   
   _SMP_lock_Initialize( &mm_lock );
@@ -42,7 +58,7 @@ void _Memory_management_Initialize( void )
 /**
  * @brief Calls _CPU_Memory_management_Install_entry.
  */
-void _Memory_management_Install_entry(
+RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
   uintptr_t base,
   size_t size,
   uint32_t attr
@@ -62,7 +78,7 @@ void _Memory_management_Install_entry(
 /**
  * @brief Calls _CPU_Memory_management_Uninstall_entry.
  */
-void _Memory_management_Uninstall_entry(
+RTEMS_INLINE_ROUTINE void _Memory_management_Uninstall_entry(
   uintptr_t base,
   size_t size
 )
@@ -81,4 +97,9 @@ void _Memory_management_Uninstall_entry(
 
 /** @}*/
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif
+/* end of include file */
