@@ -31,20 +31,12 @@ rtems_task Libmm_Task(
   char              name[5];
   char             *p;
 
-  Memory_management_Entry mme1 = {
-    .name = "Valid Entry-1",
-    .base = 0x0C000000U,
-    .size = 0x1000U,
-    .installed = false,
-    .bsp_mme = NULL
-  };
-
   /* Get the task name */
   p = rtems_object_get_name( RTEMS_SELF, 5, name );
   rtems_test_assert( p != NULL );
 
    /* Get the CPU Number */
-  cpu_num = bsp_smp_processor_id();
+  cpu_num = _CPU_SMP_Get_current_processor();
 
   /* Print that the task is up and running. */
   Loop();

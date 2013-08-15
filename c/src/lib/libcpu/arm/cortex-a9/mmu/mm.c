@@ -125,6 +125,10 @@ static void translate_attributes(
   /* Clear flags attributes */
   *ARM_CPU_ATTR = 0;
 
+  /* No protection */
+  if ( high_level_attr == 0 )
+    *ARM_CPU_ATTR = MMU_DATA_READ_WRITE;
+
   if( high_level_attr & 0x1 )
     *ARM_CPU_ATTR |= ARMV7_MMU_READ_ONLY;
 
@@ -149,7 +153,7 @@ void _CPU_Memory_management_Initialize(void)
   );
 }
 
-void _CPU_Memory_management_Install_entry(uintptr_t base,size_t size, uint32_t attr)
+void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t attr)
 {
 
   /* required as arm_cp15_set_translation_table_entries needs a pointer to end not value */
@@ -157,16 +161,15 @@ void _CPU_Memory_management_Install_entry(uintptr_t base,size_t size, uint32_t a
   uint32_t section_flags;
   
   /* translate flags from high-level to ARM specific MMU flags */
-  translate_attributes(attr, &section_flags);
-
-  arm_cp15_set_translation_table_entries(base, end, section_flags);
+  if ( attr != RTEMS_MM_REGION_NO_ACCESS )
+  {
+    translate_attributes(attr, &section_flags);
+    arm_cp15_set_translation_table_entries(base, end, section_flags);
+  } else 
+  {
+     arm_cp15_unset_translation_table_entries(base, end);
+  }
 };
-
-void _CPU_Memory_management_Uninstall_entry(uintptr_t base, size_t size)
-{
-  uint32_t end = (uint32_t)base + (uint32_t)size;
-  arm_cp15_unset_translation_table_entries(base, end);
-}
 
 static void print_data(ARMV7M_Exception_frame *frame)
 {

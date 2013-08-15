@@ -5,3 +5,5 @@ config.h.in
 Makefile.in
 *.swp
 *~
+*.patch
+*.out

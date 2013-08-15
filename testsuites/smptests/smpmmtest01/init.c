@@ -32,7 +32,7 @@ rtems_task Init(
   rtems_status_code  status;
   bool               allDone;
 
-  cpu_self = bsp_smp_processor_id();
+  cpu_self = _SMP_Get_current_processor();
 
   /* XXX - Delay a bit to allow debug messages from
    * startup to print.  This may need to go away when

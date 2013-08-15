@@ -29,11 +29,11 @@ rtems_task Init(
 
   puts( "\n\n*** Start of mmtest2 ***\n" );
 
-  //printf("Test 1: Installing Entry-1 and set it as read only\n");
-  //_Memory_management_Install_entry( 0x00100000, 0x200000, RTEMS_MM_REGION_PROTECTION_READ_ONLY );
+  printf("Test 1: set Region1  as read only\n");
+  _Memory_management_Set_attributes( 0x00100000, 0x200000, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
 
-  printf("Test 2: Installing Entry-2 and set it as write enabled\n");
-  _Memory_management_Install_entry( 0x00400000, 0x100000, RTEMS_MM_REGION_PROTECTION_WRITE );
+  printf("Test 2: set Region2  as write enabled\n");
+  _Memory_management_Set_attributes( 0x00400000, 0x100000, RTEMS_MM_REGION_PROTECTION_WRITE);
 
   // TODO: Make fatal tests withing exception handler */
   /* FIXME: make addresses target-independent */
@@ -58,8 +58,8 @@ rtems_task Init(
   printf("Checking MMU exception 5: Write to readonly block  \n");
   *a2++ = 0xCC;
 
-  printf("Test 6: Uninstalling Entry-2 \n");
-  _Memory_management_Uninstall_entry(0x00400000, 0x100000);
+  printf("Test 6: set region2 with no access attributes \n");
+  _Memory_management_Set_attributes(0x00400000, 0x100000, RTEMS_MM_REGION_NO_ACCESS);
   
   a1 = (char *) 0x00400000;
   printf("Checking MMU exception 6: Write to uninstalled block \n");

@@ -27,21 +27,13 @@ extern "C" {
 #endif
 
 /**
- * @brief _Memory_management_Region Flags defs
- *  
+ * @addtogroup SuperCoreMM
  */
-#define RTEMS_MM_REGION_PROTECTION_READ_ONLY   0x1
-#define RTEMS_MM_REGION_PROTECTION_WRITE  0x2
-//#define RTEMS_MM_REGION_PROTECTION_EXEC   0x4
+/**@{**/
 
 #ifdef RTEMS_SMP
 SMP_lock_Control mm_lock;
 #endif
-
-/**
- * @addtogroup SuperCoreMM
- */
-/**@{**/
 
 /**
  * @brief Calls _CPU_Memory_management_Initialize.
@@ -56,9 +48,9 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Initialize( void )
 }
 
 /**
- * @brief Calls _CPU_Memory_management_Install_entry.
+ * @brief Calls _CPU_Memory_management_Set_attributes.
  */
-RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
+void _Memory_management_Set_attributes(
   uintptr_t base,
   size_t size,
   uint32_t attr
@@ -68,31 +60,11 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Install_entry(
   _SMP_lock_Acquire( &mm_lock );
 #endif
 
-  _CPU_Memory_management_Install_entry(base, size, attr);
+  _CPU_Memory_management_Set_attributes(base, size, attr);
 
 #ifdef RTEMS_SMP    
   _SMP_lock_Release( &mm_lock );
 #endif
-}
-
-/**
- * @brief Calls _CPU_Memory_management_Uninstall_entry.
- */
-RTEMS_INLINE_ROUTINE void _Memory_management_Uninstall_entry(
-  uintptr_t base,
-  size_t size
-)
-{
-#ifdef RTEMS_SMP   
-  _SMP_lock_Acquire( &mm_lock );
-#endif
-
-  _CPU_Memory_management_Uninstall_entry(base, size);
-
-#ifdef RTEMS_SMP    
-  _SMP_lock_Release( &mm_lock );
-#endif
-
 }
 
 /** @}*/
