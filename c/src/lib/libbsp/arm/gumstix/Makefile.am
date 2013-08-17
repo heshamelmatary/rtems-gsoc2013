@@ -12,15 +12,19 @@ include_HEADERS = include/bsp.h
 include_HEADERS += include/tm27.h
 
 include_bsp_HEADERS =
+include_libcpu_HEADERS = 
 
 nodist_include_HEADERS = include/bspopts.h
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
-include_libcpu_HEADERS = ../../../libcpu/shared/include/mm.h
 DISTCLEANFILES = include/bspopts.h
 
 noinst_PROGRAMS =
 
 nodist_include_HEADERS += ../../shared/include/coverhd.h
+
+include_libcpu_HEADERS += ../../../libcpu/arm/shared/include/arm-cp15.h
+include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h
+include_libcpu_HEADERS += ../../../libcpu/arm/shared/include/mmu.h
 
 noinst_LIBRARIES = libbspstart.a
 libbspstart_a_SOURCES = start/start.S
@@ -55,7 +59,6 @@ libbsp_a_SOURCES += ../shared/abort/abort.c
 #framebuffer
 
 # LIBMM
-libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
 
 if ON_SKYEYE
 libbsp_a_SOURCES += fb/fb.c

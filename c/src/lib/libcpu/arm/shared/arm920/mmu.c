@@ -5,10 +5,9 @@
  *  Copyright (c) 2004 by Cogent Computer Systems
  *  Written by Jay Monkman <jtm@lopingdog.com>
  */
-#include <libcpu/mmu.h>
 #include <libcpu/arm-cp15.h>
-
 #include <libcpu/mm.h>
+#include <libcpu/mmu.h>
 
 typedef uint32_t mmu_lvl1_t;
 
@@ -59,6 +58,10 @@ static void translate_attributes(uint32_t high_level_attr, uint32_t *ARM_CPU_ATT
    /* Clear flags attributes */
    *ARM_CPU_ATTR = 0;
   //
+  /* No protection */
+  if ( high_level_attr & 0x0 )
+  *ARM_CPU_ATTR |= ARM_MMU_AP_NOPR;
+
   /* Read access */
   if ( high_level_attr & 0x1 ) 
   *ARM_CPU_ATTR |= ARM_MMU_AP_USER_READ_ONLY;
@@ -67,9 +70,9 @@ static void translate_attributes(uint32_t high_level_attr, uint32_t *ARM_CPU_ATT
   if ( high_level_attr & 0x2 )
   *ARM_CPU_ATTR |= ARM_MMU_AP_NOPR;
 
-  /* Execute access */
+  /* No access */
   if ( high_level_attr & 0x4 )
-  *ARM_CPU_ATTR |= ARM_MMU_AP_NOPR;
+  *ARM_CPU_ATTR |= ARM_MMU_AP_USER_NO_ACCESS;
 }
 
 /* Re-enable MMU (after updating PTs)
@@ -295,10 +298,10 @@ void _CPU_Memory_management_Initialize( void )
   return RTEMS_SUCCESSFUL;
 }
 
-/* Installing @mme allocates new arm920_mm_mme for it
- * and set its value for then allocate a new lvl2 page table
- * and activate it. */
-void _CPU_Memory_management_Install_entry(
+/** 
+ * Set attributes for a block.
+ */
+void _CPU_Memory_management_Set_attributes(
   uintptr_t base,
   size_t size,
   uint32_t attr
@@ -331,48 +334,6 @@ void _CPU_Memory_management_Install_entry(
     lvl1_pt[PTEIndex++] = MMU_SET_LVL1_SECT(
         paddr_base,
         arm_mmu_attr,
-        0,
-        1,
-        0
-    );
-  }
-
-  enable_mmu();
-
-  return RTEMS_SUCCESSFUL;
-}
-
-/* Uninstalling @mme from level1 page table and return
- * access/cache attributes to its defaults. Note that bsp mme
- * will still exist even after uninstalling mme.
- */
-void _CPU_Memory_management_Uninstall_entry(
-  uintptr_t base,
-  size_t size
-)
-{
-  uintptr_t      *lvl1_pt;
-  int             sectionsNumber; /* 1MB sections */
-  int             PTEIndex;
-  uintptr_t       paddr;
-  uintptr_t       paddr_base;
-  int             i;
-
-  sectionsNumber = size / MMU_SECT_SIZE;
-
-  lvl1_pt = &_ttbl_base;
-  PTEIndex = ((base & 0xfff00000U) >> 20U);
-  paddr = base & 0xfff00000U;
-
-  disable_mmu();
-
-  /* Return ap/CB for this region to defaults */
-  for ( i = 0; i < sectionsNumber; i++) {
-    paddr_base = (i<<20U) + paddr;
-
-    lvl1_pt[PTEIndex++] = MMU_SET_LVL1_SECT(
-        paddr_base,
-        ARM_MMU_AP_NO_ACCESS,
         0,
         1,
         0
