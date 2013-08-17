@@ -58,6 +58,7 @@ EXTRA_DIST += new-exceptions/bspsupport/ppc_exc_test.c
 
 # shared/include
 if shared
+include_libcpu_HEADERS += ../shared/include/mm.h 
 include_libcpu_HEADERS += shared/include/io.h shared/include/mmu.h \
     shared/include/page.h \
     shared/include/byteorder.h shared/include/pgtable.h
@@ -218,9 +219,9 @@ endif
 if mpc6xx
 
 # mpc6xx/mmu
+include_libcpu_HEADERS += ../shared/include/mm.h
 include_libcpu_HEADERS += mpc6xx/mmu/bat.h mpc6xx/mmu/pte121.h
 include_libcpu_HEADERS += mpc6xx/mmu/mmu_support.h
-include_libcpu_HEADERS += ../shared/include/mm.h
 
 noinst_PROGRAMS += mpc6xx/mmu.rel
 mpc6xx_mmu_rel_SOURCES = mpc6xx/mmu/bat.c mpc6xx/mmu/bat.h \

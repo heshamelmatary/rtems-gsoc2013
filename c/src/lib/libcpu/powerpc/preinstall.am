@@ -59,6 +59,10 @@ $(PROJECT_INCLUDE)/bsp/vectors.h: new-exceptions/bspsupport/vectors.h $(PROJECT_
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/bsp/vectors.h
 
 if shared
+$(PROJECT_INCLUDE)/libcpu/mm.h: ../shared/include/mm.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/mm.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/mm.h
+
 $(PROJECT_INCLUDE)/libcpu/io.h: shared/include/io.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/io.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/io.h
@@ -148,6 +152,10 @@ $(PROJECT_INCLUDE)/ictrl.h: mpc505/ictrl/ictrl.h $(PROJECT_INCLUDE)/$(dirstamp)
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/ictrl.h
 endif
 if mpc6xx
+$(PROJECT_INCLUDE)/libcpu/mm.h: ../shared/include/mm.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/mm.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/mm.h
+
 $(PROJECT_INCLUDE)/libcpu/bat.h: mpc6xx/mmu/bat.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/bat.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/bat.h
@@ -159,10 +167,6 @@ PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/pte121.h
 $(PROJECT_INCLUDE)/libcpu/mmu_support.h: mpc6xx/mmu/mmu_support.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/mmu_support.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/mmu_support.h
-
-$(PROJECT_INCLUDE)/libcpu/mm.h: ../shared/include/mm.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
-	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/mm.h
-PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/mm.h
 
 $(PROJECT_INCLUDE)/libcpu/c_clock.h: mpc6xx/clock/c_clock.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/c_clock.h

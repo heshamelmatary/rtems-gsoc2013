@@ -27,7 +27,7 @@ rtems_task Init(
   unsigned char* a2;
   char a;
 
-  puts( "\n\n*** Start of mmtest2 ***\n" );
+  printf( "\n\n*** Start of mmtest2 ***\n" );
 
   printf("Test 1: set Region1  as read only\n");
   _Memory_management_Set_attributes( 0x00100000, 0x200000, RTEMS_MM_REGION_PROTECTION_READ_ONLY);

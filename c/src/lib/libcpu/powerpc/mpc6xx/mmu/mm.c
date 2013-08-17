@@ -9,11 +9,12 @@
  * http://www.rtems.com/license/LICENSE.
  */
 
+//#include <libcpu/mm.h>
 #include <rtems.h>
 #include <libcpu/spr.h>
 #include <libcpu/mmu_support.h>
-#include <libcpu/mm.h>
 #include <libcpu/bat.h>
+#include <stdlib.h>
 
 SPR_RW(SDR1);
 
@@ -70,8 +71,9 @@ void _CPU_Memory_management_Initialize(void)
   */
 }
 
-static void ppc_pte_change_attributes(
-  Memory_management_Entry *mme,
+/*static void ppc_pte_change_attributes(
+  uint32_t base,
+  size_t size,
   uint32_t wimg,
   uint32_t pp
 )
@@ -81,14 +83,14 @@ static void ppc_pte_change_attributes(
   unsigned long msr;
 
   if ( mme->bsp_mme != NULL ) {
-    ea = mme->base;
-    block_end = mme->base + (uintptr_t)mme->size;
-    rtems_cache_flush_multiple_data_lines(mme->base, mme->size);
+    ea = base;
+    block_end = (uint32_t) base + (uint32_t) size;
+    rtems_cache_flush_multiple_data_lines(base, size);
     pt_entry = (mpc6xx_mm_mme *) mme->bsp_mme;
 
-    /* Switch MMU and other Interrupts off */
+    // Switch MMU and other Interrupts off 
     msr = _read_MSR();
-    //_write_MSR(msr & ~ (MSR_EE | MSR_DR | MSR_IR));
+    _write_MSR(msr & ~ (MSR_EE | MSR_DR | MSR_IR));
 
     for ( ; ea < block_end; ea += RTEMS_MPE_PAGE_SIZE ) {
       pt_entry->ptew0 &= ~PTEW0_VALID;
@@ -105,10 +107,10 @@ static void ppc_pte_change_attributes(
       asm volatile ("tlbsync; sync":::"memory");
       pt_entry--;
     }
-    /* restore, i.e., switch MMU and IRQs back on */
-   // _write_MSR( msr );
+    // restore, i.e., switch MMU and IRQs back on 
+    _write_MSR( msr );
   }
-}
+}*/
 
 static void translate_attributes(uint32_t high_level_attr, uint32_t *PPC_CPU_ATTR)
 {
@@ -117,6 +119,9 @@ static void translate_attributes(uint32_t high_level_attr, uint32_t *PPC_CPU_ATT
   /* Clear flags attributes */
   *PPC_CPU_ATTR = 0;
 
+  if ( high_level_attr == 0 ) 
+    *PPC_CPU_ATTR |= _PPC_MMU_ACCESS_NO_PROT;
+  
   /* Read access */
   if ( high_level_attr & 0x1 ) 
     *PPC_CPU_ATTR |= _PPC_MMU_ACCESS_READ_ONLY;
@@ -125,26 +130,13 @@ static void translate_attributes(uint32_t high_level_attr, uint32_t *PPC_CPU_ATT
   if ( high_level_attr & 0x2 )
     *PPC_CPU_ATTR |= _PPC_MMU_ACCESS_SUPERVISOR_WRITE_ONLY;
 
-  /* Execute access */
   if ( high_level_attr & 0x4 )
-    *PPC_CPU_ATTR |= _PPC_MMU_ACCESS_NO_PROT;
+    *PPC_CPU_ATTR |= _PPC_MMU_ACCESS_SUPERVISOR_ONLY; 
 }
 
-void _CPU_Memory_management_Set_entry_attr(
-  Memory_management_Entry  *mme, 
-  uint32_t attr
-)
-{
-  uint32_t mmu_pp;
-  
-  //tanslate attributes from high-level layers
-  translate_attributes(attr, &mmu_pp);
-  ppc_pte_change_attributes( mme, 0x0, mmu_pp);
-}
-
-void _CPU_Memory_management_Install_entry(
+void _CPU_Memory_management_Set_attributes(
     uintptr_t base,
-    size_t sizee,
+    size_t size,
     uint32_t attr
 )
 {
@@ -157,9 +149,9 @@ void _CPU_Memory_management_Install_entry(
   uintptr_t ea, block_end;
   int wimg, pp;
 
-  ea = mme->base;
-  block_end = mme->base + (uintptr_t)mme->size;
-  rtems_cache_flush_multiple_data_lines(mme->base, mme->size);
+  ea = base;
+  block_end = (uint32_t) base + (uint32_t)  size;
+  rtems_cache_flush_multiple_data_lines(base, size);
 
   for ( ; ea < block_end; ea += RTEMS_MPE_PAGE_SIZE ) {
 
@@ -179,16 +171,34 @@ void _CPU_Memory_management_Install_entry(
     /* Compute PTEG Address from the hash 1 value */
     get_pteg_addr(&ppteg, hash1);
 
-    /* setting default permissions to no protection*/
-    pp = _PPC_MMU_ACCESS_NO_PROT;
-    mme->bsp_mme = BSP_ppc_add_pte(ppteg, spteg, vsid, pi, wimg, pp);
-
-    if ( mme->bsp_mme == NULL ) {
-      break;
-    }
-
-    /* TODO: Discard the following call and merge its code here. */ 
-    _CPU_Memory_management_Set_entry_attr(mme, attr);
+    //pp = _PPC_MMU_ACCESS_NO_PROT;
+    //tanslate attributes from high-level layers
+    translate_attributes(attr, &pp);
+    //ppc_pte_change_attributes(base, size, 0x0, pp);
+    pt_entry = BSP_ppc_add_pte(ppteg, spteg, vsid, pi, wimg, pp);
   }
+
+    msr = _read_MSR();
+
+    _write_MSR(msr & ~ (MSR_EE | MSR_DR | MSR_IR));
+
+    for ( ; ea < block_end; ea += RTEMS_MPE_PAGE_SIZE ) {
+      pt_entry->ptew0 &= ~PTEW0_VALID;
+
+      asm volatile ("sync":::"memory");
+
+      pt_entry->ptew1 |= PTEW1_WIMG & wimg;
+
+      pt_entry->ptew1 &= ~PTEW1_PROTP;
+      pt_entry->ptew1 |= PTEW1_PROTP & pp;
+
+      asm volatile ("sync; tlbie %0; eieio"::"r" (ea):"memory");
+      pt_entry->ptew0 &= ~PTEW0_VALID;
+      asm volatile ("tlbsync; sync":::"memory");
+      pt_entry--;
+    }
+    /* restore, i.e., switch MMU and IRQs back on */
+    _write_MSR( msr );
+
 }
 

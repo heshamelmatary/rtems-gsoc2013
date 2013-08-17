@@ -20,6 +20,8 @@
 #include <rtems/score/smplock.h>
 #endif
 
+#include <stdint.h>
+#include <stdlib.h>
 #include <rtems/score/mm.h>
 
 #ifdef __cplusplus
@@ -38,7 +40,7 @@ SMP_lock_Control mm_lock;
 /**
  * @brief Calls _CPU_Memory_management_Initialize.
  */
-RTEMS_INLINE_ROUTINE void _Memory_management_Initialize( void )
+inline void _Memory_management_Initialize( void )
 {
 #ifdef RTEMS_SMP   
   _SMP_lock_Initialize( &mm_lock );
@@ -50,7 +52,7 @@ RTEMS_INLINE_ROUTINE void _Memory_management_Initialize( void )
 /**
  * @brief Calls _CPU_Memory_management_Set_attributes.
  */
-void _Memory_management_Set_attributes(
+inline void _Memory_management_Set_attributes(
   uintptr_t base,
   size_t size,
   uint32_t attr
