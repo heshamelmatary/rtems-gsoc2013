@@ -32,7 +32,7 @@ extern "C" {
 #define RTEMS_MM_REGION_NO_PROTECTION           0x0
 #define RTEMS_MM_REGION_PROTECTION_READ_ONLY    0x1
 #define RTEMS_MM_REGION_PROTECTION_WRITE        0x2
-#define RTEMS_MM_REGION_NO_ACCESS               0x4
+#define RTEMS_MM_REGION_NO_ACCESS               0x3
 //#define RTEMS_MM_REGION_PROTECTION_EXEC   0x4
 
 #ifdef __cplusplus

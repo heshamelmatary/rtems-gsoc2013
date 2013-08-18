@@ -15,6 +15,14 @@
 
 #define DEBUG 1
 
+uint32_t translation_table[] =
+{
+  MMU_DATA_READ_WRITE,
+  ARMV7_MMU_CODE_CACHED,
+  MMU_DATA_READ_WRITE,
+  0U
+};
+
 static void translate_attributes(
   uint32_t high_level_attr,
   uint32_t *ARM_CPU_ATTR
@@ -60,7 +68,8 @@ void _CPU_Memory_management_Initialize(void)
   for (i = 0; i < ARM_MMU_TRANSLATION_TABLE_ENTRY_COUNT; ++i) {
     /* Set default first-level sections' attributes to no protection, thus,
        RW enabled for all memory map */
-    ttb [i] = ((i << ARM_MMU_SECT_BASE_SHIFT) | ARM_MMU_SECT_AP_1 | ARM_MMU_SECT_AP_0 | 2 ) ;
+    ttb [i] = ((i << ARM_MMU_SECT_BASE_SHIFT) | ARM_CP15_DAC_CLIENT << ARM_MMU_SECT_DOMAIN_SHIFT | \
+    ARM_MMU_SECT_AP_1 | ARM_MMU_SECT_AP_0 | 2 ) ;
   }
 
   /* Enable MMU, dCache, iCache, Force protection bit in CP15 control register */
@@ -84,7 +93,7 @@ void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t 
   uint32_t *table = (uint32_t *) bsp_section_vector_begin;
   
   /* translate flags from high-level to ARM specific MMU flags */
-  translate_attributes(attr, &section_flags);
+  section_flags = translation_table[attr];
 
   rtems_interrupt_level level;
   rtems_interrupt_disable(level);
@@ -108,7 +117,7 @@ void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t 
      printf("PTE before setting attributes is 0x%x \n",ttb[i]);
      printf("Section Flags to be set are 0x%x \n",section_flags);
 #endif
-     ttb [i] |= addr | section_flags;
+     ttb [i] = addr | ARM_CP15_DAC_CLIENT << ARM_MMU_SECT_DOMAIN_SHIFT | section_flags;
 #if DEBUG
      printf("PTE after setting attributes is 0x%x \n",ttb[i]);
 #endif	

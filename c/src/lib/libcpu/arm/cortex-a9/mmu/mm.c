@@ -42,6 +42,14 @@ extern "C" {
 
 extern _ARMV4_Exception_data_abort_default;
 
+uint32_t translation_table[] = 
+{ 
+  MMU_DATA_READ_WRITE,
+  ARMV7_MMU_READ_ONLY,
+  MMU_DATA_READ_WRITE,
+  0U /* fault section */
+};
+
 typedef struct {
   uint32_t register_r0;
   uint32_t register_r1;
@@ -139,17 +147,18 @@ static void translate_attributes(
 
 void _CPU_Memory_management_Initialize(void)
 {	
+
   uint32_t ctrl = arm_cp15_start_setup_mmu_and_cache(
     		  0,
     		  ARM_CP15_CTRL_AFE | ARM_CP15_CTRL_Z
   		 );
 
   arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(
-    ctrl,
-    (uint32_t *) bsp_translation_table_base,
-    ARM_MMU_DEFAULT_CLIENT_DOMAIN,
-    &rvpbxa9_mmu_config_table[0],
-    RTEMS_ARRAY_SIZE(rvpbxa9_mmu_config_table)
+  ctrl,
+  (uint32_t *) bsp_translation_table_base,
+  ARM_MMU_DEFAULT_CLIENT_DOMAIN,
+  &rvpbxa9_mmu_config_table[0],
+  RTEMS_ARRAY_SIZE(rvpbxa9_mmu_config_table)
   );
 }
 
@@ -163,7 +172,13 @@ void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t 
   /* translate flags from high-level to ARM specific MMU flags */
   if ( attr != RTEMS_MM_REGION_NO_ACCESS )
   {
-    translate_attributes(attr, &section_flags);
+    //translate_attributes(attr, &section_flags);
+    section_flags = translation_table[attr];
+
+#if DEBUG
+    printf("section flags = 0x%x \n", section_flags);
+#endif
+
     arm_cp15_set_translation_table_entries(base, end, section_flags);
   } else 
   {

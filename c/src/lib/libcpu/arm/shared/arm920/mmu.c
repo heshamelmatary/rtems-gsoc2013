@@ -52,6 +52,14 @@ static void mmu_set_map_inval(mmu_lvl1_t *base);
 
 #define MMU_SECT_AP_ALL (0x3 << 10)
 
+uint32_t translation_table[] =
+{
+  MMU_DATA_READ_WRITE,
+  ARMV7_MMU_CODE_CACHED,
+  MMU_DATA_READ_WRITE,
+  0U
+};
+
 static void translate_attributes(uint32_t high_level_attr, uint32_t *ARM_CPU_ATTR)
 {
    //TODO: Checking for invalid flags combinations.
@@ -326,7 +334,7 @@ void _CPU_Memory_management_Set_attributes(
   disable_mmu();
   
   translate_attributes(attr, &arm_mmu_attr);
-  /* Set AP for this region to NO ACCESS */
+  arm_mmu_attr = translation_table[attr];
 
   for ( i = 0; i < sectionsNumber; i++ ) {
     paddr_base = (i<<20U) + paddr;

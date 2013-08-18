@@ -16,6 +16,14 @@
 #include <libcpu/bat.h>
 #include <stdlib.h>
 
+uint32_t translation_table[] =
+{
+  _PPC_MMU_ACCESS_NO_PROT,
+  _PPC_MMU_ACCESS_READ_ONLY,
+  _PPC_MMU_ACCESS_SUPERVISOR_WRITE_ONLY,
+  _PPC_MMU_ACCESS_SUPERVISOR_ONLY
+};
+
 SPR_RW(SDR1);
 
 void _CPU_Memory_management_Initialize(void)
@@ -173,7 +181,7 @@ void _CPU_Memory_management_Set_attributes(
 
     //pp = _PPC_MMU_ACCESS_NO_PROT;
     //tanslate attributes from high-level layers
-    translate_attributes(attr, &pp);
+    pp = translation_table[attr];
     //ppc_pte_change_attributes(base, size, 0x0, pp);
     pt_entry = BSP_ppc_add_pte(ppteg, spteg, vsid, pi, wimg, pp);
   }
