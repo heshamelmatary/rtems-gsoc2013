@@ -15,14 +15,6 @@
 extern "C" {
 #endif
 
-/** @brief Attributes' translation table.
- * This table should be filled by every
- * low level libmm implementation to 
- * translate high-level attributes into 
- * CPU specific attributes.
- */
-//uint32_t translation_table[] = {0, 0, 0, 0};
-
 #ifdef __cplusplus
 }
 #endif

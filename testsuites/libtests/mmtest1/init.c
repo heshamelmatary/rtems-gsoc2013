@@ -24,14 +24,37 @@ rtems_task Init(
   rtems_task_argument ignored
 )
 {
+  size_t size = 0x001000; 
+  uintptr_t *region1 = _Workspace_Allocate(size);
+  uintptr_t *region2 = _Workspace_Allocate(size);
 
   puts( "\n\n*** Start of mmtest1 ***\n" );
 
+  if (region1 != NULL)
+  {
+    printf("Region 1 successfully allocated from Work Space at address 0x%x \n", \
+region1);
+  } else 
+  {
+    printf("Failed to allocate memory for Region 1 from Work Space ! \n");
+    exit(0);
+  }
+
+  if (region2 != NULL)
+  {
+    printf("Region 2 successfully allocated from Work Space at address 0x%x \n", \
+ region2);
+  } else
+  {
+    printf("Failed to allocate memory for Region 2 from Work Space ! \n");
+    exit(0);
+  }
+
   printf("Test 1: Set Region1 as read only\n");
-  _Memory_management_Set_attributes( 0x00100000, 0x200000, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
+  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
 
   printf("Test 2 : Set Region2 as write enabled\n");
-  _Memory_management_Set_attributes( 0x00400000, 0x100000, RTEMS_MM_REGION_PROTECTION_WRITE);
+  _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_PROTECTION_WRITE);
 
   printf( "\n\n*** End of mmtest1 ***\n" );
 

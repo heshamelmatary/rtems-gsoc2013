@@ -24,10 +24,7 @@
 #include <bsp/linker-symbols.h>
 #include <rtems/score/mm.h>
 #include <libcpu/arm_cp15_print_fsr.h>
-//#include <rtems/score/armv7m.h>
-//#include <bsp/irq.h>
-//#include <rtems/score/cpu.h>
-//
+#include <rtems/score/armv7m.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,7 +39,7 @@ extern "C" {
 
 extern _ARMV4_Exception_data_abort_default;
 
-uint32_t translation_table[] = 
+static uint32_t translation_table[] = 
 { 
   MMU_DATA_READ_WRITE,
   ARMV7_MMU_READ_ONLY,
@@ -124,27 +121,6 @@ rvpbxa9_mmu_config_table[] = {
   }
 };
 
-static void translate_attributes(
-  uint32_t high_level_attr,
-  uint32_t *ARM_CPU_ATTR
-)
-{
-
-  /* Clear flags attributes */
-  *ARM_CPU_ATTR = 0;
-
-  /* No protection */
-  if ( high_level_attr == 0 )
-    *ARM_CPU_ATTR = MMU_DATA_READ_WRITE;
-
-  if( high_level_attr & 0x1 )
-    *ARM_CPU_ATTR |= ARMV7_MMU_READ_ONLY;
-
-  /* Write access */
-  if ( high_level_attr & 0x2 )
-    *ARM_CPU_ATTR |= MMU_DATA_READ_WRITE;
-} 
-
 void _CPU_Memory_management_Initialize(void)
 {	
 
@@ -162,10 +138,15 @@ void _CPU_Memory_management_Initialize(void)
   );
 }
 
-void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t attr)
+void _CPU_Memory_management_Set_attributes(
+  uintptr_t base,
+  size_t size,
+   uint32_t attr
+)
 {
 
-  /* required as arm_cp15_set_translation_table_entries needs a pointer to end not value */
+  /* required as arm_cp15_set_translation_table_entries 
+   * needs a pointer to end not value */
   uint32_t end = (uint32_t)base + (uint32_t)size;
   uint32_t section_flags;
   
@@ -207,7 +188,6 @@ void __attribute__((naked)) dummy_data_abort_exception_handler(void)
 //TODO: Call rtems_fatal
 exit(0);
 }
-
 
 #ifdef __cplusplus
 }

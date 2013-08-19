@@ -11,43 +11,14 @@
 #include <bsp/start.h>
 #include <bsp/linker-symbols.h>
 #include <libcpu/arm_cp15_print_fsr.h>
-//#include <stdlib.h>
 
-#define DEBUG 1
-
-uint32_t translation_table[] =
+static uint32_t translation_table[] =
 {
-  MMU_DATA_READ_WRITE,
+  ARMV7_MMU_DATA_READ_WRITE_CACHED,
   ARMV7_MMU_CODE_CACHED,
-  MMU_DATA_READ_WRITE,
+  ARMV7_MMU_DATA_READ_WRITE_CACHED,
   0U
 };
-
-static void translate_attributes(
-  uint32_t high_level_attr,
-  uint32_t *ARM_CPU_ATTR
-)
-{
-
-  /* Clear flags attributes */
-  *ARM_CPU_ATTR = 0;
-
-  if( high_level_attr == 0 )
-  {
-    *ARM_CPU_ATTR &= ~(ARM_MMU_SECT_AP_1 | ARM_MMU_SECT_AP_0 | ARM_MMU_SECT_AP_2);
-  }
-
-  if( high_level_attr & 0x1 ||  high_level_attr & 0x4 )
-    *ARM_CPU_ATTR |= ARM_MMU_SECT_AP_1 | ARM_MMU_SECT_AP_0 | ARM_MMU_SECT_AP_2 ;
-
-  /* Write access */
-  if( high_level_attr & 0x2 )
-  {
-     *ARM_CPU_ATTR |= ARM_MMU_SECT_AP_1 | ARM_MMU_SECT_AP_0;
-     *ARM_CPU_ATTR &= ~(ARM_MMU_SECT_AP_2);
-  }
-
-} 
 
 void _CPU_Memory_management_Initialize(void)
 {	
@@ -68,19 +39,24 @@ void _CPU_Memory_management_Initialize(void)
   for (i = 0; i < ARM_MMU_TRANSLATION_TABLE_ENTRY_COUNT; ++i) {
     /* Set default first-level sections' attributes to no protection, thus,
        RW enabled for all memory map */
-    ttb [i] = ((i << ARM_MMU_SECT_BASE_SHIFT) | ARM_CP15_DAC_CLIENT << ARM_MMU_SECT_DOMAIN_SHIFT | \
-    ARM_MMU_SECT_AP_1 | ARM_MMU_SECT_AP_0 | 2 ) ;
+    ttb [i] = ((i << ARM_MMU_SECT_BASE_SHIFT) | ARM_CP15_DAC_CLIENT << \
+    ARM_MMU_SECT_DOMAIN_SHIFT | ARM_MMU_SECT_AP_1 | ARM_MMU_SECT_AP_0 | 2 ) ;
   }
 
   /* Enable MMU, dCache, iCache, Force protection bit in CP15 control register */
-  ctrl |= ARM_CP15_CTRL_AFE | ARM_CP15_CTRL_S | ARM_CP15_CTRL_I | ARM_CP15_CTRL_C | ARM_CP15_CTRL_M | ARM_CP15_CTRL_XP | ARM_CP15_CTRL_R;
+  ctrl |= ARM_CP15_CTRL_AFE | ARM_CP15_CTRL_S | ARM_CP15_CTRL_I | \
+  ARM_CP15_CTRL_C | ARM_CP15_CTRL_M | ARM_CP15_CTRL_XP | ARM_CP15_CTRL_R;
 
   arm_cp15_tlb_invalidate();
 
   arm_cp15_set_control(ctrl);
 }
 
-void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t attr)
+void _CPU_Memory_management_Set_attributes(
+  uintptr_t base,
+  size_t size,
+  uint32_t attr
+)
 {
   uint32_t end = (uint32_t)base + (uint32_t)size;
   uint32_t section_flags;
@@ -99,12 +75,14 @@ void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t 
   rtems_interrupt_disable(level);
 	
   ctrl = arm_cp15_get_control();
-  arm_cp15_set_control(ctrl & ~(ARM_CP15_CTRL_M | ARM_CP15_CTRL_C | ARM_CP15_CTRL_I));
+  arm_cp15_set_control(ctrl & ~(ARM_CP15_CTRL_M | ARM_CP15_CTRL_C | \
+   ARM_CP15_CTRL_I));
 
 #if DEBUG
   printf("Control Register is 0x%x \n",arm_cp15_get_control());
   printf("the start index is %i and the end index is %i \n",i,iend);
-  printf("Domain access control register 0x%x \n",arm_cp15_get_domain_access_control());
+  printf("Domain access control register 0x%x \n",\
+  arm_cp15_get_domain_access_control());
   printf("ttb is 0x%x \n",(uint32_t) arm_cp15_get_translation_table_base());
   printf("interrupt vector start at is 0x%x \n",(uint32_t) table);
 #endif
@@ -117,7 +95,8 @@ void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t 
      printf("PTE before setting attributes is 0x%x \n",ttb[i]);
      printf("Section Flags to be set are 0x%x \n",section_flags);
 #endif
-     ttb [i] = addr | ARM_CP15_DAC_CLIENT << ARM_MMU_SECT_DOMAIN_SHIFT | section_flags;
+     ttb [i] = addr | ARM_CP15_DAC_CLIENT << ARM_MMU_SECT_DOMAIN_SHIFT | \
+     section_flags;
 #if DEBUG
      printf("PTE after setting attributes is 0x%x \n",ttb[i]);
 #endif	
@@ -146,7 +125,8 @@ void _CPU_Memory_management_Set_attributes(uintptr_t base,size_t size, uint32_t 
 #endif	
 
 #if DEBUG
-  printf("Control Register after enable MMU is 0x%x \n",arm_cp15_get_control());
+  printf("Control Register after enable MMU is 0x%x \n", \
+  arm_cp15_get_control());
 #endif	
   __asm__ volatile (
   ARM_SWITCH_TO_ARM
