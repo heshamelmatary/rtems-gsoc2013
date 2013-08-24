@@ -252,6 +252,7 @@ static inline void arm_cp15_set_control(uint32_t val)
  *
  * @return The current control register value.
  */
+
 static inline uint32_t arm_cp15_mmu_disable(uint32_t cls)
 {
   ARM_SWITCH_REGISTERS;

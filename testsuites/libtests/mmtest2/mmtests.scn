@@ -1,0 +1,15 @@
+*** Start of mmtest2 ***
+Region 1 successfully allocated from Work Space at address 0x106f80 
+Region 2 successfully allocated from Work Space at address 0x106f80 
+Test 1: set Region1  as read only
+Test 2: set Region2  as write enabled
+Test 3: Write to write enabled block
+Checking MMU exception 1: Read from Unmapped block
+Checking MMU exception 2: Write to Unmapped block
+Checking MMU exception 4: Read from readonly block
+Checking MMU exception 5: Write to readonly block  
+Test 6: set region2 with no access attributes 
+Checking MMU exception 6: Write to uninstalled block 
+
+
+*** End of mmtest2 ***

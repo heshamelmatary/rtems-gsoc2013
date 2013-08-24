@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <rtems/score/mm.h>
+#include <libcpu/mm.h>
 
 #ifdef __cplusplus
 extern "C" {

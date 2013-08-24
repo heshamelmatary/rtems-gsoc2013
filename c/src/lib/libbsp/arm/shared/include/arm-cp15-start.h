@@ -1,4 +1,5 @@
-/*
+/* 
+ * Copyright (c) 2013 Hesham AL-Matary.
  * Copyright (c) 2009-2013 embedded brains GmbH.  All rights reserved.
  *
  *  embedded brains GmbH
@@ -89,7 +90,7 @@ arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(
 
   /* Initialize translation table with invalid entries */
   for (i = 0; i < ARM_MMU_TRANSLATION_TABLE_ENTRY_COUNT; ++i) {
-    ttb [i] = 0;
+    ttb [i] = (i << ARM_MMU_SECT_BASE_SHIFT) | ARMV7_MMU_DATA_READ_WRITE;
   }
 
   for (i = 0; i < config_count; ++i) {
@@ -97,11 +98,13 @@ arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(
   }
 
   /* Enable MMU and cache */
-  ctrl |= ARM_CP15_CTRL_I | ARM_CP15_CTRL_C | ARM_CP15_CTRL_M;
+  ctrl |= ARM_CP15_CTRL_AFE | ARM_CP15_CTRL_S | ARM_CP15_CTRL_I |
+          ARM_CP15_CTRL_C | ARM_CP15_CTRL_M  | ARM_CP15_CTRL_XP;
+
   arm_cp15_set_control(ctrl);
 }
 
-BSP_START_TEXT_SECTION static inline uint32_t
+BSP_START_TEXT_SECTION inline uint32_t
 arm_cp15_start_setup_mmu_and_cache(uint32_t ctrl_clear, uint32_t ctrl_set)
 {
   uint32_t ctrl = arm_cp15_get_control();

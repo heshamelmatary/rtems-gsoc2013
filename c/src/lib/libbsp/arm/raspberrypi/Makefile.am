@@ -35,6 +35,7 @@ include_bsp_HEADERS += ../../shared/include/uart-output-char.h
 include_bsp_HEADERS += ../../shared/tod.h
 include_bsp_HEADERS += ../shared/include/linker-symbols.h
 include_bsp_HEADERS += ../shared/include/start.h
+include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
 include_bsp_HEADERS += ../shared/lpc/include/lpc-timer.h
 include_bsp_HEADERS += ../shared/lpc/include/lpc-dma.h
 include_bsp_HEADERS += include/irq.h
@@ -86,7 +87,7 @@ libbsp_a_SOURCES += ../../shared/sbrk.c
 libbsp_a_SOURCES += ../../shared/src/stackalloc.c
 libbsp_a_SOURCES += ../shared/abort/simple_abort.c
 libbsp_a_SOURCES += ../shared/startup/bsp-start-memcpy.S
-
+libbsp_a_SOURCES += ../shared/arm-cp15-set-ttb-entries.c
 
 # Startup
 libbsp_a_SOURCES += startup/bspreset.c
@@ -94,6 +95,7 @@ libbsp_a_SOURCES += startup/bspstart.c
 
 # IRQ
 libbsp_a_SOURCES += ../../shared/src/irq-default-handler.c
+libbsp_a_SOURCES += ../shared/arm-cp15-set-exception-handler.c
 libbsp_a_SOURCES += ../../shared/src/irq-generic.c
 libbsp_a_SOURCES += ../../shared/src/irq-info.c
 libbsp_a_SOURCES += ../../shared/src/irq-legacy.c
@@ -131,9 +133,8 @@ libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 libbsp_a_SOURCES += startup/bspstarthooks.c
 
 # LIBMM
-libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-set-ttb-entries.c
-libbsp_a_SOURCES += ../../../libcpu/arm/ARM1176JZF-S/mmu/mm.c
-include_libcpu_HEADERS += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-start.h
+libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/mm.c
+
 ###############################################################################
 # Network                                                    #
 ###############################################################################

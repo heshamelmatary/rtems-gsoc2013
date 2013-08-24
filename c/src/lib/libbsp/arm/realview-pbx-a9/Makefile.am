@@ -47,6 +47,7 @@ include_bsp_HEADERS += ../shared/include/arm-pl050-regs.h
 include_bsp_HEADERS += ../shared/include/arm-pl111-fb.h
 include_bsp_HEADERS += ../shared/include/arm-pl111-regs.h
 include_bsp_HEADERS += include/irq.h
+include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
 include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h
@@ -93,6 +94,7 @@ libbsp_a_SOURCES += ../../shared/src/stackalloc.c
 libbsp_a_SOURCES += ../shared/abort/simple_abort.c
 libbsp_a_SOURCES += ../shared/startup/bsp-start-memcpy.S
 libbsp_a_SOURCES += ../shared/arm-cp15-set-exception-handler.c
+libbsp_a_SOURCES += ../shared/arm-cp15-set-ttb-entries.c
 
 # Startup
 libbsp_a_SOURCES += startup/bspreset.c
@@ -128,11 +130,7 @@ libbsp_a_SOURCES += ../../../libcpu/arm/shared/include/cache_.h
 libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 
 # LIBMM 
-#libbsp_a_SOURCES += ../../../libcpu/shared/src/no_memorymanagement.c
-libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-set-ttb-entries.c
-libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/mm.c
-
-include_libcpu_HEADERS += ../../../libcpu/arm/cortex-a9/mmu/arm-cp15-start.h
+libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/mm.c
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c
