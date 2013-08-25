@@ -129,8 +129,7 @@ libbsp_a_SOURCES += ../../../libcpu/arm/shared/include/cache_.h
 libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 
 # MMU
-libbsp_a_SOURCES += ../../../libcpu/arm/cortex-a9/mmu/mm.c
-
+libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/mm.c
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c
