@@ -48,6 +48,7 @@ include_bsp_HEADERS += ../shared/include/arm-pl111-fb.h
 include_bsp_HEADERS += ../shared/include/arm-pl111-regs.h
 include_bsp_HEADERS += include/irq.h
 include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
+include_bsp_HEADERS += startup/mm_config_table.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
 include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h

@@ -17,13 +17,6 @@
 #include <bsp/arm-a9mpcore-start.h>
 #include <bsp/linker-symbols.h>
 #include <rtems/score/mm.h>
-#include <libcpu/arm-cp15.h>
-
-#ifdef RTEMS_SMP
-  #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_SHAREABLE
-#else
-  #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_CACHED
-#endif
 
 BSP_START_TEXT_SECTION void bsp_start_hook_0(void)
 {

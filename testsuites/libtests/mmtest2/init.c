@@ -17,8 +17,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <rtems/score/mm.h>
-#include <rtems/score/heapimpl.h>
-#include <rtems/score/wkspace.h>
 
 rtems_task Init(
   rtems_task_argument ignored
@@ -29,37 +27,13 @@ rtems_task Init(
   uint32_t a;
   size_t size = 0x00100000;
 
+  uint32_t *region1 = (uint32_t *) 0x0C000000U;
+  uint32_t *region2 = (uint32_t *) 0x0C100000U;
+
   puts( "\n\n*** Start of mmtest2 ***\n" );
 
-  //uintptr_t *region1 = _Workspace_Allocate(size);
-  uint32_t *region1 = (uint32_t *) 0x0C000000U;
-  uint32_t *region2 = (uint32_t *) 0x0C000000U;
-  //uint32_t *region2 = _Workspace_Allocate(size);
-  //uint32_t *region2 = _Workspace_Allocate(size);
-
-  /*if (region1 != NULL)
-  {
-    printf("Region 1 successfully allocated from Work Space at address 0x%x \n", \
-    region1);
-  } else 
-  {
-    printf("Failed to allocate memory for Region 1 from Work Space ! \n");
-    exit(0);
-  }
-
-  if (region2 != NULL)
-  {
-    printf("Region 2 successfully allocated from Work Space at address 0x%x \n", \
-    region2);
-  } else 
-  {
-    printf("Failed to allocate memory for Region 2 from Work Space ! \n");
-    exit(0);
-  }*/
-
-  //printf("Test 1: set Region1  as read only\n");
-  //_Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
-  //_Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
+  printf("Test 1: set Region1  as read only\n");
+  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
 
   printf("Test 2: set Region2  as write enabled\n");
   _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_PROTECTION_WRITE);
@@ -87,12 +61,12 @@ rtems_task Init(
   printf("Checking MMU exception 5: Write to readonly block  \n");
   *a2++ = 0xCC;
 
-  //printf("Test 6: set region2 with no access attributes \n");
-  //_Memory_management_Set_attributes(region2, size, RTEMS_MM_REGION_NO_ACCESS);
+  printf("Test 6: set region2 with no access attributes \n");
+  _Memory_management_Set_attributes(region2, size, RTEMS_MM_REGION_NO_ACCESS);
   
-  //a1 = (char *) region2;
-  //printf("Checking MMU exception 6: Write to uninstalled block \n");
-  //*a1 = 0xCC;
+  a1 = (char *) region2;
+  printf("Checking MMU exception 6: Write to uninstalled block \n");
+  *a1 = 0xCC;
 
   printf(  "\n\n*** End of mmtest2 ***\n" );
   exit( 0 );

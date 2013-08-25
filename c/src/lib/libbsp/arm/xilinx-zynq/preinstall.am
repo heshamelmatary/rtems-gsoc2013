@@ -130,6 +130,10 @@ $(PROJECT_INCLUDE)/bsp/zynq-uart-regs.h: include/zynq-uart-regs.h $(PROJECT_INCL
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/bsp/zynq-uart-regs.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/bsp/zynq-uart-regs.h
 
+$(PROJECT_INCLUDE)/bsp/mm_config_table.h: startup/mm_config_table.h $(PROJECT_INCLUDE)/bsp/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/bsp/mm_config_table.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/bsp/mm_config_table.h
+
 $(PROJECT_INCLUDE)/libcpu/arm-cp15.h: ../../../libcpu/arm/shared/include/arm-cp15.h $(PROJECT_INCLUDE)/libcpu/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/libcpu/arm-cp15.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/libcpu/arm-cp15.h

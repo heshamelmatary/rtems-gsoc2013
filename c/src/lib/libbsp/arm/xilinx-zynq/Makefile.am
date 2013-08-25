@@ -44,6 +44,7 @@ include_bsp_HEADERS += ../shared/include/arm-gic-tm27.h
 include_bsp_HEADERS += include/irq.h
 include_bsp_HEADERS += include/zynq-uart.h
 include_bsp_HEADERS += include/zynq-uart-regs.h
+include_bsp_HEADERS += startup/mm_config_table.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
 include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h

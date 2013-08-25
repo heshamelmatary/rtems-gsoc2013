@@ -41,7 +41,7 @@ SMP_lock_Control mm_lock;
 /**
  * @brief Calls _CPU_Memory_management_Initialize.
  */
-inline void _Memory_management_Initialize( void )
+void _Memory_management_Initialize( void )
 {
 #ifdef RTEMS_SMP   
   _SMP_lock_Initialize( &mm_lock );
@@ -53,7 +53,7 @@ inline void _Memory_management_Initialize( void )
 /**
  * @brief Calls _CPU_Memory_management_Set_attributes.
  */
-inline void _Memory_management_Set_attributes(
+void _Memory_management_Set_attributes(
   uintptr_t base,
   size_t size,
   uint32_t attr

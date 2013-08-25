@@ -35,6 +35,14 @@ extern "C" {
 #define RTEMS_MM_REGION_NO_ACCESS               0x3
 //#define RTEMS_MM_REGION_PROTECTION_EXEC   0x4
 
+void _Memory_management_Initialize( void );
+
+void _Memory_management_Set_attributes(
+  uintptr_t base,
+  size_t size,
+  uint32_t attr
+);
+
 #ifdef __cplusplus
 }
 #endif
