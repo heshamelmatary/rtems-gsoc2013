@@ -31,7 +31,6 @@
 void rtems_smp_secondary_cpu_initialize( void )
 {
   Per_CPU_Control *self_cpu = _Per_CPU_Get();
-  Thread_Control  *heir;
 
   #if defined(RTEMS_DEBUG)
     printk( "Made it to %d -- ", _Per_CPU_Get_index( self_cpu ) );
@@ -68,8 +67,6 @@ void rtems_smp_process_interrupt( void )
             message,
             sp
           );
-          if ( message & RTEMS_BSP_SMP_SIGNAL_TO_SELF )
-            printk( "signal to self\n" );
           if ( message & RTEMS_BSP_SMP_SHUTDOWN )
             printk( "shutdown\n" );
         }
@@ -94,11 +91,6 @@ void _SMP_Send_message( uint32_t cpu, uint32_t message )
 {
   Per_CPU_Control *per_cpu = _Per_CPU_Get_by_index( cpu );
   ISR_Level level;
-
-  #if defined(RTEMS_DEBUG)
-    if ( message & RTEMS_BSP_SMP_SIGNAL_TO_SELF )
-      printk( "Send 0x%x to %d\n", message, cpu );
-  #endif
 
   _Per_CPU_ISR_disable_and_acquire( per_cpu, level );
   per_cpu->message |= message;

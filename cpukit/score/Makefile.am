@@ -52,10 +52,14 @@ include_rtems_score_HEADERS += include/rtems/score/scheduler.h
 include_rtems_score_HEADERS += include/rtems/score/schedulerimpl.h
 include_rtems_score_HEADERS += include/rtems/score/schedulercbs.h
 include_rtems_score_HEADERS += include/rtems/score/scheduleredf.h
+include_rtems_score_HEADERS += include/rtems/score/scheduleredfimpl.h
 include_rtems_score_HEADERS += include/rtems/score/schedulerpriority.h
 include_rtems_score_HEADERS += include/rtems/score/schedulerpriorityimpl.h
+include_rtems_score_HEADERS += include/rtems/score/schedulerprioritysmp.h
 include_rtems_score_HEADERS += include/rtems/score/schedulersimple.h
 include_rtems_score_HEADERS += include/rtems/score/schedulersimpleimpl.h
+include_rtems_score_HEADERS += include/rtems/score/schedulersmp.h
+include_rtems_score_HEADERS += include/rtems/score/schedulersmpimpl.h
 include_rtems_score_HEADERS += include/rtems/score/smp.h
 include_rtems_score_HEADERS += include/rtems/score/smplock.h
 include_rtems_score_HEADERS += include/rtems/score/stack.h
@@ -118,7 +122,9 @@ libscore_a_SOURCES += src/mpci.c src/objectmp.c src/threadmp.c
 endif
 
 if HAS_SMP
+libscore_a_SOURCES += src/schedulerprioritysmp.c
 libscore_a_SOURCES += src/schedulersimplesmp.c
+libscore_a_SOURCES += src/schedulersmpstartidle.c
 libscore_a_SOURCES += src/smp.c
 endif
 
@@ -179,6 +185,7 @@ libscore_a_SOURCES += src/objectallocate.c src/objectclose.c \
     src/objectactivecount.c
 
 ## SCHEDULER_C_FILES
+libscore_a_SOURCES += src/prioritybitmap.c
 libscore_a_SOURCES += src/scheduler.c
 libscore_a_SOURCES += src/schedulerdefaultallocatefree.c
 libscore_a_SOURCES += src/schedulerdefaultreleasejob.c

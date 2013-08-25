@@ -23,8 +23,8 @@
 #include <rtems/score/schedulerpriority.h>
 #include <rtems/score/chainimpl.h>
 #include <rtems/score/prioritybitmapimpl.h>
+#include <rtems/score/schedulerimpl.h>
 #include <rtems/score/thread.h>
-#include <rtems/score/wkspace.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,25 +35,32 @@ extern "C" {
  */
 /**@{**/
 
+RTEMS_INLINE_ROUTINE Chain_Control *
+_Scheduler_priority_Get_ready_queues( void )
+{
+  return ( Chain_Control * ) _Scheduler.information;
+}
+
 /**
  * @brief Ready queue initialization.
  *
  * This routine initializes @a the_ready_queue for priority-based scheduling.
  */
-RTEMS_INLINE_ROUTINE void _Scheduler_priority_Ready_queue_initialize(void)
+RTEMS_INLINE_ROUTINE void _Scheduler_priority_Ready_queue_initialize(
+  Chain_Control *ready_queues
+)
 {
-  size_t         index;
-  Chain_Control *ready_queues;
-
-  /* allocate ready queue structures */
-  _Scheduler.information = _Workspace_Allocate_or_fatal_error(
-    ((size_t) PRIORITY_MAXIMUM + 1) * sizeof(Chain_Control)
-  );
+  size_t index;
 
   /* initialize ready queue structures */
-  ready_queues = (Chain_Control *) _Scheduler.information;
   for( index=0; index <= PRIORITY_MAXIMUM; index++)
     _Chain_Initialize_empty( &ready_queues[index] );
+}
+
+RTEMS_INLINE_ROUTINE Scheduler_priority_Per_thread *
+_Scheduler_priority_Get_scheduler_info( Thread_Control *thread )
+{
+  return ( Scheduler_priority_Per_thread * ) thread->scheduler_info;
 }
 
 /**
@@ -67,15 +74,12 @@ RTEMS_INLINE_ROUTINE void _Scheduler_priority_Ready_queue_enqueue(
   Thread_Control                  *the_thread
 )
 {
-  Scheduler_priority_Per_thread *sched_info;
-  Chain_Control                 *ready;
+  Scheduler_priority_Per_thread *sched_info_of_thread =
+    _Scheduler_priority_Get_scheduler_info( the_thread );
+  Chain_Control *ready_chain = sched_info_of_thread->ready_chain;
 
-  sched_info = (Scheduler_priority_Per_thread *) the_thread->scheduler_info;
-  ready      = sched_info->ready_chain;
-
-  _Priority_bit_map_Add( &sched_info->Priority_map );
-
-  _Chain_Append_unprotected( ready, &the_thread->Object.Node );
+  _Chain_Append_unprotected( ready_chain, &the_thread->Object.Node );
+  _Priority_bit_map_Add( &sched_info_of_thread->Priority_map );
 }
 
 /**
@@ -91,16 +95,12 @@ RTEMS_INLINE_ROUTINE void _Scheduler_priority_Ready_queue_enqueue_first(
   Thread_Control                   *the_thread
 )
 {
-  Scheduler_priority_Per_thread *sched_info;
+  Scheduler_priority_Per_thread *sched_info_of_thread =
+    _Scheduler_priority_Get_scheduler_info( the_thread );
+  Chain_Control *ready_chain = sched_info_of_thread->ready_chain;
 
-  sched_info = (Scheduler_priority_Per_thread *) the_thread->scheduler_info;
-
-  _Priority_bit_map_Add( &sched_info->Priority_map );
-
-  _Chain_Prepend_unprotected(
-    sched_info->ready_chain,
-    &the_thread->Object.Node
-  );
+  _Chain_Prepend_unprotected( ready_chain, &the_thread->Object.Node );
+  _Priority_bit_map_Add( &sched_info_of_thread->Priority_map );
 }
 
 /**
@@ -115,15 +115,13 @@ RTEMS_INLINE_ROUTINE void _Scheduler_priority_Ready_queue_extract(
   Thread_Control        *the_thread
 )
 {
-  Scheduler_priority_Per_thread *sched_info;
-  Chain_Control                 *ready;
+  Scheduler_priority_Per_thread *sched_info_of_thread =
+    _Scheduler_priority_Get_scheduler_info( the_thread );
+  Chain_Control *ready_chain = sched_info_of_thread->ready_chain;
 
-  sched_info = (Scheduler_priority_Per_thread *) the_thread->scheduler_info;
-  ready      = sched_info->ready_chain;
-
-  if ( _Chain_Has_only_one_node( ready ) ) {
-    _Chain_Initialize_empty( ready );
-    _Priority_bit_map_Remove( &sched_info->Priority_map );
+  if ( _Chain_Has_only_one_node( ready_chain ) ) {
+    _Chain_Initialize_empty( ready_chain );
+    _Priority_bit_map_Remove( &sched_info_of_thread->Priority_map );
   } else {
     _Chain_Extract_unprotected( &the_thread->Object.Node );
   }
@@ -144,10 +142,7 @@ RTEMS_INLINE_ROUTINE Thread_Control *_Scheduler_priority_Ready_queue_first(
 {
   Priority_Control index = _Priority_bit_map_Get_highest();
 
-  if ( !_Chain_Is_empty( &the_ready_queue[ index ] ) )
-    return (Thread_Control *) _Chain_First( &the_ready_queue[ index ] );
-
-  return NULL;
+  return (Thread_Control *) _Chain_First( &the_ready_queue[ index ] );
 }
 
 /**
@@ -162,17 +157,13 @@ RTEMS_INLINE_ROUTINE void _Scheduler_priority_Ready_queue_requeue(
   Thread_Control            *the_thread
 )
 {
-  Scheduler_priority_Per_thread *sched_info;
+  Scheduler_priority_Per_thread *sched_info_of_thread =
+    _Scheduler_priority_Get_scheduler_info( the_thread );
+  Chain_Control *ready_chain = sched_info_of_thread->ready_chain;
 
-  sched_info = (Scheduler_priority_Per_thread *) the_thread->scheduler_info;
-
-  if ( !_Chain_Has_only_one_node( sched_info->ready_chain ) ) {
+  if ( !_Chain_Has_only_one_node( ready_chain ) ) {
     _Chain_Extract_unprotected( &the_thread->Object.Node );
-
-    _Chain_Append_unprotected(
-      sched_info->ready_chain,
-      &the_thread->Object.Node
-    );
+    _Chain_Append_unprotected( ready_chain, &the_thread->Object.Node );
   }
 }
 
@@ -182,10 +173,33 @@ RTEMS_INLINE_ROUTINE void _Scheduler_priority_Ready_queue_requeue(
  * This kernel routine implements scheduling decision logic
  * for priority-based scheduling.
  */
-RTEMS_INLINE_ROUTINE void _Scheduler_priority_Schedule_body(void)
+RTEMS_INLINE_ROUTINE void _Scheduler_priority_Schedule_body(
+  Thread_Control *thread,
+  bool force_dispatch
+)
 {
-  _Thread_Heir = _Scheduler_priority_Ready_queue_first(
-    (Chain_Control *) _Scheduler.information
+  Chain_Control *ready_queues = _Scheduler_priority_Get_ready_queues();
+  Thread_Control *heir = _Scheduler_priority_Ready_queue_first( ready_queues );
+
+  ( void ) thread;
+
+  _Scheduler_Update_heir( heir, force_dispatch );
+}
+
+RTEMS_INLINE_ROUTINE void _Scheduler_priority_Update_body(
+  Thread_Control *thread,
+  Chain_Control *ready_queues
+)
+{
+  Scheduler_priority_Per_thread *sched_info_of_thread =
+    _Scheduler_priority_Get_scheduler_info( thread );
+
+  sched_info_of_thread->ready_chain =
+    &ready_queues[ thread->current_priority ];
+
+  _Priority_bit_map_Initialize_information(
+    &sched_info_of_thread->Priority_map,
+    thread->current_priority
   );
 }
 

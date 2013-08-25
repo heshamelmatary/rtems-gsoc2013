@@ -25,6 +25,7 @@ extern "C" {
 
 #include <rtems/score/scheduler.h>
 #include <rtems/score/schedulerpriority.h>
+#include <rtems/score/schedulersmp.h>
 
 /**
  * @defgroup ScoreSchedulerSMP Simple SMP Scheduler
@@ -48,11 +49,6 @@ extern "C" {
  * @{
  */
 
-typedef struct {
-  Chain_Control ready;
-  Chain_Control scheduled;
-} Scheduler_simple_smp_Control;
-
 /**
  * @brief Entry points for the Simple SMP Scheduler.
  */
@@ -61,7 +57,7 @@ typedef struct {
     _Scheduler_simple_smp_Initialize, \
     _Scheduler_simple_smp_Schedule, \
     _Scheduler_simple_smp_Yield, \
-    _Scheduler_simple_smp_Extract, \
+    _Scheduler_simple_smp_Block, \
     _Scheduler_simple_smp_Enqueue_priority_fifo, \
     _Scheduler_default_Allocate, \
     _Scheduler_default_Free, \
@@ -72,10 +68,12 @@ typedef struct {
     _Scheduler_priority_Priority_compare, \
     _Scheduler_default_Release_job, \
     _Scheduler_default_Tick, \
-    _Scheduler_simple_smp_Start_idle \
+    _Scheduler_SMP_Start_idle \
   }
 
 void _Scheduler_simple_smp_Initialize( void );
+
+void _Scheduler_simple_smp_Block( Thread_Control *thread );
 
 void _Scheduler_simple_smp_Enqueue_priority_fifo( Thread_Control *thread );
 
@@ -85,12 +83,7 @@ void _Scheduler_simple_smp_Extract( Thread_Control *thread );
 
 void _Scheduler_simple_smp_Yield( Thread_Control *thread );
 
-void _Scheduler_simple_smp_Schedule( void );
-
-void _Scheduler_simple_smp_Start_idle(
-  Thread_Control *thread,
-  Per_CPU_Control *cpu
-);
+void _Scheduler_simple_smp_Schedule( Thread_Control *thread );
 
 /** @} */
 

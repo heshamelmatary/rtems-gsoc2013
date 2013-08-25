@@ -191,6 +191,10 @@ $(PROJECT_INCLUDE)/rtems/score/scheduleredf.h: include/rtems/score/scheduleredf.
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/scheduleredf.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/scheduleredf.h
 
+$(PROJECT_INCLUDE)/rtems/score/scheduleredfimpl.h: include/rtems/score/scheduleredfimpl.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/scheduleredfimpl.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/scheduleredfimpl.h
+
 $(PROJECT_INCLUDE)/rtems/score/schedulerpriority.h: include/rtems/score/schedulerpriority.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/schedulerpriority.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulerpriority.h
@@ -199,6 +203,10 @@ $(PROJECT_INCLUDE)/rtems/score/schedulerpriorityimpl.h: include/rtems/score/sche
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/schedulerpriorityimpl.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulerpriorityimpl.h
 
+$(PROJECT_INCLUDE)/rtems/score/schedulerprioritysmp.h: include/rtems/score/schedulerprioritysmp.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/schedulerprioritysmp.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulerprioritysmp.h
+
 $(PROJECT_INCLUDE)/rtems/score/schedulersimple.h: include/rtems/score/schedulersimple.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/schedulersimple.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulersimple.h
@@ -206,6 +214,14 @@ PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulersimple.h
 $(PROJECT_INCLUDE)/rtems/score/schedulersimpleimpl.h: include/rtems/score/schedulersimpleimpl.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/schedulersimpleimpl.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulersimpleimpl.h
+
+$(PROJECT_INCLUDE)/rtems/score/schedulersmp.h: include/rtems/score/schedulersmp.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/schedulersmp.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulersmp.h
+
+$(PROJECT_INCLUDE)/rtems/score/schedulersmpimpl.h: include/rtems/score/schedulersmpimpl.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/schedulersmpimpl.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/score/schedulersmpimpl.h
 
 $(PROJECT_INCLUDE)/rtems/score/smp.h: include/rtems/score/smp.h $(PROJECT_INCLUDE)/rtems/score/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/score/smp.h
