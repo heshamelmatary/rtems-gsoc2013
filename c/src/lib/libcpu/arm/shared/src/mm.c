@@ -19,7 +19,6 @@ void _CPU_Memory_management_Initialize(void)
   uint32_t ctrl = 0;
   uint32_t client_domain = 15;
   uint32_t *ttb;
-  uint32_t config_count = RTEMS_ARRAY_SIZE(_cpu_mmu_config_table);
   ctrl = arm_cp15_get_control();
 
   arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(

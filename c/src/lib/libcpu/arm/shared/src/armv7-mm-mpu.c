@@ -65,7 +65,11 @@ void _CPU_Memory_management_Initialize(void)
 #endif /* ARM_MULTILIB_ARCH_V7M */
 }
 
-_CPU_Memory_management_Install_entry(uintptr_t base, size_t size, uint32_t attr)
+_CPU_Memory_management_Set_attributes(
+  uintptr_t base, 
+  size_t size,
+  uint32_t attr
+)
 {
 #ifdef ARM_MULTILIB_ARCH_V7M
   volatile ARMV7M_MPU *mpu = _ARMV7M_MPU;
@@ -97,9 +101,6 @@ _CPU_Memory_management_Install_entry(uintptr_t base, size_t size, uint32_t attr)
 #endif /* ARM_MULTILIB_ARCH_V7M */
 }
 
-_CPU_Memory_management_Uninstall_entry()
-{
-}
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
