@@ -29,11 +29,19 @@ extern "C" {
 /**
  * @brief _Memory_management_Region Flags defs      
  */
-#define RTEMS_MM_REGION_NO_PROTECTION           0x0
-#define RTEMS_MM_REGION_PROTECTION_READ_ONLY    0x1
-#define RTEMS_MM_REGION_PROTECTION_WRITE        0x2
-#define RTEMS_MM_REGION_NO_ACCESS               0x3
-//#define RTEMS_MM_REGION_PROTECTION_EXEC   0x4
+
+#define RTEMS_MM_REGION_BIT_READ        0
+#define RTEMS_MM_REGION_BIT_WRITE       1
+#define RTEMS_MM_REGION_BIT_EXECUTE     2
+#define RTEMS_MM_REGION_BIT_CACHE       3
+#define RTEMS_MM_REGION_BIT_DEVICE      4
+#define RTEMS_MM_REGION_BIT_SHARED      5
+
+#define RTEMS_MM_REGION_READ    (1U << RTEMS_MM_REGION_BIT_READ)
+#define RTEMS_MM_REGION_WRITE   (1U << RTEMS_MM_REGION_BIT_WRITE)
+#define RTEMS_MM_REGION_EXECUTE (1U << RTEMS_MM_REGION_BIT_EXECUTE)
+#define RTEMS_MM_REGION_CACHE   (1U << RTEMS_MM_REGION_BIT_CACHE)
+#define RTEMS_MM_REGION_DEVICE  (1U << RTEMS_MM_REGION_BIT_SHARED)
 
 void _Memory_management_Initialize( void );
 

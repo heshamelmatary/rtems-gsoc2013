@@ -48,7 +48,6 @@ include_bsp_HEADERS += startup/mm_config_table.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
 include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h
-include_libcpu_HEADERS += ../../../libcpu/arm/shared/include/arm_cp15_print_fsr.h
 
 ###############################################################################
 #                  Data                                                       #
@@ -129,8 +128,9 @@ libbsp_a_SOURCES += ../../../libcpu/shared/src/cache_manager.c
 libbsp_a_SOURCES += ../../../libcpu/arm/shared/include/cache_.h
 libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 
-# MMU
+# LIBMM
 libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/mm.c
+libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/arm_cp15_print_fsr.c
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c

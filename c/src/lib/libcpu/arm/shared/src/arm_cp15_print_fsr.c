@@ -14,26 +14,11 @@
  * http://www.rtems.com/license/LICENSE.
  */
 
-#ifndef LICPU_SHARED_ARM_CP15_DATA_FAULT_INFO
-#define LICPU_SHARED_ARM_CP15_DATA_FAULT_INFO
-#endif
+#include <libcpu/arm-cp15.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
-
-/* Define mask for ARM CP15 fault status register */
-#define ARM_CP15_FAULT_STATUS_MASK 0x040F
-
-/* Error States for ARM CP15 fault status register */
-#define ARM_CP15_ALIGNMENT_FAULT   0x00000001
-#define ARM_CP15_BACKGROUND_FAULT  0x0000
-#define ARM_CP15_ACCESS_PERMISSION_FAULT 0x000D
-#define ARM_CP15_PRECISE_EXTERNAL_ABORT_FAULT 0x0008 
-#define ARM_CP15_IMPRECISE_EXTERNAL_ABORT_FAULT 0x0406
-#define ARM_CP15_PRECISE_PARITY_ERROR_EXCEPTION 0x0006
-#define ARM_CP15_IMPRECISE_PARITY_ERROR_EXCEPTION 0x0408
-#define ARM_CP15_DEBUG_EVENT 0x0002
 
 /* print error description */
 
@@ -81,4 +66,5 @@ void arm_cp15_print_fault_status_description(uint32_t fsr)
 }
 
 #ifdef __cplusplus
-#endif /* LICPU_SHARED_ARM_CP15_DATA_FAULT_INFO */
+}
+#endif

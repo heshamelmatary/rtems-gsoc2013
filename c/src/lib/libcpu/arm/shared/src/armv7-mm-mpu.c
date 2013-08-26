@@ -13,11 +13,12 @@
  * found in the file LICENSE in this distribution or at
  * http://www.rtems.com/license/LICENSE.
  */
- 
+
 #ifndef LIBCPU_ARM_MPU_LIBMM
 #define LIBCPU_ARM_MPU_LIBMM
 
 #include <rtems/score/armv7m.h>
+#include <rtems/score/mm.h>
 #include <libcpu/mm.h>
 #include <bsp/start-config.h>
 
@@ -27,6 +28,10 @@ extern "C" {
  
 #define ALIGN_REGION_START_ADDRESS(addr,size) \
   addr &= (2<<size)
+
+#define translate_attributes(attr) \
+  ((((attr) >> RTEMS_MM_REGION_READ))? ARMV7M_MPU_AP_PRIV_RO_USER_RO : 0U) \
+  | ((((attr) >> RTEMS_MM_REGION_WRITE)) ? ARMV7M_MPU_AP_PRIV_RW_USER_RW : 0U)
 
 static void translate_attributes(
   uint32_t high_level_attr,
@@ -46,7 +51,6 @@ static void translate_attributes(
 #endif /* ARM_MULTILIB_ARCH_V7M */
 }
 
-
 void _CPU_Memory_management_Initialize(void)
 {
 #ifdef ARM_MULTILIB_ARCH_V7M
@@ -55,8 +59,8 @@ void _CPU_Memory_management_Initialize(void)
   size_t i = 0;
 
   for (i = 0; i < region_count; ++i) {
-    mpu->rbar = arm_start_config_mpu_region [i].rbar;
-    mpu->rasr = arm_start_config_mpu_region [i].rasr;
+    mpu->rbar = arm_start_config_mpu_region[i].rbar;
+    mpu->rasr = arm_start_config_mpu_region[i].rasr;
   }
 
   if (region_count > 0) {
@@ -75,11 +79,6 @@ _CPU_Memory_management_Set_attributes(
   volatile ARMV7M_MPU *mpu = _ARMV7M_MPU;
   rtems_interrupt_level level;
 
-  uint32_t mpu_attr;
-
-  translate_attributes(attr, &mpu_attr);
-
-
   /* Disable MPU and interrupts */
   rtems_interrupt_disable(level);
   mpu-> = 0;
@@ -89,7 +88,7 @@ _CPU_Memory_management_Set_attributes(
           0,
           base,
           size,
-          mpu_attr
+          translate_attributes(attr)
     );
   
   mpu->rbar = region.basr;

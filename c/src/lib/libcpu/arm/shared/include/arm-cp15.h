@@ -175,6 +175,27 @@ extern "C" {
 
 /** @} */
 
+/**
+ * @name Fault Status Register Defines
+ *
+ * @{
+ */
+
+#define ARM_CP15_FAULT_STATUS_MASK 0x040F
+
+#define ARM_CP15_ALIGNMENT_FAULT   0x00000001
+#define ARM_CP15_BACKGROUND_FAULT  0x0000
+#define ARM_CP15_ACCESS_PERMISSION_FAULT 0x000D
+#define ARM_CP15_PRECISE_EXTERNAL_ABORT_FAULT 0x0008 
+#define ARM_CP15_IMPRECISE_EXTERNAL_ABORT_FAULT 0x0406
+#define ARM_CP15_PRECISE_PARITY_ERROR_EXCEPTION 0x0006
+#define ARM_CP15_IMPRECISE_PARITY_ERROR_EXCEPTION 0x0408
+#define ARM_CP15_DEBUG_EVENT 0x0002
+
+/** @} */
+
+/** @} */
+
 static inline uint32_t arm_cp15_get_id_code(void)
 {
   ARM_SWITCH_REGISTERS;
@@ -252,7 +273,6 @@ static inline void arm_cp15_set_control(uint32_t val)
  *
  * @return The current control register value.
  */
-
 static inline uint32_t arm_cp15_mmu_disable(uint32_t cls)
 {
   ARM_SWITCH_REGISTERS;
@@ -1025,24 +1045,10 @@ uint32_t arm_cp15_set_translation_table_entries(
   uint32_t section_flags
 );
 
-/**
- * @brief Unsets the @a sections entry for the address range [@a begin, @a end).
- * Unset section entry by set its value to Zero 
- */
-uint32_t arm_cp15_unset_translation_table_entries(
-  const void *begin,
-  const void *end
-);
-
 void arm_cp15_set_exception_handler(
   Arm_symbolic_exception_name exception,
   void (*handler)(void)
 );
-
-/**
- * @brief dummy exception handler for data aborts to help in debugging
- */
-void dummy_data_abort_exception_handler(void);
 
 /** @} */
 

@@ -51,10 +51,10 @@ region1);
   }
 
   printf("Test 1: Set Region1 as read only\n");
-  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
+  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_READ);
 
   printf("Test 2 : Set Region2 as write enabled\n");
-  _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_PROTECTION_WRITE);
+  _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_WRITE);
 
   printf( "\n\n*** End of mmtest1 ***\n" );
 

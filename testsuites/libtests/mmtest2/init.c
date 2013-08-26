@@ -28,15 +28,15 @@ rtems_task Init(
   size_t size = 0x00100000;
 
   uint32_t *region1 = (uint32_t *) 0x0C000000U;
-  uint32_t *region2 = (uint32_t *) 0x0C100000U;
+  uint32_t *region2 = (uint32_t *) 0x0C200000U;
 
   puts( "\n\n*** Start of mmtest2 ***\n" );
 
   printf("Test 1: set Region1  as read only\n");
-  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_PROTECTION_READ_ONLY);
+  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_READ);
 
   printf("Test 2: set Region2  as write enabled\n");
-  _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_PROTECTION_WRITE);
+  _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_WRITE);
 
   // TODO: Make fatal tests withing exception handler */
   /* FIXME: make addresses target-independent */
@@ -60,13 +60,6 @@ rtems_task Init(
 
   printf("Checking MMU exception 5: Write to readonly block  \n");
   *a2++ = 0xCC;
-
-  printf("Test 6: set region2 with no access attributes \n");
-  _Memory_management_Set_attributes(region2, size, RTEMS_MM_REGION_NO_ACCESS);
-  
-  a1 = (char *) region2;
-  printf("Checking MMU exception 6: Write to uninstalled block \n");
-  *a1 = 0xCC;
 
   printf(  "\n\n*** End of mmtest2 ***\n" );
   exit( 0 );
