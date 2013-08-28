@@ -130,7 +130,6 @@ libbsp_a_CPPFLAGS += -I$(srcdir)/../../../libcpu/arm/shared/include
 
 # LIBMM 
 libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/mm.c
-libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/arm_cp15_print_fsr.c
 
 # Start hooks
 libbsp_a_SOURCES += startup/bspstarthooks.c

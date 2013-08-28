@@ -134,7 +134,6 @@ libbsp_a_SOURCES += startup/bspstarthooks.c
 
 # LIBMM
 libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/mm.c
-libbsp_a_SOURCES += ../../../libcpu/arm/shared/src/arm_cp15_print_fsr.c
 
 ###############################################################################
 # Network                                                    #
