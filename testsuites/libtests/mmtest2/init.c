@@ -11,12 +11,25 @@
  * found in the file LICENSE in this distribution or at
  * http://www.rtems.com/license/LICENSE.
  */
-#define __RTEMS_VIOLATE_KERNEL_VISIBILITY__
 #define CONFIGURE_INIT
+
 #include "system.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <rtems/score/mm.h>
+#include <assert.h>
+
+static void fatal_extension(
+  rtems_fatal_source source,
+  bool is_internal,
+  rtems_fatal_code error
+)
+{
+  if (source == RTEMS_FATAL_SOURCE_EXCEPTION)
+     {
+	printk("Internal Exception Occured \n");
+     }
+}
 
 rtems_task Init(
   rtems_task_argument ignored
@@ -32,13 +45,12 @@ rtems_task Init(
 
   puts( "\n\n*** Start of mmtest2 ***\n" );
 
-  printf("Test 1: set Region1  as read only\n");
-  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_READ);
-
-  printf("Test 2: set Region2  as write enabled\n");
+  printf("Test 1: set Region2  as write enabled\n");
   _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_WRITE);
 
-  // TODO: Make fatal tests withing exception handler */
+  printf("Test 2: set Region1  as read only\n");
+  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_READ);
+
   /* FIXME: make addresses target-independent */
 
   a1 = region2;

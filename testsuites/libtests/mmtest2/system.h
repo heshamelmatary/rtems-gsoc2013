@@ -14,6 +14,11 @@ rtems_task Init(
   rtems_task_argument argument
 );
 
+static void fatal_extension(
+  rtems_fatal_source source,
+  bool is_internal,
+  rtems_fatal_code error
+);
 /* configuration information */
 
 #include <bsp.h> /* for device driver prototypes */
@@ -27,6 +32,12 @@ rtems_task Init(
 #define CONFIGURE_RTEMS_INIT_TASKS_TABLE
 
 #define CONFIGURE_USE_DEVFS_AS_BASE_FILESYSTEM
+
+#define CONFIGURE_ZERO_WORKSPACE_AUTOMATICALLY FALSE
+
+#define CONFIGURE_INITIAL_EXTENSIONS { .fatal = fatal_extension }
+
+#define CONFIGURE_MEMORY_OVERHEAD 1024 * 3 
 
 #include <rtems/confdefs.h>
 /* end of include file */

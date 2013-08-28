@@ -30,7 +30,7 @@
   | (((attr) >> RTEMS_MM_REGION_BIT_SHARED) ? ARM_MMU_SECT_S : 0U) \
   | (ARM_MMU_SECT_DEFAULT))
 
-BSP_START_DATA_SECTION static const arm_cp15_start_section_config
+BSP_START_DATA_SECTION const arm_cp15_start_section_config
 _cpu_mmu_config_table[] = {
   {
     .begin = (uint32_t) bsp_section_fast_text_begin,
@@ -81,12 +81,4 @@ _cpu_mmu_config_table[] = {
     .end = 0xf9000000U,
     .flags = ARMV7_MMU_DEVICE
   }
-};
-
-const static uint32_t translation_table[] =
-{
-  ARMV7_MMU_DATA_READ_WRITE,
-  ARMV7_MMU_READ_ONLY,
-  ARMV7_MMU_DATA_READ_WRITE,
-  0U
 };

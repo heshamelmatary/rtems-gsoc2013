@@ -13,7 +13,6 @@
  * http://www.rtems.com/license/LICENSE.
  */
 
-#define __RTEMS_VIOLATE_KERNEL_VISIBILITY__
 #define CONFIGURE_INIT
 #include "system.h"
 #include <stdio.h>
@@ -24,7 +23,7 @@ rtems_task Init(
   rtems_task_argument ignored
 )
 {
-  size_t size = 0x001000; 
+  size_t size = 0x00100000; 
   uintptr_t *region1 = _Workspace_Allocate(size);
   uintptr_t *region2 = _Workspace_Allocate(size);
 
@@ -50,11 +49,11 @@ region1);
     exit(0);
   }
 
-  printf("Test 1: Set Region1 as read only\n");
-  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_READ);
-
-  printf("Test 2 : Set Region2 as write enabled\n");
+  printf("Test 1 : Set Region2 as write enabled\n");
   _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_WRITE);
+
+  printf("Test 2: Set Region1 as read only\n");
+  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_READ);
 
   printf( "\n\n*** End of mmtest1 ***\n" );
 

@@ -194,8 +194,6 @@ extern "C" {
 
 /** @} */
 
-/** @} */
-
 static inline uint32_t arm_cp15_get_id_code(void)
 {
   ARM_SWITCH_REGISTERS;
