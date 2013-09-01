@@ -16,6 +16,7 @@
 #ifndef _RTEMS_SCORE_MM_H
 #define _RTEMS_SCORE_MM_H
 
+#include <stdlib.h> 
 /* @defgroup SuperCoreMM Memory Management Support
  *
  * @ingroup Score
@@ -41,7 +42,8 @@ extern "C" {
 #define RTEMS_MM_REGION_WRITE   (1U << RTEMS_MM_REGION_BIT_WRITE)
 #define RTEMS_MM_REGION_EXECUTE (1U << RTEMS_MM_REGION_BIT_EXECUTE)
 #define RTEMS_MM_REGION_CACHE   (1U << RTEMS_MM_REGION_BIT_CACHE)
-#define RTEMS_MM_REGION_DEVICE  (1U << RTEMS_MM_REGION_BIT_SHARED)
+#define RTEMS_MM_REGION_DEVICE  (1U << RTEMS_MM_REGION_BIT_DEVICE)
+#define RTEMS_MM_REGION_SHARED  (1U << RTEMS_MM_REGION_BIT_SHARED)
 
 void _Memory_management_Initialize( void );
 

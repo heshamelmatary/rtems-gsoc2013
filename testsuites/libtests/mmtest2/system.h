@@ -37,7 +37,7 @@ static void fatal_extension(
 
 #define CONFIGURE_INITIAL_EXTENSIONS { .fatal = fatal_extension }
 
-#define CONFIGURE_MEMORY_OVERHEAD 1024 * 3 
+#define CONFIGURE_MEMORY_OVERHEAD 1024 * 10 
 
 #include <rtems/confdefs.h>
 /* end of include file */

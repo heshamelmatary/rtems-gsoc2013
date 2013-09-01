@@ -68,6 +68,14 @@ $(PROJECT_INCLUDE)/rtems/posix/keyimpl.h: include/rtems/posix/keyimpl.h $(PROJEC
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/posix/keyimpl.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/posix/keyimpl.h
 
+$(PROJECT_INCLUDE)/rtems/posix/mman.h: include/rtems/posix/mman.h $(PROJECT_INCLUDE)/rtems/posix/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/posix/mman.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/posix/mman.h
+
+$(PROJECT_INCLUDE)/rtems/posix/mmap-internal.h: include/rtems/posix/mmap-internal.h $(PROJECT_INCLUDE)/rtems/posix/$(dirstamp)
+	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/posix/mmap-internal.h
+PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/posix/mmap-internal.h
+
 $(PROJECT_INCLUDE)/rtems/posix/mqueue.h: include/rtems/posix/mqueue.h $(PROJECT_INCLUDE)/rtems/posix/$(dirstamp)
 	$(INSTALL_DATA) $< $(PROJECT_INCLUDE)/rtems/posix/mqueue.h
 PREINSTALL_FILES += $(PROJECT_INCLUDE)/rtems/posix/mqueue.h

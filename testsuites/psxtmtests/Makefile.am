@@ -15,6 +15,7 @@ SUBDIRS += psxtmcond09
 SUBDIRS += psxtmcond10
 SUBDIRS += psxtmkey01
 SUBDIRS += psxtmkey02
+SUBDIRS += psxtmman01
 SUBDIRS += psxtmmq01
 SUBDIRS += psxtmmutex01
 SUBDIRS += psxtmmutex02

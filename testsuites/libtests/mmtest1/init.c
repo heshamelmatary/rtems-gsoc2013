@@ -19,41 +19,29 @@
 #include <stdlib.h>
 #include <rtems/score/mm.h>
 
+#define BLOCK_SIZE  1024 * 1024 /* 1MB */
+#define BLOCK_COUNT 3
+
+char memory_pool [BLOCK_SIZE * BLOCK_COUNT];
+char *a1;
+char *a2;
+char a;
+size_t size = BLOCK_SIZE;
+
+char *region1 = &memory_pool;
+char *region2 = (((char *) &memory_pool) + (BLOCK_SIZE));
+
 rtems_task Init(
   rtems_task_argument ignored
 )
 {
-  size_t size = 0x00100000; 
-  uintptr_t *region1 = _Workspace_Allocate(size);
-  uintptr_t *region2 = _Workspace_Allocate(size);
-
   puts( "\n\n*** Start of mmtest1 ***\n" );
 
-  if (region1 != NULL)
-  {
-    printf("Region 1 successfully allocated from Work Space at address 0x%x \n", \
-region1);
-  } else 
-  {
-    printf("Failed to allocate memory for Region 1 from Work Space ! \n");
-    exit(0);
-  }
+  printf("Test 1 : Set Region1 as write enabled\n");
+  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_WRITE);
 
-  if (region2 != NULL)
-  {
-    printf("Region 2 successfully allocated from Work Space at address 0x%x \n", \
- region2);
-  } else
-  {
-    printf("Failed to allocate memory for Region 2 from Work Space ! \n");
-    exit(0);
-  }
-
-  printf("Test 1 : Set Region2 as write enabled\n");
-  _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_WRITE);
-
-  printf("Test 2: Set Region1 as read only\n");
-  _Memory_management_Set_attributes( region1, size, RTEMS_MM_REGION_READ);
+  printf("Test 2: Set Region2 as read only\n");
+  _Memory_management_Set_attributes( region2, size, RTEMS_MM_REGION_READ);
 
   printf( "\n\n*** End of mmtest1 ***\n" );
 

@@ -89,6 +89,7 @@ psxtmcond09/Makefile
 psxtmcond10/Makefile
 psxtmkey01/Makefile
 psxtmkey02/Makefile
+psxtmman01/Makefile
 psxtmmq01/Makefile
 psxtmmutex01/Makefile
 psxtmmutex02/Makefile
