@@ -58,19 +58,17 @@ rtems_task Init(
   printf("Test 2: set Region2  as read only\n");
   _Memory_management_Set_attributes(region2, size, RTEMS_MM_REGION_READ);
 
-  /* FIXME: make addresses target-independent */
-
   a1 = region1;
   printf("Test 3: Write to write enabled block\n");
   *a1 = 0xCC;
 
   a1 = (char*)0xffffffffU;
   printf("Checking MMU exception 1: Read from Unmapped block\n");
-  //a = *a1++;
+  a = *a1++;
 
   a1 = 0xffffffffU;
   printf("Checking MMU exception 2: Write to Unmapped block\n");
-  //*a1++ = 0xCC;
+  *a1++ = 0xCC;
 
   // this one isn't an exception.
   a2 = (char *) region2;

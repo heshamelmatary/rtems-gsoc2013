@@ -29,8 +29,6 @@ rtems_task Init(
 
 #define CONFIGURE_USE_DEVFS_AS_BASE_FILESYSTEM
 
-#define CONFIGURE_ZERO_WORKSPACE_AUTOMATICALLY FALSE
-
 #define CONFIGURE_MEMORY_OVERHEAD 1024 * 3 
 
 #include <rtems/confdefs.h>

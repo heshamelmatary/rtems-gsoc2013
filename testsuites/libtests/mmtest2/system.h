@@ -33,11 +33,9 @@ static void fatal_extension(
 
 #define CONFIGURE_USE_DEVFS_AS_BASE_FILESYSTEM
 
-#define CONFIGURE_ZERO_WORKSPACE_AUTOMATICALLY FALSE
-
 #define CONFIGURE_INITIAL_EXTENSIONS { .fatal = fatal_extension }
 
-#define CONFIGURE_MEMORY_OVERHEAD 1024 * 10 
+#define CONFIGURE_MEMORY_OVERHEAD 1024 * 5 
 
 #include <rtems/confdefs.h>
 /* end of include file */
