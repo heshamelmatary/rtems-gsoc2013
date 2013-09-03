@@ -39,7 +39,7 @@ SMP_lock_Control mm_lock;
 #endif
 
 /**
- * @brief Calls _CPU_Memory_management_Initialize.
+ * @brief Calls bsp_memory_management_Initialize.
  */
 void _Memory_management_Initialize( void )
 {
@@ -47,7 +47,7 @@ void _Memory_management_Initialize( void )
   _SMP_lock_Initialize( &mm_lock );
 #endif 
 
-  _CPU_Memory_management_Initialize();
+  bsp_memory_management_Initialize();
 }
 
 /**

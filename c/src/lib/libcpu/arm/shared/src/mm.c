@@ -6,25 +6,18 @@
  * http://www.rtems.com/license/LICENSE.
  */
 
-#include <bsp/arm-cp15-start.h>
-#include <libcpu/arm-cp15.h>
 #include <libcpu/mm.h>
-#include <bsp/start.h>
-#include <bsp/linker-symbols.h>
-#include <bsp/mm_config_table.h>
+#include <libcpu/arm-cp15.h>
 
-BSP_START_TEXT_SECTION void _CPU_Memory_management_Initialize(void)
-{	
-  uint32_t ctrl = arm_cp15_get_control();
-
-  arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(
-  ctrl,
-  (uint32_t *) bsp_translation_table_base,
-  ARM_MMU_DEFAULT_CLIENT_DOMAIN,
-  &_cpu_mmu_config_table[0],
-  RTEMS_ARRAY_SIZE(&_cpu_mmu_config_table)
-  );
-}
+#define translate_attributes(attr) \
+  ((ARM_MMU_DEFAULT_CLIENT_DOMAIN << ARM_MMU_SECT_DOMAIN_SHIFT) \
+  | (ARM_MMU_SECT_AP_0) \
+  | ((((attr) >> RTEMS_MM_REGION_BIT_WRITE) & 1U) ? 0U : (ARM_MMU_SECT_AP_2)) \
+  | ((((attr) >> RTEMS_MM_REGION_BIT_CACHE) & 1U) ? \
+  (ARM_MMU_SECT_TEX_0|ARM_MMU_SECT_C|ARM_MMU_SECT_B) : 0U) \
+  | ((((attr) >> RTEMS_MM_REGION_BIT_DEVICE) & 1U) ? ARM_MMU_SECT_B : 0U) \
+  | ((((attr) >> RTEMS_MM_REGION_BIT_SHARED) & 1U) ? ARM_MMU_SECT_S : 0U) \
+  | (ARM_MMU_SECT_DEFAULT))
 
 void _CPU_Memory_management_Set_attributes(
   uintptr_t base,

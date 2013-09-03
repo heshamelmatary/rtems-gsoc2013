@@ -245,7 +245,7 @@ void arm_Region_Change_Attr(
 }
 
 /* Initialize first page table level with no protected entries */
-void _CPU_Memory_management_Initialize( void )
+void bsp_memory_management_Initialize( void )
 {
   uintptr_t *lvl1_base;
   uintptr_t paddr;

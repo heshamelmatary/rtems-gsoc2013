@@ -26,7 +26,7 @@ uint32_t translation_table[] =
 
 SPR_RW(SDR1);
 
-void _CPU_Memory_management_Initialize(void)
+void bsp_memory_management_Initialize(void)
 {
   uintptr_t pt_base, pt_end;
   uint32_t cache_line_size;

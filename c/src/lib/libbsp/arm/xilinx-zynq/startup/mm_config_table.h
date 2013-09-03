@@ -21,16 +21,6 @@
   #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_CACHED
 #endif
 
-#define translate_attributes(attr) \
-  ((ARM_MMU_DEFAULT_CLIENT_DOMAIN << ARM_MMU_SECT_DOMAIN_SHIFT) \
-  | (ARM_MMU_SECT_AP_0) \
-  | ((((attr) >> RTEMS_MM_REGION_BIT_WRITE) & 1U) ? 0U : (ARM_MMU_SECT_AP_2)) \
-  | ((((attr) >> RTEMS_MM_REGION_BIT_CACHE) & 1U) ? \
-  (ARM_MMU_SECT_TEX_0|ARM_MMU_SECT_C|ARM_MMU_SECT_B) : 0U) \
-  | ((((attr) >> RTEMS_MM_REGION_BIT_DEVICE) & 1U) ? ARM_MMU_SECT_B : 0U) \
-  | ((((attr) >> RTEMS_MM_REGION_BIT_SHARED) & 1U) ? ARM_MMU_SECT_S : 0U) \
-  | (ARM_MMU_SECT_DEFAULT))
-
 BSP_START_DATA_SECTION const arm_cp15_start_section_config
 _cpu_mmu_config_table[] = {
   {

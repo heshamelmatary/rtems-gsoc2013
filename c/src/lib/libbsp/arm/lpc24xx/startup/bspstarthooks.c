@@ -505,7 +505,7 @@ BSP_START_TEXT_SECTION void bsp_start_hook_1(void)
   lpc24xx_init_memory_map();
   lpc24xx_init_memory_accelerator();
   lpc24xx_init_emc_dynamic();
-  _CPU_Memory_management_Initialize();
+  bsp_memory_management_Initialize();
   lpc24xx_stop_gpdma();
   lpc24xx_stop_ethernet();
   lpc24xx_stop_usb();

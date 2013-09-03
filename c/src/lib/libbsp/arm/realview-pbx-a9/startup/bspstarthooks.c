@@ -27,6 +27,6 @@ BSP_START_TEXT_SECTION void bsp_start_hook_1(void)
 {
   arm_a9mpcore_start_hook_1();
   bsp_start_copy_sections();
-  _CPU_Memory_management_Initialize();
+  bsp_memory_management_Initialize();
   bsp_start_clear_bss();
 }

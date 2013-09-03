@@ -10,7 +10,7 @@
 #include <rtems.h>
 #include <libcpu/mm.h>
 
-void _CPU_Memory_management_Initialize( void ) { }
+void bsp_memory_management_Initialize( void ) { }
 
 void _CPU_Memory_management_Set_attributes( uintptr_t base, size_t size, uint32_t flags ) { }
 

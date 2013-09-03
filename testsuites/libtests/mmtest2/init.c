@@ -62,11 +62,10 @@ rtems_task Init(
   printf("Test 3: Write to write enabled block\n");
   *a1 = 0xCC;
 
-  a1 = (char*)0xffffffffU;
+  a1 = (char *)0xffffffffU;
   printf("Checking MMU exception 1: Read from Unmapped block\n");
   a = *a1++;
 
-  a1 = 0xffffffffU;
   printf("Checking MMU exception 2: Write to Unmapped block\n");
   *a1++ = 0xCC;
 

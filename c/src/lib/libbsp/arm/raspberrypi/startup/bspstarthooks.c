@@ -25,13 +25,11 @@
 #include <bspopts.h>
 #include <bsp/start.h>
 #include <bsp/raspberrypi.h>
-#include <bsp/mmu.h>
 #include <bsp/linker-symbols.h>
-#include <rtems/score/mm.h>
 
 void BSP_START_TEXT_SECTION bsp_start_hook_0(void)
 {
-  _CPU_Memory_management_Initialize();
+  bsp_memory_management_Initialize();
 }
 
 
