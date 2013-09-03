@@ -32,6 +32,39 @@ extern "C" {
 /**@{*/
 
 /**
+ * @brief atomic data initializer for static initialization.
+ */
+#define ATOMIC_INITIALIZER_UINT(value) CPU_ATOMIC_INITIALIZER_UINT(value)
+#define ATOMIC_INITIALIZER_PTR(value) CPU_ATOMIC_INITIALIZER_PTR(value)
+
+/**
+ * @brief Initializes an atomic flag object to the cleared state.
+ */
+#define ATOMIC_INITIALIZER_FLAG CPU_ATOMIC_INITIALIZER_FLAG
+
+/**
+ * @brief Initializes an atomic type value into a atomic object.
+ *
+ * @param object an atomic type pointer of object.
+ * @param value a value to be stored into object.
+ */
+static inline void _Atomic_Init_uint(
+  volatile Atomic_Uint *object,
+  uint_fast32_t value
+)
+{
+  _CPU_atomic_Init_uint(object, value);
+}
+
+static inline void _Atomic_Init_ptr(
+  volatile Atomic_Pointer *object,
+  uintptr_t value
+)
+{
+  _CPU_atomic_Init_ptr(object, value);
+}
+
+/**
  * @brief Atomically load an atomic type value from atomic object.
  *
  * @param object an atomic type pointer of object.
@@ -39,7 +72,7 @@ extern "C" {
  * 
  * The order shall not be ATOMIC_ORDER_RELEASE.
  */
-RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Load_uint(
+static inline uint_fast32_t _Atomic_Load_uint(
   volatile Atomic_Uint *object,
   Atomic_Order order
 )
@@ -47,7 +80,7 @@ RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Load_uint(
   return _CPU_atomic_Load_uint( object, order );
 }
 
-RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Load_ptr(
+static inline uintptr_t _Atomic_Load_ptr(
   volatile Atomic_Pointer *object,
   Atomic_Order order
 )
@@ -64,7 +97,7 @@ RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Load_ptr(
  * 
  * The order shall not be ATOMIC_ORDER_ACQUIRE.
  */
-RTEMS_INLINE_ROUTINE void _Atomic_Store_uint(
+static inline void _Atomic_Store_uint(
   volatile Atomic_Uint *object,
   uint_fast32_t value,
   Atomic_Order order
@@ -73,7 +106,7 @@ RTEMS_INLINE_ROUTINE void _Atomic_Store_uint(
   _CPU_atomic_Store_uint( object, value, order );
 }
 
-RTEMS_INLINE_ROUTINE void _Atomic_Store_ptr(
+static inline void _Atomic_Store_ptr(
   volatile Atomic_Pointer *object,
   uintptr_t value,
   Atomic_Order order
@@ -91,7 +124,7 @@ RTEMS_INLINE_ROUTINE void _Atomic_Store_ptr(
  * 
  * @retval a result value before add ops.
  */
-RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Fetch_add_uint(
+static inline uint_fast32_t _Atomic_Fetch_add_uint(
   volatile Atomic_Uint *object,
   uint_fast32_t value,
   Atomic_Order order
@@ -100,7 +133,7 @@ RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Fetch_add_uint(
   return _CPU_atomic_Fetch_add_uint( object, value, order );
 }
 
-RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Fetch_add_ptr(
+static inline uintptr_t _Atomic_Fetch_add_ptr(
   volatile Atomic_Pointer *object,
   uintptr_t value,
   Atomic_Order order
@@ -118,7 +151,7 @@ RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Fetch_add_ptr(
  * 
  * @retval a result value before sub ops.
  */
-RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Fetch_sub_uint(
+static inline uint_fast32_t _Atomic_Fetch_sub_uint(
   volatile Atomic_Uint *object,
   uint_fast32_t value,
   Atomic_Order order
@@ -127,7 +160,7 @@ RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Fetch_sub_uint(
   return _CPU_atomic_Fetch_sub_uint( object, value, order );
 }
 
-RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Fetch_sub_ptr(
+static inline uintptr_t _Atomic_Fetch_sub_ptr(
   volatile Atomic_Pointer *object,
   uintptr_t value,
   Atomic_Order order
@@ -145,7 +178,7 @@ RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Fetch_sub_ptr(
  * 
  * @retval a result value before or ops.
  */
-RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Fetch_or_uint(
+static inline uint_fast32_t _Atomic_Fetch_or_uint(
   volatile Atomic_Uint *object,
   uint_fast32_t value,
   Atomic_Order order
@@ -154,7 +187,7 @@ RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Fetch_or_uint(
   return _CPU_atomic_Fetch_or_uint( object, value, order );
 }
 
-RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Fetch_or_ptr(
+static inline uintptr_t _Atomic_Fetch_or_ptr(
   volatile Atomic_Pointer *object,
   uintptr_t value,
   Atomic_Order order
@@ -172,7 +205,7 @@ RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Fetch_or_ptr(
  * 
  * @retval a result value before and ops.
  */
-RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Fetch_and_uint(
+static inline uint_fast32_t _Atomic_Fetch_and_uint(
   volatile Atomic_Uint *object,
   uint_fast32_t value,
   Atomic_Order order
@@ -181,7 +214,7 @@ RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Fetch_and_uint(
   return _CPU_atomic_Fetch_and_uint( object, value, order );
 }
 
-RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Fetch_and_ptr(
+static inline uintptr_t _Atomic_Fetch_and_ptr(
   volatile Atomic_Pointer *object,
   uintptr_t value,
   Atomic_Order order
@@ -199,7 +232,7 @@ RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Fetch_and_ptr(
  * 
  * @retval a result value before exchange ops.
  */
-RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Exchange_uint(
+static inline uint_fast32_t _Atomic_Exchange_uint(
  volatile Atomic_Uint *object,
  uint_fast32_t value,
  Atomic_Order order
@@ -208,7 +241,7 @@ RTEMS_INLINE_ROUTINE uint_fast32_t _Atomic_Exchange_uint(
   return _CPU_atomic_Exchange_uint( object, value, order );
 }
 
-RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Exchange_ptr(
+static inline uintptr_t _Atomic_Exchange_ptr(
  volatile Atomic_Pointer *object,
  uintptr_t value,
  Atomic_Order order
@@ -231,7 +264,7 @@ RTEMS_INLINE_ROUTINE uintptr_t _Atomic_Exchange_ptr(
  * @retval true if the compare exchange successully.
  * @retval false if the compare exchange failed.
  */
-RTEMS_INLINE_ROUTINE bool _Atomic_Compare_exchange_uint(
+static inline bool _Atomic_Compare_exchange_uint(
   volatile Atomic_Uint *object,
   uint_fast32_t *old_value,
   uint_fast32_t new_value,
@@ -243,7 +276,7 @@ RTEMS_INLINE_ROUTINE bool _Atomic_Compare_exchange_uint(
     order_succ, order_fail );
 }
 
-RTEMS_INLINE_ROUTINE bool _Atomic_Compare_exchange_ptr(
+static inline bool _Atomic_Compare_exchange_ptr(
   volatile Atomic_Pointer *object,
   uintptr_t *old_value,
   uintptr_t new_value,
@@ -256,35 +289,35 @@ RTEMS_INLINE_ROUTINE bool _Atomic_Compare_exchange_ptr(
 }
 
 /**
- * @brief Atomically clear the value of an atomic flag type object.
+ * @brief Atomically clears an atomic flag.
  *
- * @param[in, out] object an atomic flag type pointer of object.
- * @param order a type of Atomic_Order. 
+ * @param[in, out] object Pointer to the atomic flag object.
+ * @param[in] order The atomic memory order.
  * 
  */
-RTEMS_INLINE_ROUTINE void _Atomic_Clear_flag(
- volatile Atomic_Flag *object,
- Atomic_Order order
+static inline void _Atomic_Flag_clear(
+  volatile Atomic_Flag *object,
+  Atomic_Order order
 )
 {
-  _CPU_atomic_Clear_flag( object, order );
+  _CPU_atomic_Flag_clear( object, order );
 }
 
 /**
- * @brief Atomically test and clear the value of an atomic flag type object.
+ * @brief Atomically tests and sets an atomic flag.
  *
- * @param[in, out] object an atomic flag type pointer of object.
- * @param order a type of Atomic_Order. 
+ * @param[in, out] object Pointer to the atomic flag object.
+ * @param[in] order The atomic memory order.
  * 
- * @retval true if the test and set successully.
- * @retval false if the test and set failed.
+ * @retval true The atomic flag was already set.
+ * @retval false Otherwise.
  */
-RTEMS_INLINE_ROUTINE bool _Atomic_Test_set_flag(
- volatile Atomic_Flag *object,
- Atomic_Order order
+static inline bool _Atomic_Flag_test_and_set(
+  volatile Atomic_Flag *object,
+  Atomic_Order order
 )
 {
-  return _CPU_atomic_Test_set_flag( object, order );
+  return _CPU_atomic_Flag_test_and_set( object, order );
 }
 
 #ifdef __cplusplus

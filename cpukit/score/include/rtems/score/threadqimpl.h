@@ -135,8 +135,11 @@ void _Thread_queue_Requeue(
  *
  *  @param[in] the_thread_queue is the pointer to the ThreadQ header
  *  @param[in] the_thread is the pointer to a thread control block that is to be removed
+ *
+ *  @retval true The extract operation was performed by the executing context.
+ *  @retval false Otherwise.
  */
-void _Thread_queue_Extract(
+bool _Thread_queue_Extract(
   Thread_queue_Control *the_thread_queue,
   Thread_Control       *the_thread
 );
@@ -258,9 +261,11 @@ Thread_blocking_operation_States _Thread_queue_Enqueue_priority (
  *         timeout or state
  *  - INTERRUPT LATENCY:
  *    + EXTRACT_PRIORITY
+ *
+ *  @retval true The extract operation was performed by the executing context.
+ *  @retval false Otherwise.
  */
-void _Thread_queue_Extract_priority_helper(
-  Thread_queue_Control *the_thread_queue,
+bool _Thread_queue_Extract_priority_helper(
   Thread_Control       *the_thread,
   bool                  requeuing
 );
@@ -271,8 +276,8 @@ void _Thread_queue_Extract_priority_helper(
  * This macro wraps the underlying call and hides the requeuing argument.
  */
 
-#define _Thread_queue_Extract_priority( _the_thread_queue, _the_thread ) \
-  _Thread_queue_Extract_priority_helper( _the_thread_queue, _the_thread, false )
+#define _Thread_queue_Extract_priority( _the_thread ) \
+  _Thread_queue_Extract_priority_helper( _the_thread, false )
 /**
  *  @brief Get highest priority thread on the_thread_queue.
  *
@@ -332,8 +337,7 @@ Thread_blocking_operation_States _Thread_queue_Enqueue_fifo (
  *  This routine removes the_thread from the_thread_queue
  *  and cancels any timeouts associated with this blocking.
  */
-void _Thread_queue_Extract_fifo(
-  Thread_queue_Control *the_thread_queue,
+bool _Thread_queue_Extract_fifo(
   Thread_Control       *the_thread
 );
 
