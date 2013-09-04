@@ -39,18 +39,6 @@ SMP_lock_Control mm_lock;
 #endif
 
 /**
- * @brief Calls bsp_memory_management_Initialize.
- */
-void _Memory_management_Initialize( void )
-{
-#ifdef RTEMS_SMP   
-  _SMP_lock_Initialize( &mm_lock );
-#endif 
-
-  bsp_memory_management_Initialize();
-}
-
-/**
  * @brief Calls _CPU_Memory_management_Set_attributes.
  */
 void _Memory_management_Set_attributes(

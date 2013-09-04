@@ -12,5 +12,10 @@
 
 void bsp_memory_management_Initialize( void ) { }
 
-void _CPU_Memory_management_Set_attributes( uintptr_t base, size_t size, uint32_t flags ) { }
-
+void _CPU_Memory_management_Set_attributes(
+  uintptr_t base,
+  size_t size,
+  uint32_t flags 
+  )
+  {
+  }

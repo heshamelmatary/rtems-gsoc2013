@@ -9,6 +9,8 @@
 #include <bsp/mm_config_table.h>
 #include <bsp/linker-symbols.h>
 
+void bsp_memory_management_Initialize(void);
+
 BSP_START_TEXT_SECTION void bsp_memory_management_Initialize(void)
 {
   uint32_t ctrl = arm_cp15_get_control();
