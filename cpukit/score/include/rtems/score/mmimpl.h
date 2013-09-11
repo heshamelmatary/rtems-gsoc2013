@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <rtems/score/mm.h>
-#include <libcpu/mm.h>
+#include <bsp/mm.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,11 +35,25 @@ extern "C" {
 /**@{**/
 
 #ifdef RTEMS_SMP
-SMP_lock_Control mm_lock;
+static SMP_lock_Control mm_lock;
 #endif
 
+static inline void libmm_smp_lock_obtain( void )
+{
+#ifdef RTEMS_SMP
+  _SMP_lock_Acquire( &mm_lock );
+#endif
+}
+
+static inline void libmm_smp_lock_release( void )
+{
+#ifdef RTEMS_SMP
+  _SMP_lock_Release ( &mm_lock );
+#endif
+}
+
 /**
- * @brief Calls _CPU_Memory_management_Set_attributes.
+ * @brief Calls bsp_memory_management_set_attributes.
  */
 void _Memory_management_Set_attributes(
   uintptr_t base,
@@ -47,15 +61,10 @@ void _Memory_management_Set_attributes(
   uint32_t attr
 )
 {
-#ifdef RTEMS_SMP   
-  _SMP_lock_Acquire( &mm_lock );
-#endif
+  libmm_smp_lock_obtain();
+  bsp_memory_management_set_attributes(base, size, attr);
+  libmm_smp_lock_release();
 
-  _CPU_Memory_management_Set_attributes(base, size, attr);
-
-#ifdef RTEMS_SMP    
-  _SMP_lock_Release( &mm_lock );
-#endif
 }
 
 /** @}*/

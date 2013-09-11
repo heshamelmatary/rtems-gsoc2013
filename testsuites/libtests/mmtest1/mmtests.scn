@@ -1,9 +1,7 @@
 *** Start of mmtest1 ***
 
-Region 1 successfully allocated from Work Space at address 0x106e20 
-Region 2 successfully allocated from Work Space at address 0x107e28 
-Test 1: Set Region1 as read only
-Test 2 : Set Region2 as write enabled
+Test 1 : Set Region1 as write enabled
+Test 2: Set Region2 as read only
 
 
 *** End of mmtest1 ***

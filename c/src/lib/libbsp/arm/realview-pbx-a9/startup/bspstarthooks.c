@@ -16,7 +16,7 @@
 #include <bsp/start.h>
 #include <bsp/arm-a9mpcore-start.h>
 #include <bsp/linker-symbols.h>
-#include <rtems/score/mm.h>
+#include <bsp/mm.h>
 
 BSP_START_TEXT_SECTION void bsp_start_hook_0(void)
 {
@@ -27,6 +27,6 @@ BSP_START_TEXT_SECTION void bsp_start_hook_1(void)
 {
   arm_a9mpcore_start_hook_1();
   bsp_start_copy_sections();
-  bsp_memory_management_Initialize();
+  bsp_memory_management_initialize();
   bsp_start_clear_bss();
 }

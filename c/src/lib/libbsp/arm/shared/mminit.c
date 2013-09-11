@@ -5,13 +5,15 @@
  * found in the file LICENSE in this distribution or at
  * http://www.rtems.com/license/LICENSE.
  */
-
-#include <bsp/mm_config_table.h>
+#include <bsp/arm-cp15-start.h>
 #include <bsp/linker-symbols.h>
+#include <bsp/mm.h>
+#include <bsp/start.h>
 
-void bsp_memory_management_Initialize(void);
+extern const mm_init_start_config bsp_mm_config_table[];
+extern const size_t bsp_mm_config_table_size;
 
-BSP_START_TEXT_SECTION void bsp_memory_management_Initialize(void)
+BSP_START_TEXT_SECTION void bsp_memory_management_initialize(void)
 {
   uint32_t ctrl = arm_cp15_get_control();
 
@@ -19,7 +21,7 @@ BSP_START_TEXT_SECTION void bsp_memory_management_Initialize(void)
   ctrl,
   (uint32_t *) bsp_translation_table_base,
   ARM_MMU_DEFAULT_CLIENT_DOMAIN,
-  &_cpu_mmu_config_table[0],
-  RTEMS_ARRAY_SIZE(&_cpu_mmu_config_table)
+  &bsp_mm_config_table[0],
+  bsp_mm_config_table_size
   );
 }

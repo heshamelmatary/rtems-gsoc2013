@@ -27,6 +27,7 @@ nodist_include_HEADERS = ../../shared/include/coverhd.h \
 nodist_include_bsp_HEADERS = ../../shared/include/bootcard.h
 
 include_bsp_HEADERS =
+include_bsp_HEADERS += ../../../libbsp/shared/include/mm.h
 include_bsp_HEADERS += ../../shared/include/utility.h
 include_bsp_HEADERS += ../../shared/include/irq-generic.h
 include_bsp_HEADERS += ../../shared/include/irq-info.h
@@ -44,10 +45,8 @@ include_bsp_HEADERS += ../shared/include/arm-gic-tm27.h
 include_bsp_HEADERS += include/irq.h
 include_bsp_HEADERS += include/zynq-uart.h
 include_bsp_HEADERS += include/zynq-uart-regs.h
-include_bsp_HEADERS += startup/mm_config_table.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
-include_libcpu_HEADERS += ../../../libcpu/shared/include/mm.h
 
 ###############################################################################
 #                  Data                                                       #
@@ -129,6 +128,7 @@ libbsp_a_SOURCES += include/cache_.h
 libbsp_a_CPPFLAGS += -I$(srcdir)/include
 
 # LIBMM
+libbsp_a_SOURCES += startup/mm_config_table.c
 libbsp_a_SOURCES += ../shared/mm.c
 libbsp_a_SOURCES += ../shared/mminit.c
 

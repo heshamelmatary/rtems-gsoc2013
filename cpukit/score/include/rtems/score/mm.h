@@ -45,8 +45,6 @@ extern "C" {
 #define RTEMS_MM_REGION_DEVICE  (1U << RTEMS_MM_REGION_BIT_DEVICE)
 #define RTEMS_MM_REGION_SHARED  (1U << RTEMS_MM_REGION_BIT_SHARED)
 
-void _Memory_management_Initialize( void );
-
 void _Memory_management_Set_attributes(
   uintptr_t base,
   size_t size,

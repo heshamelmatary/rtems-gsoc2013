@@ -17,24 +17,20 @@
 #include "system.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <rtems/score/mm.h>
+#include <rtems/score/mmimpl.h>
 
 #define BLOCK_SIZE  1024 * 1024 /* 1MB */
 #define BLOCK_COUNT 3
 
 char memory_pool [BLOCK_SIZE * BLOCK_COUNT];
-char *a1;
-char *a2;
-char a;
-size_t size = BLOCK_SIZE;
-
-char *region1 = &memory_pool;
-char *region2 = (((char *) &memory_pool) + (BLOCK_SIZE));
-
 rtems_task Init(
   rtems_task_argument ignored
 )
 {
+  size_t size = BLOCK_SIZE;
+  char *region1 = &memory_pool;
+  char *region2 = (((char *) &memory_pool) + (BLOCK_SIZE));
+
   puts( "\n\n*** Start of mmtest1 ***\n" );
 
   printf("Test 1 : Set Region1 as write enabled\n");

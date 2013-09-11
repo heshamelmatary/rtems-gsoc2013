@@ -26,7 +26,7 @@ uint32_t translation_table[] =
 
 SPR_RW(SDR1);
 
-void bsp_memory_management_Initialize(void)
+void bsp_memory_management_initialize(void)
 {
   uintptr_t pt_base, pt_end;
   uint32_t cache_line_size;
@@ -142,7 +142,7 @@ static void translate_attributes(uint32_t high_level_attr, uint32_t *PPC_CPU_ATT
     *PPC_CPU_ATTR |= _PPC_MMU_ACCESS_SUPERVISOR_ONLY; 
 }
 
-void _CPU_Memory_management_Set_attributes(
+void bsp_memory_management_set_attributes(
     uintptr_t base,
     size_t size,
     uint32_t attr

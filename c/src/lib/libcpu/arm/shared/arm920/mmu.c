@@ -245,7 +245,7 @@ void arm_Region_Change_Attr(
 }
 
 /* Initialize first page table level with no protected entries */
-void bsp_memory_management_Initialize( void )
+void bsp_memory_management_initialize( void )
 {
   uintptr_t *lvl1_base;
   uintptr_t paddr;
@@ -286,7 +286,7 @@ void bsp_memory_management_Initialize( void )
 /** 
  * Set attributes for a block.
  */
-void _CPU_Memory_management_Set_attributes(
+void bsp_memory_management_set_attributes(
   uintptr_t base,
   size_t size,
   uint32_t attr

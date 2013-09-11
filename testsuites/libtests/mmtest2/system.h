@@ -27,15 +27,13 @@ static void fatal_extension(
 #define CONFIGURE_APPLICATION_NEEDS_CLOCK_DRIVER
 #define CONFIGURE_APPLICATION_NEEDS_CONSOLE_DRIVER
 
-#define CONFIGURE_MAXIMUM_TASKS            9
+#define CONFIGURE_MAXIMUM_TASKS 1 
 
 #define CONFIGURE_RTEMS_INIT_TASKS_TABLE
 
 #define CONFIGURE_USE_DEVFS_AS_BASE_FILESYSTEM
 
 #define CONFIGURE_INITIAL_EXTENSIONS { .fatal = fatal_extension }
-
-#define CONFIGURE_MEMORY_OVERHEAD 1024 * 5 
 
 #include <rtems/confdefs.h>
 /* end of include file */
