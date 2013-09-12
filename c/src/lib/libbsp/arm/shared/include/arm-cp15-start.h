@@ -104,7 +104,7 @@ arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(
   arm_cp15_set_control(ctrl);
 }
 
-BSP_START_TEXT_SECTION inline uint32_t
+BSP_START_TEXT_SECTION static inline uint32_t
 arm_cp15_start_setup_mmu_and_cache(uint32_t ctrl_clear, uint32_t ctrl_set)
 {
   uint32_t ctrl = arm_cp15_get_control();
