@@ -14,7 +14,7 @@
 #endif
 #include <rtems.h>
 #include <stdlib.h>
-#include <rtems/score/mm.h>
+#include <rtems/score/mmimpl.h>
 
 //#include <rtems/posix/mmap-internal.h>
 #include <unistd.h>

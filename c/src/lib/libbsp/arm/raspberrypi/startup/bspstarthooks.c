@@ -25,7 +25,7 @@
 #include <bspopts.h>
 #include <bsp/start.h>
 #include <bsp/raspberrypi.h>
-#include <bsp/linker-symbols.h>
+#include <bsp/mm.h>
 
 void BSP_START_TEXT_SECTION bsp_start_hook_0(void)
 {

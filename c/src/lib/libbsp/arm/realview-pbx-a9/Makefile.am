@@ -37,6 +37,7 @@ include_bsp_HEADERS += ../shared/include/start.h
 include_bsp_HEADERS += ../shared/include/arm-a9mpcore-irq.h
 include_bsp_HEADERS += ../shared/include/arm-a9mpcore-regs.h
 include_bsp_HEADERS += ../shared/include/arm-a9mpcore-start.h
+include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
 include_bsp_HEADERS += ../shared/include/arm-gic.h
 include_bsp_HEADERS += ../shared/include/arm-gic-irq.h
 include_bsp_HEADERS += ../shared/include/arm-gic-regs.h
@@ -48,7 +49,6 @@ include_bsp_HEADERS += ../shared/include/arm-pl050-regs.h
 include_bsp_HEADERS += ../shared/include/arm-pl111-fb.h
 include_bsp_HEADERS += ../shared/include/arm-pl111-regs.h
 include_bsp_HEADERS += include/irq.h
-include_bsp_HEADERS += ../shared/include/arm-cp15-start.h
 
 include_libcpu_HEADERS = ../../../libcpu/arm/shared/include/arm-cp15.h
 

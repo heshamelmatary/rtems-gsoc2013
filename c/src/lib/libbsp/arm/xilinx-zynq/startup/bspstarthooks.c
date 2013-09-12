@@ -15,7 +15,7 @@
 #include <bsp.h>
 #include <bsp/start.h>
 #include <bsp/arm-a9mpcore-start.h>
-#include <bsp/linker-symbols.h>
+#include <bsp/mm.h>
 
 #ifdef RTEMS_SMP
   #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_SHAREABLE
