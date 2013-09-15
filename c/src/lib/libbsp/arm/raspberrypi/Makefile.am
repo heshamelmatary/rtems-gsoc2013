@@ -132,7 +132,6 @@ libbsp_a_SOURCES += startup/bspstarthooks.c
 
 # LIBMM
 libbsp_a_SOURCES += startup/mm_config_table.c
-libbsp_a_SOURCES += ../shared/mm.c
 libbsp_a_SOURCES += ../shared/mminit.c
 
 ###############################################################################

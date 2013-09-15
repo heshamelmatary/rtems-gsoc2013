@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2013 Hesham AL-Matary.
  * Copyright (c) 2013 Gedare Bloom.
  *
  * The license and distribution terms for this file may be
