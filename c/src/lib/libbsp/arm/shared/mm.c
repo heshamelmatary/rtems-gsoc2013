@@ -22,7 +22,7 @@
 #define ARM_MMU_BIND_SECTION_TO_CLIENT_DOMAIN \
   (ARM_MMU_DEFAULT_CLIENT_DOMAIN << ARM_MMU_SECT_DOMAIN_SHIFT)
 
-#define LIBMM_TRANSLATE_ATTRIBUTES_TO_CPU(attr) \
+#define TRANSLATE_ATTRIBUTES_TO_CPU(attr) \
   ((ARM_MMU_BIND_SECTION_TO_CLIENT_DOMAIN) \
   | (ARM_MMU_SECT_AP_0) \
   | (LIBMM_REGION_IS_PROTECTION_WRITE_ENABLED(attr) ? \
@@ -39,8 +39,8 @@ void bsp_memory_management_set_attributes(
   uint32_t attr
 )
 {
-  uintptr_t end = (uint32_t)base + (uint32_t)size;
-  uint32_t section_flags = LIBMM_TRANSLATE_ATTRIBUTES_TO_CPU(attr);
+  uintptr_t end = base + size;
+  uint32_t section_flags = TRANSLATE_ATTRIBUTES_TO_CPU(attr);
 
   arm_cp15_set_translation_table_entries(base, end, section_flags);
 }

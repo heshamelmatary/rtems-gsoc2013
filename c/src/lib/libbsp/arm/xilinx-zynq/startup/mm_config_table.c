@@ -12,7 +12,6 @@
  * http://www.rtems.com/license/LICENSE.
  */
 
-#include <bsp/mm.h>
 #include <libcpu/arm-cp15.h>
 #include <bsp/start.h>
 
@@ -22,7 +21,7 @@
   #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_CACHED
 #endif
 
-BSP_START_DATA_SECTION const mm_init_start_config
+BSP_START_DATA_SECTION const arm_cp15_start_section_config
 bsp_mm_config_table[] = {
   {
     .begin = (uint32_t) bsp_section_fast_text_begin,

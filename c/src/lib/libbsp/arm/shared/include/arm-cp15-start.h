@@ -17,7 +17,6 @@
 #define LIBBSP_ARM_SHARED_ARM_CP15_START_H
 
 #include <libcpu/arm-cp15.h>
-
 #include <bsp/start.h>
 
 #ifdef __cplusplus
@@ -88,7 +87,7 @@ arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(
   arm_cp15_set_domain_access_control(dac);
   arm_cp15_set_translation_table_base(ttb);
 
-  /* Initialize translation table with invalid entries */
+  /* Initialize translation table with fixed-map read-write entries */
   for (i = 0; i < ARM_MMU_TRANSLATION_TABLE_ENTRY_COUNT; ++i) {
     ttb [i] = (i << ARM_MMU_SECT_BASE_SHIFT) | ARMV7_MMU_DATA_READ_WRITE;
   }
@@ -104,7 +103,7 @@ arm_cp15_start_setup_translation_table_and_enable_mmu_and_cache(
   arm_cp15_set_control(ctrl);
 }
 
-BSP_START_TEXT_SECTION inline uint32_t
+BSP_START_TEXT_SECTION static inline uint32_t
 arm_cp15_start_setup_mmu_and_cache(uint32_t ctrl_clear, uint32_t ctrl_set)
 {
   uint32_t ctrl = arm_cp15_get_control();

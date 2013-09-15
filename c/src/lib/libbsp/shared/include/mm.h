@@ -16,12 +16,6 @@
 extern "C" {
 #endif
 
-typedef struct {
-  uint32_t begin;
-  uint32_t end;
-  uint32_t flags;
-} mm_init_start_config;
-
 void bsp_memory_management_initialize(void);
 
 void bsp_memory_management_set_attributes(
