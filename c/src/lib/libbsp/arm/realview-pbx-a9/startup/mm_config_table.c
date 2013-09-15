@@ -12,8 +12,8 @@
  * http://www.rtems.com/license/LICENSE.
  */
 
-#include <libcpu/arm-cp15.h>
 #include <bsp/start.h>
+#include <bsp/arm-cp15-start.h>
 
 #ifdef RTEMS_SMP
   #define MMU_DATA_READ_WRITE ARMV7_MMU_DATA_READ_WRITE_SHAREABLE
