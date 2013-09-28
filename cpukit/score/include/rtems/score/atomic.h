@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @brief atomic data initializer for static initialization.
  */
-#define ATOMIC_INITIALIZER_UINT(value) CPU_ATOMIC_INITIALIZER_UINT(value)
+#define ATOMIC_INITIALIZER_ULONG(value) CPU_ATOMIC_INITIALIZER_ULONG(value)
 #define ATOMIC_INITIALIZER_PTR(value) CPU_ATOMIC_INITIALIZER_PTR(value)
 
 /**
@@ -46,22 +46,22 @@ extern "C" {
  * @brief Initializes an atomic type value into a atomic object.
  *
  * @param object an atomic type pointer of object.
- * @param value a value to be stored into object.
+ * @param pointer a pointer to be stored into object.
  */
-static inline void _Atomic_Init_uint(
-  volatile Atomic_Uint *object,
-  uint_fast32_t value
+static inline void _Atomic_Init_ulong(
+  volatile Atomic_Ulong *object,
+  unsigned long value
 )
 {
-  _CPU_atomic_Init_uint(object, value);
+  _CPU_atomic_Init_ulong(object, value);
 }
 
 static inline void _Atomic_Init_ptr(
   volatile Atomic_Pointer *object,
-  uintptr_t value
+  void *pointer
 )
 {
-  _CPU_atomic_Init_ptr(object, value);
+  _CPU_atomic_Init_ptr(object, pointer);
 }
 
 /**
@@ -72,15 +72,15 @@ static inline void _Atomic_Init_ptr(
  * 
  * The order shall not be ATOMIC_ORDER_RELEASE.
  */
-static inline uint_fast32_t _Atomic_Load_uint(
-  volatile Atomic_Uint *object,
+static inline unsigned long _Atomic_Load_ulong(
+  volatile Atomic_Ulong *object,
   Atomic_Order order
 )
 {
-  return _CPU_atomic_Load_uint( object, order );
+  return _CPU_atomic_Load_ulong( object, order );
 }
 
-static inline uintptr_t _Atomic_Load_ptr(
+static inline void *_Atomic_Load_ptr(
   volatile Atomic_Pointer *object,
   Atomic_Order order
 )
@@ -97,22 +97,22 @@ static inline uintptr_t _Atomic_Load_ptr(
  * 
  * The order shall not be ATOMIC_ORDER_ACQUIRE.
  */
-static inline void _Atomic_Store_uint(
-  volatile Atomic_Uint *object,
-  uint_fast32_t value,
+static inline void _Atomic_Store_ulong(
+  volatile Atomic_Ulong *object,
+  unsigned long value,
   Atomic_Order order
 )
 {
-  _CPU_atomic_Store_uint( object, value, order );
+  _CPU_atomic_Store_ulong( object, value, order );
 }
 
 static inline void _Atomic_Store_ptr(
   volatile Atomic_Pointer *object,
-  uintptr_t value,
+  void *pointer,
   Atomic_Order order
 )
 {
-  _CPU_atomic_Store_ptr( object, value, order );
+  _CPU_atomic_Store_ptr( object, pointer, order );
 }
 
 /**
@@ -124,13 +124,13 @@ static inline void _Atomic_Store_ptr(
  * 
  * @retval a result value before add ops.
  */
-static inline uint_fast32_t _Atomic_Fetch_add_uint(
-  volatile Atomic_Uint *object,
-  uint_fast32_t value,
+static inline unsigned long _Atomic_Fetch_add_ulong(
+  volatile Atomic_Ulong *object,
+  unsigned long value,
   Atomic_Order order
 )
 {
-  return _CPU_atomic_Fetch_add_uint( object, value, order );
+  return _CPU_atomic_Fetch_add_ulong( object, value, order );
 }
 
 static inline uintptr_t _Atomic_Fetch_add_ptr(
@@ -151,13 +151,13 @@ static inline uintptr_t _Atomic_Fetch_add_ptr(
  * 
  * @retval a result value before sub ops.
  */
-static inline uint_fast32_t _Atomic_Fetch_sub_uint(
-  volatile Atomic_Uint *object,
-  uint_fast32_t value,
+static inline unsigned long _Atomic_Fetch_sub_ulong(
+  volatile Atomic_Ulong *object,
+  unsigned long value,
   Atomic_Order order
 )
 {
-  return _CPU_atomic_Fetch_sub_uint( object, value, order );
+  return _CPU_atomic_Fetch_sub_ulong( object, value, order );
 }
 
 static inline uintptr_t _Atomic_Fetch_sub_ptr(
@@ -178,13 +178,13 @@ static inline uintptr_t _Atomic_Fetch_sub_ptr(
  * 
  * @retval a result value before or ops.
  */
-static inline uint_fast32_t _Atomic_Fetch_or_uint(
-  volatile Atomic_Uint *object,
-  uint_fast32_t value,
+static inline unsigned long _Atomic_Fetch_or_ulong(
+  volatile Atomic_Ulong *object,
+  unsigned long value,
   Atomic_Order order
 )
 {
-  return _CPU_atomic_Fetch_or_uint( object, value, order );
+  return _CPU_atomic_Fetch_or_ulong( object, value, order );
 }
 
 static inline uintptr_t _Atomic_Fetch_or_ptr(
@@ -205,13 +205,13 @@ static inline uintptr_t _Atomic_Fetch_or_ptr(
  * 
  * @retval a result value before and ops.
  */
-static inline uint_fast32_t _Atomic_Fetch_and_uint(
-  volatile Atomic_Uint *object,
-  uint_fast32_t value,
+static inline unsigned long _Atomic_Fetch_and_ulong(
+  volatile Atomic_Ulong *object,
+  unsigned long value,
   Atomic_Order order
 )
 {
-  return _CPU_atomic_Fetch_and_uint( object, value, order );
+  return _CPU_atomic_Fetch_and_ulong( object, value, order );
 }
 
 static inline uintptr_t _Atomic_Fetch_and_ptr(
@@ -232,22 +232,22 @@ static inline uintptr_t _Atomic_Fetch_and_ptr(
  * 
  * @retval a result value before exchange ops.
  */
-static inline uint_fast32_t _Atomic_Exchange_uint(
- volatile Atomic_Uint *object,
- uint_fast32_t value,
+static inline unsigned long _Atomic_Exchange_ulong(
+ volatile Atomic_Ulong *object,
+ unsigned long value,
  Atomic_Order order
 )
 {
-  return _CPU_atomic_Exchange_uint( object, value, order );
+  return _CPU_atomic_Exchange_ulong( object, value, order );
 }
 
-static inline uintptr_t _Atomic_Exchange_ptr(
+static inline void *_Atomic_Exchange_ptr(
  volatile Atomic_Pointer *object,
- uintptr_t value,
+ void *pointer,
  Atomic_Order order
 )
 {
-  return _CPU_atomic_Exchange_ptr( object, value, order );
+  return _CPU_atomic_Exchange_ptr( object, pointer, order );
 }
 
 /**
@@ -264,27 +264,27 @@ static inline uintptr_t _Atomic_Exchange_ptr(
  * @retval true if the compare exchange successully.
  * @retval false if the compare exchange failed.
  */
-static inline bool _Atomic_Compare_exchange_uint(
-  volatile Atomic_Uint *object,
-  uint_fast32_t *old_value,
-  uint_fast32_t new_value,
+static inline bool _Atomic_Compare_exchange_ulong(
+  volatile Atomic_Ulong *object,
+  unsigned long *old_value,
+  unsigned long new_value,
   Atomic_Order order_succ,
   Atomic_Order order_fail
 )
 {
-  return _CPU_atomic_Compare_exchange_uint( object, old_value, new_value,
+  return _CPU_atomic_Compare_exchange_ulong( object, old_value, new_value,
     order_succ, order_fail );
 }
 
 static inline bool _Atomic_Compare_exchange_ptr(
   volatile Atomic_Pointer *object,
-  uintptr_t *old_value,
-  uintptr_t new_value,
+  void **old_pointer,
+  void *new_pointer,
   Atomic_Order order_succ,
   Atomic_Order order_fail
 )
 {
-  return _CPU_atomic_Compare_exchange_ptr( object, old_value, new_value,
+  return _CPU_atomic_Compare_exchange_ptr( object, old_pointer, new_pointer,
     order_succ, order_fail );
 }
 

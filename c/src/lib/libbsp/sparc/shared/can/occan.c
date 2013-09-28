@@ -747,7 +747,7 @@ static void occan_stat_print(occan_stats *stats){
 static int occan_calc_speedregs(unsigned int clock_hz, unsigned int rate, occan_speed_regs *result){
 	int best_error = 1000000000;
 	int error;
-	int best_tseg=0, best_brp=0, best_rate=0, brp=0;
+	int best_tseg=0, best_brp=0, brp=0;
 	int tseg=0, tseg1=0, tseg2=0;
 	int sjw = 0;
 	int clock = clock_hz / 2;
@@ -791,7 +791,6 @@ static int occan_calc_speedregs(unsigned int clock_hz, unsigned int rate, occan_
 			best_error = error;
 			best_tseg = tseg/2;
 			best_brp = brp-1;
-			best_rate = clock/(brp*(1+tseg/2));
 		}
 	}
 
@@ -1806,6 +1805,8 @@ static void occan_interrupt_handler(rtems_vector_number v){
 #define OCCAN_DRIVER_TABLE_ENTRY { occan_initialize, occan_open, occan_close, occan_read, occan_write, occan_ioctl }
 
 static rtems_driver_address_table occan_driver = OCCAN_DRIVER_TABLE_ENTRY;
+
+int OCCAN_PREFIX(_register)(struct ambapp_bus *bus);
 
 int OCCAN_PREFIX(_register)(struct ambapp_bus *bus){
 	rtems_status_code r;

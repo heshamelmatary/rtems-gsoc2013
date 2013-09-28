@@ -20,6 +20,7 @@ project_lib_DATA += start.$(OBJEXT)
 project_lib_DATA += startup/linkcmds
 
 EXTRA_DIST = startup/linkcmds.stm32f4
+EXTRA_DIST += startup/linkcmds.stm32f105rc
 
 ###############################################################################
 #                  Header                                                     #
@@ -47,6 +48,11 @@ include_bsp_HEADERS += ../shared/armv7m/include/armv7m-irq.h
 include_bsp_HEADERS += include/irq.h
 include_bsp_HEADERS += include/usart.h
 include_bsp_HEADERS += include/stm32f4.h
+include_bsp_HEADERS += include/stm32f10xxx_gpio.h
+include_bsp_HEADERS += include/stm32f10xxx_rcc.h
+include_bsp_HEADERS += include/stm32f4xxxx_gpio.h
+include_bsp_HEADERS += include/stm32f4xxxx_rcc.h
+include_bsp_HEADERS += include/stm32_usart.h
 include_bsp_HEADERS += include/io.h
 include_bsp_HEADERS += include/rcc.h
 

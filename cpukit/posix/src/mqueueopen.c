@@ -55,8 +55,15 @@ mqd_t mq_open(
   /* struct mq_attr  attr */
 )
 {
+  /*
+   * mode is set but never used. GCC gives a warning for this
+   * and we need to tell GCC not to complain. But we have to
+   * have it because we have to work through the variable
+   * arguments to get to attr.
+   */
+  mode_t                          mode RTEMS_COMPILER_UNUSED_ATTRIBUTE;
+
   va_list                         arg;
-  mode_t                          mode;
   struct mq_attr                 *attr = NULL;
   int                             status;
   Objects_Id                      the_mq_id;
